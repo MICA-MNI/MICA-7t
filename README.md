@@ -21,15 +21,3 @@ mica-pipe -sub pilot3 -ses pilot -bids /data_/mica3/MICA-7T/rawdata \
     -out /data_/mica3/MICA-7T/derivatives \
     -proc_structural -proc_freesurfer -mica -threads 25
 ```
-
-## keep track of your repositories!
-
-- `git status` shows which files have changes.   
-
-- `git add` these files  
-
-- `git commit -m` to comment what changes  
-
-- `git push` to push your changes from your local computer to the remote (cloud)  
-
-- On the other computer you `git pull` to add the remote changes on your local repository.
