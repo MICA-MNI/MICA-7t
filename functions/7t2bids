@@ -77,18 +77,28 @@ do
 done
 
 # argument check out & WARNINGS
-arg=($SUBJ_DIR $Subj $BIDS_DIR $SES)
-if [ "${#arg[@]}" -lt 4 ]; then help
+arg=($SUBJ_DIR $Subj $BIDS_DIR)
+if [ "${#arg[@]}" -lt 3 ]; then help
 Error "One or more mandatory arguments are missing:
          -id    $Subj
-         -ses   $SES
          -in    $SUBJ_DIR
          -bids  $BIDS_DIR"
 exit 0; fi
 
+# Add the real path to the directories
+SUBJ_DIR=$(realpath "$SUBJ_DIR")
+BIDS_DIR=$(realpath "$BIDS_DIR")
+
 # Sequence names and variables (ses is for default "ses-pre")
-SES="ses-${SES/ses-/}"
-id="sub-${Subj}_${SES}_"
+if [ -z ${SES} ]; then
+  id="sub-${Subj}_"
+  SES="SINGLE"
+  BIDS="${BIDS_DIR}/sub-${Subj}"
+else
+  SES="ses-${SES/ses-/}";
+  id="sub-${Subj}_${SES}_"
+  BIDS="${BIDS_DIR}/sub-${Subj}/${SES}"
+fi
 
 echo -e "\n\033[38;5;141m
 -------------------------------------------------------------
@@ -98,9 +108,6 @@ echo -e "\n\033[38;5;141m
 # argument check out & WARNINGS
 if [ "${#arg[@]}" -eq 0 ]; then help; exit 0; fi
 if [[ -z $(which dcm2niix) ]]; then Error "dcm2niix NOT found"; exit 0; else Info "dcm2niix was found and is ready to work."; fi
-
-SUBJ_DIR=$(realpath "$SUBJ_DIR")
-BIDS_DIR=$(realpath "$BIDS_DIR")
 
 # Check mandatory inputs: -id
 arg=("$Subj")
@@ -117,29 +124,35 @@ if [ ! -d "${SUBJ_DIR}" ]; then Error "Subject DICOMS directory doesn't exist: \
 fi
 
 # overwrite BIDS-SUBJECT
-if [[ "${force}" == TRUE ]]; then rm -rf "${BIDS_DIR}/sub-${Subj}/${SES}"; fi
-# if [ -d ${BIDS_DIR}/sub-${Subj}/${SES} ]; then Error "Output directory already exist, use -force to overwrite it. \n\t     ${BIDS_DIR}/sub-${Subj}/${SES}\t    "; exit 0; fi
+if [[ "${force}" == TRUE ]]; then rm -rf "${BIDS}"; fi
+# if [ -d ${BIDS} ]; then Error "Output directory already exist, use -force to overwrite it. \n\t    ${BIDS}\t    "; exit 0; fi
 
 # Save actual path
 here=$(pwd)
 
 # -----------------------------------------------------------------------------------------------
 # CHANGE THIS regex (regular expressions) ACCORDING TO YOUR DICOMS NAMING
-#orig=("*mprage_sag_*_0.8mm" "*t2space_0.5iso_tra"  "*0.5mm_INV1"  "*0.5mm_INV2"  "*0.5mm_UNI_Images"  "*0.5mm_T1_Images"  "*0.4mm_INV1"  "*0.4mm_INV2"  "*0.4mm_UNI_Images"  "*0.4mm_T1_Images"  "*mbep2d_3e_bold"  "*mbep2d_se"  "*mbep2d_se_PA" "*me_gre_0.5mm_pat6_lessPF" "*me_gre_0.5mm_pat6" "*T2Star_Images" "*mbep2d_3e_bold_1.8mm" "*mbep2d_3e_bold_1.8mm_PA" "*mbep2d_se_1.8mm" "*mbep2d_se_1.8mm_PA")
-origDWI=("*diff_b2000-AP"  "*diff_b700-AP"  "*diff_b300-AP"  "*diff_b2000-PA"  "*diff_b700-PA"  "*diff_b300-PA"  "*b2000-AP_SBRef"  "*b2000-PA_SBRef"  "*b700-AP_SBRef"  "*b700-PA_SBRef"  "*b300-AP_SBRef"  "*b300-PA_SBRef"  "*diff_AP_b2000_90"  "*diff_multi-AP_advB0"  "*diff_multi-AP_stdB0"  "*diff_multi-AP_FS" "*diff_multi-AP_advB0_SBRef" "*diff_multi-AP_stdB0_SBRef" "*diff_multi-AP_FS_SBRef" "*diff_multi-AP_advB0_TRACEW" "*multi-PA_advB0_SBRef" "*diff_multi-PA_advB0")
-
-# pilot4
-orig=("*b1map_tra_p2" "*b1map_tra_p2" "*mp2rage_0.5iso_sag_FA4_INV1" "*mp2rage_0.5iso_sag_FA4_INV2" "*mp2rage_0.5iso_sag_FA4_T1_Images" "*mp2rage_0.5iso_sag_FA4_UNI_Images" "*mprage_0.75iso_sag_FA4" "*gre_0.5iso_sag_FA4" "*mp2rage_0.5iso_sag_TI1000-3200_INV1" "*mp2rage_0.5iso_sag_TI1000-3200_INV2" "*mp2rage_0.5iso_sag_TI1000-3200_T1_Images" "*mp2rage_0.5iso_sag_TI1000-3200_UNI_Images" "*gre_FA13_0.5iso" "*mbep2d_3e_PL5500" "*mbep2d_se_PL5500" "*mbep2d_diff_multi-AP_advB0_PS_SBRef" "*mbep2d_diff_multi-AP_advB0_PS" "*mbep2d_diff_multi-AP_advB0_VS_SBRef" "*mbep2d_diff_multi-AP_advB0_VS" "*mbep2d_single_PL5500" "*mbep2d_single_PL5500" "*mprage_0.75iso_sag_FA7_TI1100")
-bids=(aqc-b1map_tra_p2 b1map_tra_p2 mp2rage_0.5iso_sag_FA4_INV1 mp2rage_0.5iso_sag_FA4_INV2 mp2rage_0.5iso_sag_FA4_T1_Images mp2rage_0.5iso_sag_FA4_UNI_Images mprage_0.75iso_sag_FA4 gre_0.5iso_sag_FA4 mp2rage_0.5iso_sag_TI1000-3200_INV1 mp2rage_0.5iso_sag_TI1000-3200_INV2 mp2rage_0.5iso_sag_TI1000-3200_T1_Images mp2rage_0.5iso_sag_TI1000-3200_UNI_Images gre_FA13_0.5iso mbep2d_3e_PL5500 mbep2d_se_PL5500 mbep2d_diff_multi-AP_advB0_PS_SBRef mbep2d_diff_multi-AP_advB0_PS mbep2d_diff_multi-AP_advB0_VS_SBRef mbep2d_diff_multi-AP_advB0_VS mbep2d_single_PL5500 mbep2d_single_PL5500 mprage_0.75iso_sag_FA7_TI1100)
+# orig=("*mprage_sag_*_0.8mm" "*t2space_0.5iso_tra"  "*0.5mm_INV1"  "*0.5mm_INV2"  "*0.5mm_UNI_Images"  "*0.5mm_T1_Images"  "*0.4mm_INV1"  "*0.4mm_INV2"  "*0.4mm_UNI_Images"  "*0.4mm_T1_Images"  "*mbep2d_3e_bold"  "*mbep2d_se"  "*mbep2d_se_PA" "*me_gre_0.5mm_pat6_lessPF" "*me_gre_0.5mm_pat6" "*T2Star_Images" "*mbep2d_3e_bold_1.8mm" "*mbep2d_3e_bold_1.8mm_PA" "*mbep2d_se_1.8mm" "*mbep2d_se_1.8mm_PA")
+# origDWI=("*diff_b2000-AP"  "*diff_b700-AP"  "*diff_b300-AP"  "*diff_b2000-PA"  "*diff_b700-PA"  "*diff_b300-PA"  "*b2000-AP_SBRef"  "*b2000-PA_SBRef"  "*b700-AP_SBRef"  "*b700-PA_SBRef"  "*b300-AP_SBRef"  "*b300-PA_SBRef"  "*diff_AP_b2000_90"  "*diff_multi-AP_advB0"  "*diff_multi-AP_stdB0"  "*diff_multi-AP_FS" "*diff_multi-AP_advB0_SBRef" "*diff_multi-AP_stdB0_SBRef" "*diff_multi-AP_FS_SBRef" "*diff_multi-AP_advB0_TRACEW" "*multi-PA_advB0_SBRef" "*diff_multi-PA_advB0")
 
 # New BIDS-naming, follow the BIDS specification:
 # https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html
 #bids=(acq-0.8mm_T1w  acq-0.5mm_T2w  acq-0.5mm_inv1_T1map  acq-0.5mm_inv2_T1map  acq-0.5mm_uni_T1map  acq-0.5mm_T1_T1map  acq-0.4mm_inv1_T1map  acq-0.4mm_inv2_T1map  acq-0.4mm_uni_T1map  acq-0.4mm_T1_T1map  task-rest_acq-mb_dir-AP_bold  task-rest_acq-mbpe_dir-AP_bold  task-rest_acq-mbrpe_dir-PA_bold acq-0.5mm_pat6_lessPF acq-0.5mm_pat6 T2Star task-rest_acq-mb3e_1.8mm_dir-AP_bold  task-rest_acq-mb3e_1.8mm_dir-PA_bold  task-rest_acq-mbpe_1.8mm_dir-AP_bold task-rest_acq-mbpe_1.8mm_dir-PA_bold)
-bidsDWI=(acq-b2000-NUM_dir-AP_dwi  acq-b700-NUM_dir-AP_dwi  acq-b300-NUM_dir-AP_dwi  acq-b2000-NUM_dir-PA_dwi  acq-b700-NUM_dir-PA_dwi  acq-b300-NUM_dir-PA_dwi  acq-b2000_b0_dir-AP_dwi  acq-b2000_b0_dir-PA_dwi  acq-b700_b0_dir-AP_dwi  acq-b700_b0_dir-PA_dwi  acq-b300_b0_dir-AP_dwi  acq-b300_b0_dir-PA_dwi  acq-b2000-NUM_ep2d_dir-AP_dwi  acq-multi-NUM_advB0_dir-AP_dwi  acq-multi-NUM_stdB0_dir-AP_dwi  acq-multi-NUM_dir-AP_dwi acq-multi-NUM_dir-AP_desc-advB0_SBRef_dwi acq-multi-NUM_dir-AP_desc-stdB0_SBRef_dwi acq-multi-NUM_dir-AP_desc-FS_SBRef_dwi acq-multi-NUM_dir-AP_desc-advB0_TRACEW_dwi acq-multi-NUM_dir-PA_desc-advB0_SBRef_dwi acq-multi-NUM_dir-PA_desc-multi-PA_advB0_dwi)
+# bidsDWI=(acq-b2000-NUM_dir-AP_dwi  acq-b700-NUM_dir-AP_dwi  acq-b300-NUM_dir-AP_dwi  acq-b2000-NUM_dir-PA_dwi  acq-b700-NUM_dir-PA_dwi  acq-b300-NUM_dir-PA_dwi  acq-b2000_b0_dir-AP_dwi  acq-b2000_b0_dir-PA_dwi  acq-b700_b0_dir-AP_dwi  acq-b700_b0_dir-PA_dwi  acq-b300_b0_dir-AP_dwi  acq-b300_b0_dir-PA_dwi  acq-b2000-NUM_ep2d_dir-AP_dwi  acq-multi-NUM_advB0_dir-AP_dwi  acq-multi-NUM_stdB0_dir-AP_dwi  acq-multi-NUM_dir-AP_dwi acq-multi-NUM_dir-AP_desc-advB0_SBRef_dwi acq-multi-NUM_dir-AP_desc-stdB0_SBRef_dwi acq-multi-NUM_dir-AP_desc-FS_SBRef_dwi acq-multi-NUM_dir-AP_desc-advB0_TRACEW_dwi acq-multi-NUM_dir-PA_desc-advB0_SBRef_dwi acq-multi-NUM_dir-PA_desc-multi-PA_advB0_dwi)
+
+# pilot4
+# orig=("*b1map_tra_p2" "*b1map_tra_p2" "*mp2rage_0.5iso_sag_FA4_INV1" "*mp2rage_0.5iso_sag_FA4_INV2" "*mp2rage_0.5iso_sag_FA4_T1_Images" "*mp2rage_0.5iso_sag_FA4_UNI_Images" "*mprage_0.75iso_sag_FA4" "*gre_0.5iso_sag_FA4" "*mp2rage_0.5iso_sag_TI1000-3200_INV1" "*mp2rage_0.5iso_sag_TI1000-3200_INV2" "*mp2rage_0.5iso_sag_TI1000-3200_T1_Images" "*mp2rage_0.5iso_sag_TI1000-3200_UNI_Images" "*gre_FA13_0.5iso" "*mbep2d_3e_PL5500" "*mbep2d_se_PL5500" "*mbep2d_diff_multi-AP_advB0_PS_SBRef" "*mbep2d_diff_multi-AP_advB0_PS" "*mbep2d_diff_multi-AP_advB0_VS_SBRef" "*mbep2d_diff_multi-AP_advB0_VS" "*mbep2d_single_PL5500" "*mbep2d_single_PL5500" "*mprage_0.75iso_sag_FA7_TI1100")
+# bids=(aqc-b1map_tra_p2 b1map_tra_p2 mp2rage_0.5iso_sag_FA4_INV1 mp2rage_0.5iso_sag_FA4_INV2 mp2rage_0.5iso_sag_FA4_T1_Images mp2rage_0.5iso_sag_FA4_UNI_Images mprage_0.75iso_sag_FA4 gre_0.5iso_sag_FA4 mp2rage_0.5iso_sag_TI1000-3200_INV1 mp2rage_0.5iso_sag_TI1000-3200_INV2 mp2rage_0.5iso_sag_TI1000-3200_T1_Images mp2rage_0.5iso_sag_TI1000-3200_UNI_Images gre_FA13_0.5iso mbep2d_3e_PL5500 mbep2d_se_PL5500 mbep2d_diff_multi-AP_advB0_PS_SBRef mbep2d_diff_multi-AP_advB0_PS mbep2d_diff_multi-AP_advB0_VS_SBRef mbep2d_diff_multi-AP_advB0_VS mbep2d_single_PL5500 mbep2d_single_PL5500 mprage_0.75iso_sag_FA7_TI1100)
+
+# pilot5
+origDWI=("*cmrr_mbep2d_diff_90d-AP_advB0_PS_SBRef" "*cmrr_mbep2d_diff_90d-AP_advB0_PS" "*cmrr_mbep2d_diff_40d-AP_advB0_PS_SBRef" "*cmrr_mbep2d_diff_40d-AP_advB0_PS" "*cmrr_mbep2d_diff_10d-AP_advB0_PS_SBRef" "*cmrr_mbep2d_diff_10d-AP_advB0_PS")
+bidsDWI=(acq-90b-SBRef_dir-AP_dwi acq-90b_dir-AP_dwi acq-40b-SBRef_dir-AP_dwi acq-40b_dir-AP_dwi acq-10b-SBRef_dir-AP_dwi acq-10b_dir-AP_dwi)
+orig=("*ns_tfl_mprage_0.75iso_sag_FA7_TI1100" "*ns_gre_FA13_0.5iso_TE5.71_pat6" "*AAHead_Scout_32ch-head-coil" "*AAHead_Scout_32ch-head-coil_MPR_sag" "*AAHead_Scout_32ch-head-coil_MPR_cor" "*AAHead_Scout_32ch-head-coil_MPR_tra" "*ns_tfl_mprage_0.75iso_sag_FA4" "*cmrr_mbep2d_3e_PL55" "*cmrr_mbep2d_3e_PL55_2.5mm" "*ns_gre_FA13_0.5iso_TE5.71_pat6" "*ns_tse_vfl_c9_0.6iso_TR8")
+bids=(acq-0.75iso_FA7_mprage acq-0.5iso_greFA13 acq-AAHead acq-AAHead_sag acq-AAHead_cor acq-AAHead_tra acq-0.75iso_FA4_mprage acq-mbep2d_func acq-2.5mm_mbep2d_func acq-0.5iso_gre_FA13 acq-0.6iso_tse_vfl)
+
 
 # -----------------------------------------------------------------------------------------------
 # Create BIDS/subj_dir
-BIDS="${BIDS_DIR}/sub-${Subj}/${SES}"
 Do_cmd mkdir -p "$BIDS"/{anat,func,dwi}
 if [ ! -d "$BIDS" ]; then Error "Could not create subject BIDS directory, check permissions \n\t     ${BIDS}\t    "; exit 0; fi
 
