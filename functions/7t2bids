@@ -151,14 +151,20 @@ here=$(pwd)
 # bids=(acq-0.75iso_FA7_mprage acq-0.5iso_greFA13 acq-AAHead acq-AAHead_sag acq-AAHead_cor acq-AAHead_tra acq-0.75iso_FA4_mprage acq-mbep2d_func acq-2.5mm_mbep2d_func acq-0.5iso_gre_FA13 acq-0.6iso_tse_vfl)
 
 # pilot 6
-origDWI=( )
-bidsDWI=( )
-orig=("*06_b1map_tra_p2" "*07_b1map_tra_p2" "*08_ns_tfl_mprage_0.75iso_sag_FA4" "*09_cmrr_mbep2d_3e_bold_1.8mm_PL55" "*10_cmrr_mbep2d_3e_1.9mm_PL55_advB0" "*11_cmrr_mbep2d_spinecho_1.8" "*12_cmrr_mbep2d_spinecho_1.8_PA" "*13_cmrr_mbep2d_spinecho_1.9" "*14_cmrr_mbep2d_spinecho_1.9_PA" "*15_ns_tfl_mp2rage_0.5iso_sag_TI1000-3200_INV1" "*16_ns_tfl_mp2rage_0.5iso_sag_TI1000-3200_T1_Images" "*17_ns_tfl_mp2rage_0.5iso_sag_TI1000-3200_UNI_Images" "*18_ns_tfl_mp2rage_0.5iso_sag_TI1000-3200_INV2" "*19_cmrr_mbep2d_3e_1.9mm_PL55_advB0_task" "*20_me_gre_0.5mm_pat6" "*21_me_gre_0.5mm_pat6" "*22_T2Star_Images" "*23_fl_tof_tra_p3" "*24_fl_tof_tra_p3_MIP_SAG" "*25_fl_tof_tra_p3_MIP_COR" "*26_fl_tof_tra_p3_MIP_TRA")
-bids=(acq-b1map_run-1 acq-b1map_run-2 acq-0.75iso_FA4_mprage_T1w acq-mbep2d_1.8mm_PL55_dir-AP_bold acq-mbep2d_1.9mm_PL55_advB0_dir-AP_bold acq-spinecho_1.8mm_dir-AP_bold acq-spinecho_1.8mm_dir-PA_bold acq-spinecho_1.9mm_dir-AP_bold acq-spinecho_1.9mm_dir-PA_bold acq-0.5iso_m2rage_inv1_T1map acq-0.5iso_m2rage_T1w_T1map acq-0.5iso_m2rage_uni_T1map acq-0.5iso_m2rage_inv2_T1map acq-mbep2d_1.9mm_PL55_advB0_task_bold acq-gre_0.5mm_run-1_pat_T2star acq-gre_0.5mm_run-2_pat_T2star T2starw angio acq-SAG_angio acq-COR_angio acq-TRA_angio)
+# origDWI=( )
+# bidsDWI=( )
+# orig=("*06_b1map_tra_p2" "*07_b1map_tra_p2" "*08_ns_tfl_mprage_0.75iso_sag_FA4" "*09_cmrr_mbep2d_3e_bold_1.8mm_PL55" "*10_cmrr_mbep2d_3e_1.9mm_PL55_advB0" "*11_cmrr_mbep2d_spinecho_1.8" "*12_cmrr_mbep2d_spinecho_1.8_PA" "*13_cmrr_mbep2d_spinecho_1.9" "*14_cmrr_mbep2d_spinecho_1.9_PA" "*15_ns_tfl_mp2rage_0.5iso_sag_TI1000-3200_INV1" "*16_ns_tfl_mp2rage_0.5iso_sag_TI1000-3200_T1_Images" "*17_ns_tfl_mp2rage_0.5iso_sag_TI1000-3200_UNI_Images" "*18_ns_tfl_mp2rage_0.5iso_sag_TI1000-3200_INV2" "*19_cmrr_mbep2d_3e_1.9mm_PL55_advB0_task" "*20_me_gre_0.5mm_pat6" "*21_me_gre_0.5mm_pat6" "*22_T2Star_Images" "*23_fl_tof_tra_p3" "*24_fl_tof_tra_p3_MIP_SAG" "*25_fl_tof_tra_p3_MIP_COR" "*26_fl_tof_tra_p3_MIP_TRA")
+# bids=(acq-b1map_run-1 acq-b1map_run-2 acq-0.75iso_FA4_mprage_T1w acq-mbep2d_1.8mm_PL55_dir-AP_bold acq-mbep2d_1.9mm_PL55_advB0_dir-AP_bold acq-spinecho_1.8mm_dir-AP_bold acq-spinecho_1.8mm_dir-PA_bold acq-spinecho_1.9mm_dir-AP_bold acq-spinecho_1.9mm_dir-PA_bold acq-0.5iso_m2rage_inv1_T1map acq-0.5iso_m2rage_T1w_T1map acq-0.5iso_m2rage_uni_T1map acq-0.5iso_m2rage_inv2_T1map acq-mbep2d_1.9mm_PL55_advB0_task_bold acq-gre_0.5mm_run-1_pat_T2star acq-gre_0.5mm_run-2_pat_T2star T2starw angio acq-SAG_angio acq-COR_angio acq-TRA_angio)
+
+# pilot 7
+origDWI=("*dwi_acq_b0-dir_PA_SBRef" "*dwi_acq_b0-dir_PA" "*dwi_acq_b2000_90d-dir_AP_SBRef" "*dwi_acq_b2000_90d-dir_AP" "*dwi_acq_b700_40d-dir_AP_SBRef" "*dwi_acq_b700_40d-dir_AP" "*dwi_acq_b300_10d-dir_AP_SBRef" "*dwi_acq_b300_10d-dir_AP")
+bidsDWI=(acq_b0_SBRef_dir-PA_dwi acq_b0_dir-PA_dwi acq-b2000_SBRef_dir-AP_dwi acq-b2000_dir-AP_dwi acq-b700_SBRef_dir-AP_dwi acq-b700_dir-AP_dwi acq-b300_SBRef_dir-AP_dwi acq-b300_dir-AP_dwi)
+orig=("*b1map_tra_p2" "*gre_field_mapping" "*anat-T1w_acq-mprage_075iso" "*anat-T1w_acq-mp2rage_05mm_INV1" "*anat-T1w_acq-mp2rage_05mm_INV2" "*anat-T1w_acq-mp2rage_05mm_T1_Images" "*anat-T1w_acq-mp2rage_05mm_UNI_Images" "*func-rsfmri_acq-mbep2_ME_19mm" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA")
+bids=(acq-b1map_tra_p2_fmap acq-gre_fmap acq-mprage_075iso_T1w acq-mp2rage_05mm_inv1_T1map acq-mp2rage_05mm_inv2_T1map acq-mp2rage_05mm_T1_T1map acq-mp2rage_05mm_uni_T1map task-rest_bold task-rest_dir-AP_bold task-rest_dir-PA_bold)
 
 # -----------------------------------------------------------------------------------------------
 # Create BIDS/subj_dir
-Do_cmd mkdir -p "$BIDS"/{anat,func,dwi}
+Do_cmd mkdir -p "$BIDS"/{anat,func,dwi,fmap}
 if [ ! -d "$BIDS" ]; then Error "Could not create subject BIDS directory, check permissions \n\t     ${BIDS}\t    "; exit 0; fi
 
 # dicomx to Nifti with BIDS Naming
@@ -191,6 +197,7 @@ Do_cmd mv -v "$BIDS"/*mp2rage* "$BIDS"/anat
 Do_cmd mv -v "$BIDS"/*bold* "$BIDS"/func
 Do_cmd mv -v "$BIDS"/*T1* "$BIDS"/anat
 Do_cmd mv -v "$BIDS"/*T2* "$BIDS"/anat
+Do_cmd mv -v "$BIDS"/*fmap* "$BIDS"/fmap
 
 # BIDS names of DWI including NUM_dwi: Number of Directions
 n=$((${#origDWI[@]} - 1))
