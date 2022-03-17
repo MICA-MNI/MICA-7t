@@ -7,7 +7,7 @@ The files from the 7t scan are in `/data/transfer/dicoms`.
 
 1. The first step is to sort the dicoms to `/data_/mica3/MICA-7T/sorted`
 ```bash
-dcmSort /data/transfer/dicoms/pilot3 /data_/mica3/MICA-7T/sorted/sub-pilot3
+dcmSort /data/transfer/dicom/pilot3 /data_/mica3/MICA-7T/sorted/sub-pilot3
 ```
 2. From sorted to BIDS
 ```bash
