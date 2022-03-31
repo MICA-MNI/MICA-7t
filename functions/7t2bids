@@ -12,7 +12,6 @@ Usage:    $(basename $0)\033[0m  \033[38;5;197m-in\033[0m <DICOMS_directory> \03
 \t\t\t  -id CAN be different than -in DICOMS directory
 \t\t\033[38;5;197m-ses\033[0m 	flag to specify the session number (DEFAULT is 'ses-pre')
 \t\t\033[38;5;197m-bids\033[0m 	Path to BIDS directory ( . or FULL PATH)
-\t\t\033[38;5;197m-mica\033[0m 	ALWAYS use this flag in mica workstations
 
 \t\t\033[38;5;197m-force\033[0m 	flag that will overwrite the directory
 
@@ -69,10 +68,6 @@ do
    SES=$2
    shift;shift
   ;;
-  -mica)
-   mica=TRUE
-   shift;shift
-  ;;
    esac
 done
 
@@ -118,10 +113,7 @@ if [[ "$Subj" =~ ['!@#$%^&*()_+'] ]]; then Error "Subject id shouldn't contain s
 if [[ -z "$BIDS_DIR" ]]; then Error "BIDS directory is empty"; exit 0; fi
 
 # check mandatory inputs: -in Is $SUBJ_DIR found?
-if [ ! -d "${SUBJ_DIR}" ]; then Error "Subject DICOMS directory doesn't exist: \n\t ${Subj}";
-    if [[ "${mica}" == TRUE ]]; then echo "$Subj, no dicoms_sorted" >> "${BIDS_DIR}/CHANGES"; fi;
-    exit 0
-fi
+if [ ! -d "${SUBJ_DIR}" ]; then Error "Subject DICOMS directory doesn't exist: \n\t ${Subj}"; exit 0; fi
 
 # overwrite BIDS-SUBJECT
 if [[ "${force}" == TRUE ]]; then rm -rf "${BIDS}"; fi
@@ -157,10 +149,16 @@ here=$(pwd)
 # bids=(acq-b1map_run-1 acq-b1map_run-2 acq-0.75iso_FA4_mprage_T1w acq-mbep2d_1.8mm_PL55_dir-AP_bold acq-mbep2d_1.9mm_PL55_advB0_dir-AP_bold acq-spinecho_1.8mm_dir-AP_bold acq-spinecho_1.8mm_dir-PA_bold acq-spinecho_1.9mm_dir-AP_bold acq-spinecho_1.9mm_dir-PA_bold acq-0.5iso_m2rage_inv1_T1map acq-0.5iso_m2rage_T1w_T1map acq-0.5iso_m2rage_uni_T1map acq-0.5iso_m2rage_inv2_T1map acq-mbep2d_1.9mm_PL55_advB0_task_bold acq-gre_0.5mm_run-1_pat_T2star acq-gre_0.5mm_run-2_pat_T2star T2starw angio acq-SAG_angio acq-COR_angio acq-TRA_angio)
 
 # pilot 7
-origDWI=("*dwi_acq_b0-dir_PA_SBRef" "*dwi_acq_b0-dir_PA" "*dwi_acq_b2000_90d-dir_AP_SBRef" "*dwi_acq_b2000_90d-dir_AP" "*dwi_acq_b700_40d-dir_AP_SBRef" "*dwi_acq_b700_40d-dir_AP" "*dwi_acq_b300_10d-dir_AP_SBRef" "*dwi_acq_b300_10d-dir_AP")
-bidsDWI=(acq_b0_SBRef_dir-PA_dwi acq_b0_dir-PA_dwi acq-b2000_SBRef_dir-AP_dwi acq-b2000_dir-AP_dwi acq-b700_SBRef_dir-AP_dwi acq-b700_dir-AP_dwi acq-b300_SBRef_dir-AP_dwi acq-b300_dir-AP_dwi)
-orig=("*b1map_tra_p2" "*gre_field_mapping" "*anat-T1w_acq-mprage_075iso" "*anat-T1w_acq-mp2rage_05mm_INV1" "*anat-T1w_acq-mp2rage_05mm_INV2" "*anat-T1w_acq-mp2rage_05mm_T1_Images" "*anat-T1w_acq-mp2rage_05mm_UNI_Images" "*func-rsfmri_acq-mbep2_ME_19mm" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA")
-bids=(acq-b1map_tra_p2_fmap acq-gre_fmap acq-mprage_075iso_T1w acq-mp2rage_05mm_inv1_T1map acq-mp2rage_05mm_inv2_T1map acq-mp2rage_05mm_T1_T1map acq-mp2rage_05mm_uni_T1map task-rest_bold task-rest_dir-AP_bold task-rest_dir-PA_bold)
+# origDWI=("*dwi_acq_b0-dir_PA_SBRef" "*dwi_acq_b0-dir_PA" "*dwi_acq_b2000_90d-dir_AP_SBRef" "*dwi_acq_b2000_90d-dir_AP" "*dwi_acq_b700_40d-dir_AP_SBRef" "*dwi_acq_b700_40d-dir_AP" "*dwi_acq_b300_10d-dir_AP_SBRef" "*dwi_acq_b300_10d-dir_AP")
+# bidsDWI=(acq_b0_SBRef_dir-PA_dwi acq_b0_dir-PA_dwi acq-b2000_SBRef_dir-AP_dwi acq-b2000_dir-AP_dwi acq-b700_SBRef_dir-AP_dwi acq-b700_dir-AP_dwi acq-b300_SBRef_dir-AP_dwi acq-b300_dir-AP_dwi)
+# orig=("*b1map_tra_p2" "*gre_field_mapping" "*anat-T1w_acq-mprage_075iso" "*anat-T1w_acq-mp2rage_05mm_INV1" "*anat-T1w_acq-mp2rage_05mm_INV2" "*anat-T1w_acq-mp2rage_05mm_T1_Images" "*anat-T1w_acq-mp2rage_05mm_UNI_Images" "*func-rsfmri_acq-mbep2_ME_19mm" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA")
+# bids=(acq-b1map_tra_p2_fmap acq-gre_fmap acq-mprage_075iso_T1w acq-mp2rage_05mm_inv1_T1map acq-mp2rage_05mm_inv2_T1map acq-mp2rage_05mm_T1_T1map acq-mp2rage_05mm_uni_T1map task-rest_bold task-rest_dir-AP_bold task-rest_dir-PA_bold)
+
+# pilot 8
+origDWI=()
+bidsDWI=()
+orig=("*me_gre_0.5mm_pat6" "*func-patternsep2_acq-mbep2d_ME_19mm" "*func-pattersep1_acq-mbep2d_ME_19mm" "*func-epiretrieve_acq-mbep2d_ME_19mm" "*func-epiencode_acq-mbep2d_ME_19mm" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP" "*func-rsfmri_acq-mbep2d_ME_19mm" "*anat-MTT1w_acq-full" "*anat-MTOFF_acq-full" "*anat-MTON_acq-slab" "*anat-MTON_acq-full" "*_T2Star_Images" "*fmap-b1_acq-tra_p2" "*fmap-b1_acq-sag_p2" "*anat-T1w_acq-mprage_07mm_UP" "*anat-T1w_acq-mp2rage_05mm_UP_INV1" "*anat-T1w_acq-mp2rage_05mm_UP_INV2" "*anat-T1w_acq-mp2rage_05mm_UP_T1_Images" "*anat-T1w_acq-mp2rage_05mm_UP_UNI_Images")
+bids=(acq-me_05mm_T2w task-pattersep2_bold task-pattersep1_bold task-epiretrieve_bold task-epiencode_bold task-fmri_dir-PA_bold task-fmri_dir-AP_bold task-rest_bold acq-MTT1w_full_MTRmap acq-MTOFF_full_MTRmap acq-MTON_slab_MTRmap acq-MTON_full_MTRmap T2starmap acq-b1map_tra_p2_fmap acq-b1map_sag_p2_fmap acq-mprage_07up_T1w acq-mp2rage_05mm_up_inv1_T1map acq-mp2rage_05mm_up_inv2_T1map acq-mp2rage_05mm_up_T1_T1map acq-mp2rage_05mm_up_uni_T1map )
 
 # -----------------------------------------------------------------------------------------------
 # Create BIDS/subj_dir
@@ -173,14 +171,10 @@ Do_cmd cd $SUBJ_DIR
 n=$((${#orig[@]} - 1))
 for ((k=0; k<=n; k++)); do
   N=$(ls -d ${orig[k]} | wc -l)
-  # ONLY for MICA dicoms_sorted NAMES
-  if [[ "$mica" == TRUE ]]; then N=`ls -d $(find . -name "${orig[k]}" ! -name "*ORIG*") | wc -l`; fi
   if [ "$N" -eq 0 ]; then
     Warn "No directories were found with the following name: ${orig[k]}"
   elif [ "$N" -gt 1 ]; then
     Names=($(ls -d ${orig[k]}))
-    # ONLY for MICA dicoms_sorted NAMES
-    if [[ "$mica" == TRUE ]]; then Names=($(ls -d $(find . -name "${orig[k]}" ! -name "*ORIG*"))); fi
     for ((i = 1; i <= N; i++)); do
        nii=$(echo ${Names[((i-2))]} | awk -F '_' '{print $1 "_" $2}')
        nom="${id}${bids[k]}"
