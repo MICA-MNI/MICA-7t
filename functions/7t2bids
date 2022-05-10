@@ -155,10 +155,15 @@ here=$(pwd)
 # bids=(acq-b1map_tra_p2_fmap acq-gre_fmap acq-mprage_075iso_T1w acq-mp2rage_05mm_inv1_T1map acq-mp2rage_05mm_inv2_T1map acq-mp2rage_05mm_T1_T1map acq-mp2rage_05mm_uni_T1map task-rest_bold task-rest_dir-AP_bold task-rest_dir-PA_bold)
 
 # pilot 8
-origDWI=()
-bidsDWI=()
-orig=("*me_gre_0.5mm_pat6" "*func-patternsep2_acq-mbep2d_ME_19mm" "*func-pattersep1_acq-mbep2d_ME_19mm" "*func-epiretrieve_acq-mbep2d_ME_19mm" "*func-epiencode_acq-mbep2d_ME_19mm" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP" "*func-rsfmri_acq-mbep2d_ME_19mm" "*anat-MTT1w_acq-full" "*anat-MTOFF_acq-full" "*anat-MTON_acq-slab" "*anat-MTON_acq-full" "*_T2Star_Images" "*fmap-b1_acq-tra_p2" "*fmap-b1_acq-sag_p2" "*anat-T1w_acq-mprage_07mm_UP" "*anat-T1w_acq-mp2rage_05mm_UP_INV1" "*anat-T1w_acq-mp2rage_05mm_UP_INV2" "*anat-T1w_acq-mp2rage_05mm_UP_T1_Images" "*anat-T1w_acq-mp2rage_05mm_UP_UNI_Images")
-bids=(acq-me_05mm_T2w task-pattersep2_bold task-pattersep1_bold task-epiretrieve_bold task-epiencode_bold task-fmri_dir-PA_bold task-fmri_dir-AP_bold task-rest_bold acq-MTT1w_full_MTRmap acq-MTOFF_full_MTRmap acq-MTON_slab_MTRmap acq-MTON_full_MTRmap T2starmap acq-b1map_tra_p2_fmap acq-b1map_sag_p2_fmap acq-mprage_07up_T1w acq-mp2rage_05mm_up_inv1_T1map acq-mp2rage_05mm_up_inv2_T1map acq-mp2rage_05mm_up_T1_T1map acq-mp2rage_05mm_up_uni_T1map )
+# origDWI=()
+# bidsDWI=()
+# orig=("*me_gre_0.5mm_pat6" "*func-patternsep2_acq-mbep2d_ME_19mm" "*func-pattersep1_acq-mbep2d_ME_19mm" "*func-epiretrieve_acq-mbep2d_ME_19mm" "*func-epiencode_acq-mbep2d_ME_19mm" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP" "*func-rsfmri_acq-mbep2d_ME_19mm" "*anat-MTT1w_acq-full" "*anat-MTOFF_acq-full" "*anat-MTON_acq-slab" "*anat-MTON_acq-full" "*_T2Star_Images" "*fmap-b1_acq-tra_p2" "*fmap-b1_acq-sag_p2" "*anat-T1w_acq-mprage_07mm_UP" "*anat-T1w_acq-mp2rage_05mm_UP_INV1" "*anat-T1w_acq-mp2rage_05mm_UP_INV2" "*anat-T1w_acq-mp2rage_05mm_UP_T1_Images" "*anat-T1w_acq-mp2rage_05mm_UP_UNI_Images")
+# bids=(acq-me_05mm_T2w task-pattersep2_bold task-pattersep1_bold task-epiretrieve_bold task-epiencode_bold task-fmri_dir-PA_bold task-fmri_dir-AP_bold task-rest_bold acq-MTT1w_full_MTRmap acq-MTOFF_full_MTRmap acq-MTON_slab_MTRmap acq-MTON_full_MTRmap T2starmap acq-b1map_tra_p2_fmap acq-b1map_sag_p2_fmap acq-mprage_07up_T1w acq-mp2rage_05mm_up_inv1_T1map acq-mp2rage_05mm_up_inv2_T1map acq-mp2rage_05mm_up_T1_T1map acq-mp2rage_05mm_up_uni_T1map )
+
+orig=("*anat-T1w_acq-mprage_07mm_UP" "*anat-T1w_acq-mp2rage_05mm_UP_INV1" "*anat-T1w_acq-mp2rage_05mm_UP_INV2" "*anat-T1w_acq-mp2rage_05mm_UP_T1_Images" "*anat-T1w_acq-mp2rage_05mm_UP_UNI_Images" "*fmap-b1_acq-tra_p2" "*fmap-b1_acq-sag_p2" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA" "*func-rsfmri_acq-mbep2d_ME_19mm" "*func-epiencode_acq-mbep2d_ME_19mm" "*func-epiretrieve_acq-mbep2d_ME_19mm" "*func-pattersep1_acq-mbep2d_ME_19mm" "*func-patternsep2_acq-mbep2d_ME_19mm")
+bids=(acq-mprage_T1w acq-mp2rage_inv1_T1map acq-mp2rage_inv2_T1map acq-mp2rage_T1w_T1map acq-mp2rage_uni_T1map acq-b1_tra_fmap acq-b1_sag_fmap task-rest_dir-AP_bold task-rest_dir-PA_bold task-rest_bold task-epiencode_bold task-epiretrieve_bold task-patternsep1_bold task-patternsep2_bold)
+origDWI=("*dwi_acq_b0-dir_PA_SBRef" "*dwi_acq_b0-dir_PA" "*dwi_acq_b2000_90d-dir_AP_SBRef" "*dwi_acq_b2000_90d-dir_AP" "*dwi_acq_b700_40d-dir_AP_SBRef" "*dwi_acq_b700_40d-dir_AP" "*dwi_acq_b300_10d-dir_AP_SBRef" "*dwi_acq_b300_10d-dir_AP")
+bidsDWI=(acq-b0_dir-PA_sbref acq-b0_dir-PA_dwi acq-b2000_dir-AP_sbref acq-b2000_dir-AP_dwi acq-b700_dir-AP_sbref acq-b700_dir-AP_dwi acq-b300_dir-AP_sbref acq-b300_dir-AP_dwi)
 
 # -----------------------------------------------------------------------------------------------
 # Create BIDS/subj_dir
@@ -192,6 +197,9 @@ Do_cmd mv -v "$BIDS"/*bold* "$BIDS"/func
 Do_cmd mv -v "$BIDS"/*T1* "$BIDS"/anat
 Do_cmd mv -v "$BIDS"/*T2* "$BIDS"/anat
 Do_cmd mv -v "$BIDS"/*fmap* "$BIDS"/fmap
+Do_cmd mv -v "$BIDS"/*sbref* "$BIDS"/dwi
+
+# Rename echos: echo-1_bold.nii.gz
 
 # BIDS names of DWI including NUM_dwi: Number of Directions
 n=$((${#origDWI[@]} - 1))
