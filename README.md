@@ -21,3 +21,24 @@ mica-pipe -sub pilot3 -ses pilot -bids /data_/mica3/MICA-7T/rawdata \
     -out /data_/mica3/MICA-7T/derivatives \
     -proc_structural -proc_freesurfer -mica -threads 25
 ```
+
+# Rawdata size
+| **Directory** | **size** |
+|---------------|----------|
+| anat          | 495M     |
+| dwi           | 1.2G     |
+| fmap          | 15M      |
+| func          | 7.7G     |
+| *Total*      | 9.4G     |
+
+# Derivatives size
+| **Directory** | **size** |
+|---------------|----------|
+| freesurfer    | ~830     |
+| micapipe/anat | ~820M    |
+| micapipe/dwi  | 13G      |
+| micapipe/func | 24G      |
+| micapipe/logs | 31M      |
+| micapipe/xfm  | 2.6G     |
+| micapipe/QC   | 46M      |
+| micapipe/     | ~10-40G  |
