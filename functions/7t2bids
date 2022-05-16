@@ -163,7 +163,7 @@ here=$(pwd)
 orig=("*anat-T1w_acq-mprage_07mm_UP" "*anat-T1w_acq-mp2rage_05mm_UP_INV1" "*anat-T1w_acq-mp2rage_05mm_UP_INV2" "*anat-T1w_acq-mp2rage_05mm_UP_T1_Images" "*anat-T1w_acq-mp2rage_05mm_UP_UNI_Images" "*fmap-b1_acq-tra_p2" "*fmap-b1_acq-sag_p2" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA" "*func-rsfmri_acq-mbep2d_ME_19mm" "*func-epiencode_acq-mbep2d_ME_19mm" "*func-epiretrieve_acq-mbep2d_ME_19mm" "*func-pattersep1_acq-mbep2d_ME_19mm" "*func-patternsep2_acq-mbep2d_ME_19mm")
 bids=(acq-mprage_T1w acq-inv1_T1map acq-inv2_T1map acq-T1_T1map acq-uni_T1map acq-b1tra_fieldmap acq-b1sag_fieldmap acq-fmri_dir-AP_epi acq-fmri_dir-PA_epi task-rest_bold task-epiencode_bold task-epiretrieve_bold task-patternsep1_bold task-patternsep2_bold)
 origDWI=("*dwi_acq_b0-dir_PA_SBRef" "*dwi_acq_b0-dir_PA" "*dwi_acq_b2000_90d-dir_AP_SBRef" "*dwi_acq_b2000_90d-dir_AP" "*dwi_acq_b700_40d-dir_AP_SBRef" "*dwi_acq_b700_40d-dir_AP" "*dwi_acq_b300_10d-dir_AP_SBRef" "*dwi_acq_b300_10d-dir_AP")
-bidsDWI=(acq-b0_dir-PA_sbref acq-b0_dir-PA_dwi acq-b2000_dir-AP_sbref acq-b2000_dir-AP_dwi acq-b700_dir-AP_sbref acq-b700_dir-AP_dwi acq-b300_dir-AP_sbref acq-b300_dir-AP_dwi)
+bidsDWI=(acq-b0_dir-PA_sbref acq-b0_dir-PA_epi acq-b2000_dir-AP_sbref acq-b2000_dir-AP_dwi acq-b700_dir-AP_sbref acq-b700_dir-AP_dwi acq-b300_dir-AP_sbref acq-b300_dir-AP_dwi)
 
 # -----------------------------------------------------------------------------------------------
 # Create BIDS/subj_dir
@@ -196,7 +196,7 @@ Do_cmd mv -v "$BIDS"/*mp2rage* "$BIDS"/anat
 Do_cmd mv -v "$BIDS"/*bold* "$BIDS"/func
 Do_cmd mv -v "$BIDS"/*T1* "$BIDS"/anat
 Do_cmd mv -v "$BIDS"/*T2* "$BIDS"/anat
-Do_cmd mv -v "$BIDS"/*fmap* "$BIDS"/fmap
+Do_cmd mv -v "$BIDS"/*fieldmap* "$BIDS"/fmap
 
 # Rename echos: echo-1_bold.nii.gz
 for i in {1..3}; do
@@ -233,6 +233,7 @@ for n in $(ls *bval); do Dir=0
 done
 Do_cmd mv -v "$BIDS"/*b0* "$BIDS"/dwi
 Do_cmd mv -v "$BIDS"/*sbref* "$BIDS"/dwi
+Do_cmd mv -v "$BIDS"/*epi* "$BIDS"/fmap
 Do_cmd rm -v "$BIDS"/anat/*ROI*
 
 # QC, count the number of Niftis (json) per subject
