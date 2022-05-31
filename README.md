@@ -14,13 +14,61 @@ dcmSort /data/transfer/dicom/pilot3 /data_/mica3/MICA-7T/sorted/sub-pilot3
 7t2bids -in /data_/mica3/MICA-7T/sorted/sub-pilot3 -id pilot3 -bids /data_/mica3/MICA-7T/rawdata -ses pilot
 ```
 
-3. `micapipe`  
-Here we run the first two steps, `proc_structural` and `proc_freesurfer`
+Processing 7T with micapipe
+=======
+1. First run the structural processing
 ```bash
-mica-pipe -sub pilot3 -ses pilot -bids /data_/mica3/MICA-7T/rawdata \
-    -out /data_/mica3/MICA-7T/derivatives \
-    -proc_structural -proc_freesurfer -mica -threads 25
+# Subject's ID
+sub=PNC001
+
+micapipe -sub ${sub} -ses 01 \
+         -bids /data_/mica3/BIDS_PNC/rawdata \
+         -out /data_/mica3/BIDS_PNC/derivatives \
+         -proc_structural \
+         -qsub
 ```
+
+2.  Once is ready run the freesurfer processing with the flag `-hires` 
+```bash
+micapipe -sub ${sub} -ses 01 \
+         -bids /data_/mica3/BIDS_PNC/rawdata \
+         -out /data_/mica3/BIDS_PNC/derivatives \
+         -proc_freesurfer -hires \
+         -qsub
+```
+
+3. Do the QC points and re-run freesurfer if necessary
+
+4. Then the post structural processing and `dwi_proc`
+```bash
+micapipe -sub ${sub} -ses 01 \
+         -bids /data_/mica3/BIDS_PNC/rawdata \
+         -out /data_/mica3/BIDS_PNC/derivatives \
+         -post_structural \
+         -proc_dwi \
+         -dwi_rpe rawdata/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-b0_dir-PA_epi.nii.gz \ 
+         -qsub
+```
+
+5. Once the post structural processing is ready run the `-GD` `-Morphology`, `-SC` and `-proc_func` with the corresponding arguments
+```bash
+# set the bids directory as a variable
+rawdata=/data_/mica3/BIDS_PNC/rawdata
+
+micapipe -sub ${sub} -ses 01 \
+         -bids ${rawdata} \
+         -out /data_/mica3/BIDS_PNC/derivatives \
+         -SC -tracts 10M \
+         -proc_func \
+         -mainScanStr task-rest_echo-1_bold,task-rest_echo-2_bold,task-rest_echo-3_bold \
+         -fmri_pe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-AP_epi.nii.gz \
+         -fmri_rpe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-PA_epi.nii.gz \
+         -MPC -mpc_acq T1map \
+         -microstructural_img ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-inv1_T1map.nii.gz \
+         -microstructural_reg ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-T1_T1map.nii.gz
+         -qsub -threads 15 \
+```
+
 
 # Rawdata size
 | **Directory** | **size** |
