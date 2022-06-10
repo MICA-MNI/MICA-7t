@@ -16,7 +16,7 @@ dcmSort /data/transfer/dicom/pilot3 /data_/mica3/MICA-7T/sorted/sub-pilot3
 
 Processing 7T with micapipe
 =======
-1. First run the structural processing
+1. First run the structural processing with the flag `-hires` for 7T data
 ```bash
 # Subject's ID
 sub=PNC001
