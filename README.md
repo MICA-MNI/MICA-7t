@@ -16,7 +16,7 @@ dcmSort /data/transfer/dicom/pilot3 /data_/mica3/MICA-7T/sorted/sub-pilot3
 
 Processing 7T with micapipe
 =======
-1. First run the structural processing with the flag `-hires` for 7T data
+1. First run the structural processing with the flag `-N4wm` for 7T data
 ```bash
 # Subject's ID
 sub=PNC001
@@ -25,7 +25,7 @@ micapipe -sub ${sub} -ses 01 \
          -bids /data_/mica3/BIDS_PNC/rawdata \
          -out /data_/mica3/BIDS_PNC/derivatives \
          -proc_structural \
-         -qsub
+         -N4wm -qsub
 ```
 
 2.  Once is ready run the freesurfer processing with the flag `-hires` 
@@ -34,7 +34,7 @@ micapipe -sub ${sub} -ses 01 \
          -bids /data_/mica3/BIDS_PNC/rawdata \
          -out /data_/mica3/BIDS_PNC/derivatives \
          -proc_freesurfer -hires \
-         -qsub
+         -hires -qsub
 ```
 
 3. Do the QC points and re-run freesurfer if necessary
