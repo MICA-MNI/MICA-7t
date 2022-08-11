@@ -199,6 +199,8 @@ done
 Do_cmd mv -v "$BIDS"/*b0* "$BIDS"/dwi
 Do_cmd mv -v "$BIDS"/*sbref* "$BIDS"/dwi
 Do_cmd mv -v "$BIDS"/*epi* "$BIDS"/fmap
+Do_cmd mv -v "$BIDS"/*angio* "$BIDS"/anat
+Do_cmd mv -v "$BIDS"/*MTR* "$BIDS"/anat
 Do_cmd rm -v "$BIDS"/anat/*ROI*
 
 # QC, count the number of Niftis (json) per subject
