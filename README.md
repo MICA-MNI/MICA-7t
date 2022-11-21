@@ -11,30 +11,30 @@ dcmSort /data/transfer/dicom/pilot3 /data_/mica3/MICA-7T/sorted/sub-pilot3
 ```
 2. From sorted to BIDS
 ```bash
-7t2bids -in /data_/mica3/MICA-7T/sorted/sub-pilot3 -id pilot3 -bids /data_/mica3/MICA-7T/rawdata -ses pilot
+7t2bids -in /data_/mica3/MICA-7T/sorted/sub-pilot3 -id PNC001 -bids /data_/mica3/MICA-7T/rawdata -ses 01
 ```
 
 Processing 7T with micapipe
 =======
-1. First run the structural processing with the flag `-N4wm` for 7T data
+1. First run the structural processing with the flag `-uni` for MP2RAGE 7T data
 ```bash
 # Subject's ID
 sub=PNC001
 
-micapipe -sub ${sub} -ses 01 \
-         -bids /data_/mica3/BIDS_PNC/rawdata \
-         -out /data_/mica3/BIDS_PNC/derivatives \
-         -proc_structural \
-         -N4wm -qsub
+micapipe -sub PNC001 -ses 01 -bids bids_PNC \
+         -out bids_PNC/derivatives/ \
+         -uni -t1wStr acq-uni_T1map \
+         -proc_structural –mf 3 -qsub \
+         -threads 15
+
 ```
 
-2.  Once is ready run the freesurfer processing with the flag `-hires` 
+2.  Once is ready run the surface processing module
 ```bash
-micapipe -sub ${sub} -ses 01 \
-         -bids /data_/mica3/BIDS_PNC/rawdata \
-         -out /data_/mica3/BIDS_PNC/derivatives \
-         -proc_freesurfer -hires \
-         -hires -qsub
+micapipe -sub PNC001 -ses 01 -bids bids_PNC \
+         -out bids_PNC/derivatives/ \
+         -proc_surf \
+         -threads 15
 ```
 
 3. Do the QC points and re-run freesurfer if necessary
