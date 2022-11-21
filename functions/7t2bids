@@ -204,8 +204,12 @@ Do_cmd mv -v "$BIDS"/*MTR* "$BIDS"/anat
 Do_cmd rm -v "$BIDS"/anat/*ROI*
 
 # QC, count the number of Niftis (json) per subject
-N=$(ls -R */*json | wc -l)
-echo "sub-${Subj} $N $SUBJ_DIR" >> "$BIDS_DIR"/participants.tsv
+dat=$(stat ${BIDS} | awk 'NR==6 {print $2}')
+anat=$(ls -R ${BIDS}/anat | grep gz | wc -l)
+dwi=$(ls -R ${BIDS}/dwi | grep gz | wc -l)
+func=$(ls -R ${BIDS}/func | grep gz | wc -l)
+fmap=$(ls -R ${BIDS}/fmap | grep gz | wc -l)
+echo -e "${Subj}\t${SES}\t${dat}\t${anat}\t${dwi}\t${func}\t${fmap}" >> "$BIDS_DIR"/participants.tsv
 
 # Go back to initial directory
 Do_cmd cd "$here"
