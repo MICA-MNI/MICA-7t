@@ -69,6 +69,27 @@ micapipe -sub ${sub} -ses 01 \
          -qsub -threads 15 \
 ```
 
+Fastsurfer manual corrections (in process)
+=======
+The main outputs of `fastsurfer` deep volumetric segmentation are found under the `mri/` directory: `aparc.DKTatlas+aseg.deep.mgz`, `mask.mgz`, and `orig.mgz`. The equivalent of freesurfer's brainmask.mgz now is called `norm.mgz`.
+
+1. The edits should be perfom on the `mask.mgz` file. However, maybe it's easier to correct over the file called `norm.mgz`. Once the edits are perform you can replace `mask.mgz` with the binarized version of the corrected `norm.mgz`.
+
+```bash
+# Convert from mgz to nifti
+mri_convert.bin norm.mgz norm.nii.gz
+
+# Binarize nifti
+fslmaths norm.nii.gz -bin mask.nii.gz
+
+# Replace mask
+mri_convert mask.nii.gz mask.mgz
+
+# removed intermediate files
+rm mask.nii.gz norm.nii.gz
+
+```
+
 # 7T MRI acquisition protocol
 | Session  | Acquisition                                | BIDS dir | BIDS name              |
 |----------|--------------------------------------------|----------|------------------------|
