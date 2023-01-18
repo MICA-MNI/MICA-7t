@@ -1,5 +1,5 @@
 # MICA-7t
-scripts for 7t sorting a organizing
+scripts for 7t sorting and organizing
 =======
 scripts for 7t sorting, organizing and processing data.
 
@@ -88,6 +88,34 @@ mri_convert mask.nii.gz mask.mgz
 # removed intermediate files
 rm mask.nii.gz norm.nii.gz
 
+# remove files previouslly created by the first run of recon-surf
+rm wm.mgz aparc.DKTatlas+aseg.orig.mgz
+```
+
+2. Re-run the command `recon-surf` using a singularity container:
+```
+# freesurfer licence
+fs_licence=/data_/mica1/01_programs/freesurfer-7.3.2/
+
+# output directory
+SUBJECTS_DIR=/data_/mica3/BIDS_PNI/derivatives/fastsurf
+
+# Subject id
+id=sub-PNC001_ses-01
+
+# path to singularity image
+fastsurfer_img=/data_/mica3/BIDS_PNI/derivatives/fastsurf/sub-PNC001_ses-01/fastsurfer-cpu-v2.0.0.sif
+
+# Run only the surface recontruction with spectral spherical projection (fastsurfer default algorithm isntead of freesurfer)
+singularity exec --nv -B ${SUBJECTS_DIR}/${id}:/data \
+                      -B "${SUBJECTS_DIR}":/output \
+                      -B "${fs_licence}":/fs \
+                       ${fastsurfer_img} \
+                       /fastsurfer/recon_surf/recon-surf.sh \
+                      --fs_license /fs/license.txt \
+                      --t1 /data/mri/orig.mgz \
+                      --sid sub-PNC001_ses-01 --sd /output \
+                      --parallel --threads ${threads} --no_fs_T1
 ```
 
 # 7T MRI acquisition protocol
