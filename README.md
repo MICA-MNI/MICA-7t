@@ -69,7 +69,7 @@ micapipe -sub ${sub} -ses 01 \
          -qsub -threads 15 \
 ```
 
-Fastsurfer manual corrections (in process)
+Fastsurfer manual corrections
 =======
 The main outputs of `fastsurfer` deep volumetric segmentation are found under the `mri/` directory: `aparc.DKTatlas+aseg.deep.mgz`, `mask.mgz`, and `orig.mgz`. The equivalent of freesurfer's brainmask.mgz now is called `norm.mgz`.
 
