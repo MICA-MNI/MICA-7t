@@ -104,7 +104,7 @@ SUBJECTS_DIR=/data_/mica3/BIDS_PNI/derivatives/fastsurf
 id=sub-PNC001_ses-01
 
 # path to singularity image
-fastsurfer_img=/data_/mica3/BIDS_PNI/derivatives/fastsurf/sub-PNC001_ses-01/fastsurfer-cpu-v2.0.0.sif
+fastsurfer_img=/data_/mica1/01_programs/fastsurfer/fastsurfer-cpu-v2.0.0.sif
 
 # Run only the surface recontruction with spectral spherical projection (fastsurfer default algorithm isntead of freesurfer)
 singularity exec --nv -B ${SUBJECTS_DIR}/${id}:/data \
