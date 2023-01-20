@@ -37,9 +37,7 @@ micapipe -sub PNC001 -ses 01 -bids bids_PNC \
          -threads 15
 ```
 
-3. Do the QC points and re-run freesurfer if necessary
-
-4. Then the post structural processing and `dwi_proc`
+3. Then the post structural processing and `dwi_proc`
 ```bash
 micapipe -sub ${sub} -ses 01 \
          -bids /data_/mica3/BIDS_PNC/rawdata \
@@ -50,7 +48,7 @@ micapipe -sub ${sub} -ses 01 \
          -qsub
 ```
 
-5. Once the post structural processing is ready run the `-GD` `-Morphology`, `-SC` and `-proc_func` with the corresponding arguments
+4. Once the post structural processing is ready run the `-GD` `-Morphology`, `-SC` and `-proc_func` with the corresponding arguments
 ```bash
 # set the bids directory as a variable
 rawdata=/data_/mica3/BIDS_PNC/rawdata
@@ -69,11 +67,36 @@ micapipe -sub ${sub} -ses 01 \
          -qsub -threads 15 \
 ```
 
-Fastsurfer manual corrections
+Fastsurfer surface workflow with QC
 =======
 The main outputs of `fastsurfer` deep volumetric segmentation are found under the `mri/` directory: `aparc.DKTatlas+aseg.deep.mgz`, `mask.mgz`, and `orig.mgz`. The equivalent of freesurfer's brainmask.mgz now is called `norm.mgz`.
 
-1. The edits should be perfom on the `mask.mgz` file. However, maybe it's easier to correct over the file called `norm.mgz`. Once the edits are perform you can replace `mask.mgz` with the binarized version of the corrected `norm.mgz`.
+1. Run `fastsurfer` deep segmentation first separately from micapipe using the singularity container:
+```bash
+# Define variables
+sub=sub-PNA002
+ses=ses-01
+PNI_DIR=/data_/mica3/BIDS_PNI/derivatives
+SUBJECTS_DIR=${PNI_DIR}/fastsurfer
+t1nativepro=${PNI_DIR}/micapipe_v0.2.0/${sub}/${ses}/anat
+fastsurfer_img=/data_/mica1/01_programs/fastsurfer/fastsurfer-cpu-v2.0.0.sif
+fs_licence=/data_/mica1/01_programs/freesurfer-7.3.2/
+threads=15
+
+# Run the singularity container
+singularity exec --nv -B ${SUBJECTS_DIR}/${sub}_${ses}:/data \
+                      -B "${SUBJECTS_DIR}":/output \
+                      -B "${fs_licence}":/fs \
+                      -B "${t1nativepro}":/anat \
+                       ${fastsurfer_img} \
+                       /fastsurfer/run_fastsurfer.sh \
+                      --fs_license /fs/license.txt \
+                      --t1 /anat/${sub}_${ses}_space-nativepro_t1w.nii.gz --seg_only \
+                      --sid ${sub}_${ses} --sd /output --no_fs_T1 \
+                      --parallel --threads ${threads} 
+```
+
+2. The edits should be perfom on the `mask.mgz` file. However, maybe it's easier to correct over the file called `norm.mgz`. Once the edits are perform you can replace `mask.mgz` with the binarized version of the corrected `norm.mgz`.
 
 ```bash
 # Convert from mgz to nifti
@@ -92,30 +115,34 @@ rm mask.nii.gz norm.nii.gz
 rm wm.mgz aparc.DKTatlas+aseg.orig.mgz
 ```
 
-2. Re-run the command `recon-surf` using a singularity container:
+3. Re-run the command `recon-surf` using a singularity container to generate the new surfaces:
 ```
+# Subject id
+sub=sub-PNA002
+ses=ses-01
+
+# output directory
+SUBJECTS_DIR=/data_/mica3/BIDS_PNI/derivatives/fastsurfer
+
+# path to singularity image
+fastsurfer_img=/data_/mica1/01_programs/fastsurfer/run_fastsurfer.sh
+
 # freesurfer licence
 fs_licence=/data_/mica1/01_programs/freesurfer-7.3.2/
 
-# output directory
-SUBJECTS_DIR=/data_/mica3/BIDS_PNI/derivatives/fastsurf
-
-# Subject id
-id=sub-PNC001_ses-01
-
-# path to singularity image
-fastsurfer_img=/data_/mica1/01_programs/fastsurfer/fastsurfer-cpu-v2.0.0.sif
+# Number of threads for parallel processing
+threads=15
 
 # Run only the surface recontruction with spectral spherical projection (fastsurfer default algorithm isntead of freesurfer)
-singularity exec --nv -B ${SUBJECTS_DIR}/${id}:/data \
+singularity exec --nv -B ${SUBJECTS_DIR}/${sub}_${ses}:/data \
                       -B "${SUBJECTS_DIR}":/output \
                       -B "${fs_licence}":/fs \
                        ${fastsurfer_img} \
                        /fastsurfer/recon_surf/recon-surf.sh \
                       --fs_license /fs/license.txt \
                       --t1 /data/mri/orig.mgz \
-                      --sid sub-PNC001_ses-01 --sd /output \
-                      --parallel --threads ${threads} --no_fs_T1
+                      --sid ${sub}_${ses} --sd /output --no_fs_T1 \
+                      --parallel --threads ${threads}
 ```
 
 # 7T MRI acquisition protocol
