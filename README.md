@@ -93,7 +93,10 @@ singularity exec --nv -B ${SUBJECTS_DIR}/${sub}_${ses}:/data \
                       --fs_license /fs/license.txt \
                       --t1 /anat/${sub}_${ses}_space-nativepro_t1w.nii.gz --seg_only \
                       --sid ${sub}_${ses} --sd /output --no_fs_T1 \
-                      --parallel --threads ${threads} 
+                      --parallel --threads ${threads}
+                      
+# Change the outputs permission, in case that someone else has to work on them
+chmod aug+wr -R ${SUBJECTS_DIR}/${sub}_${ses}
 ```
 
 2. The edits should be perfom on the `mask.mgz` file. However, maybe it's easier to correct over the file called `norm.mgz`. Once the edits are perform you can replace `mask.mgz` with the binarized version of the corrected `norm.mgz`.
@@ -143,6 +146,9 @@ singularity exec --nv -B ${SUBJECTS_DIR}/${sub}_${ses}:/data \
                       --t1 /data/mri/orig.mgz \
                       --sid ${sub}_${ses} --sd /output --no_fs_T1 \
                       --parallel --threads ${threads}
+                      
+# Change the outputs permission, in case that someone else has to work on them
+chmod aug+wr -R ${SUBJECTS_DIR}/${sub}_${ses}
 ```
 
 # 7T MRI acquisition protocol
