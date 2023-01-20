@@ -91,7 +91,7 @@ singularity exec --nv -B ${SUBJECTS_DIR}/${sub}_${ses}:/data \
                        ${fastsurfer_img} \
                        /fastsurfer/run_fastsurfer.sh \
                       --fs_license /fs/license.txt \
-                      --t1 /anat/${sub}_${ses}_space-nativepro_t1w.nii.gz --seg_only \
+                      --t1 /anat/${sub}_${ses}_space-nativepro_t1w.nii.gz \
                       --sid ${sub}_${ses} --sd /output --no_fs_T1 \
                       --parallel --threads ${threads}
                       
@@ -136,7 +136,7 @@ fs_licence=/data_/mica1/01_programs/freesurfer-7.3.2/
 # Number of threads for parallel processing
 threads=15
 
-# Run only the surface recontruction with spectral spherical projection (fastsurfer default algorithm isntead of freesurfer)
+# Run only the surface recontruction with spectral spherical projection (fastsurfer default algorithm instead of freesurfer)
 singularity exec --nv -B ${SUBJECTS_DIR}/${sub}_${ses}:/data \
                       -B "${SUBJECTS_DIR}":/output \
                       -B "${fs_licence}":/fs \
