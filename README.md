@@ -84,6 +84,9 @@ fs_licence=/data_/mica1/01_programs/freesurfer-7.3.2/
 threads=15
 unset TMPDIR
 
+# create the output directory if it doesn't exist yet
+mkdir "${SUBJECTS_DIR}"/${sub}_${ses}
+
 # Run the singularity container
 singularity exec --nv -B ${SUBJECTS_DIR}/${sub}_${ses}:/data \
                       -B "${SUBJECTS_DIR}":/output \
