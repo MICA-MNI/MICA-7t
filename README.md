@@ -82,6 +82,7 @@ t1nativepro=${PNI_DIR}/micapipe_v0.2.0/${sub}/${ses}/anat
 fastsurfer_img=/data_/mica1/01_programs/fastsurfer/fastsurfer-cpu-v2.0.0.sif
 fs_licence=/data_/mica1/01_programs/freesurfer-7.3.2/
 threads=15
+unset TMPDIR
 
 # Run the singularity container
 singularity exec --nv -B ${SUBJECTS_DIR}/${sub}_${ses}:/data \
@@ -135,6 +136,9 @@ fs_licence=/data_/mica1/01_programs/freesurfer-7.3.2/
 
 # Number of threads for parallel processing
 threads=15
+
+# Remove this variable from `env` cos it could lead to an error withing the container
+unset TMPDIR
 
 # Run only the surface recontruction with spectral spherical projection (fastsurfer default algorithm instead of freesurfer)
 singularity exec --nv -B ${SUBJECTS_DIR}/${sub}_${ses}:/data \
