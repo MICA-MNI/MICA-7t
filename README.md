@@ -71,7 +71,7 @@ Fastsurfer surface workflow with QC
 =======
 The main outputs of `fastsurfer` deep volumetric segmentation are found under the `mri/` directory: `aparc.DKTatlas+aseg.deep.mgz`, `mask.mgz`, and `orig.mgz`. The equivalent of freesurfer's brainmask.mgz now is called `norm.mgz`.
 
-1. Run `fastsurfer` deep segmentation first separately from micapipe using the singularity container:
+1. Run `run_fastsurfer.sh` deep segmentation first separately from micapipe using the singularity container:
 ```bash
 # Define variables
 sub=sub-PNA002
@@ -115,7 +115,7 @@ rm mask.nii.gz norm.nii.gz
 rm wm.mgz aparc.DKTatlas+aseg.orig.mgz
 ```
 
-3. Re-run the command `recon-surf` using a singularity container to generate the new surfaces:
+3. Re the command `recon-surf.sh` using a singularity container to generate the new surfaces:
 ```
 # Subject id
 sub=sub-PNA002
