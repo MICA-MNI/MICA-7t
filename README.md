@@ -118,7 +118,7 @@ rm mask.nii.gz norm.nii.gz
 rm wm.mgz aparc.DKTatlas+aseg.orig.mgz
 ```
 
-3. Re the command `recon-surf.sh` using a singularity container to generate the new surfaces:
+3. Run the command `recon-surf.sh` using a singularity container to generate the new surfaces:
 ```
 # Subject id
 sub=sub-PNA002
