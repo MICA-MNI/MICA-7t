@@ -152,6 +152,20 @@ micapipe -sub ${sub} -ses 01 \
          -qsub -threads 15 \
 ```
 
+# Processing times
+# Rawdata size
+| **Module**    | **Cores** |**Time** |
+|---------------|----------|----------|
+| `proc_struct` |   15     | ~122 min |
+| `proc_surf`   |   15     | ~186 min |
+| `post_struct` |   15     | ~303 min |
+| `proc_func`   |   15     |    ?     |
+| `proc_dwi`    |   15     |    ?     |
+| `SC`          |   15     |    ?     |
+| `MPC`         |   10     |    ?     |
+| `Morphology`  |   10     |    ?     |
+| *Total*       |    -     |    ?     |
+
 # 7T MRI acquisition protocol
 | Session  | Acquisition                                | BIDS dir | BIDS name              |
 |----------|--------------------------------------------|----------|------------------------|
