@@ -1,7 +1,6 @@
 # MICA-7t
-scripts for 7t sorting and organizing
+Scripts for sorting, organizing and processing the 7T database
 =======
-scripts for 7t sorting, organizing and processing data.
 
 The files from the 7t scan are in `/data/transfer/dicoms`.  
 
@@ -14,8 +13,12 @@ dcmSort /data/transfer/dicom/pilot3 /data_/mica3/MICA-7T/sorted/sub-pilot3
 7t2bids -in /data_/mica3/MICA-7T/sorted/sub-pilot3 -id PNC001 -bids /data_/mica3/MICA-7T/rawdata -ses 01
 ```
 
-Processing 7T with micapipe
+Processing 7T with `micapipe`
 =======
+You can run any module of the pipeline locally (`-mica`), on the mica.q (`-qsub`) or all.q (`-qall`). But you should always use one of these flags.
+
+`micapipe` first stage modules: structural processing
+-------
 1. First run the structural processing with the flag `-uni` for MP2RAGE 7T data
 ```bash
 # Subject's ID
@@ -24,86 +27,45 @@ sub=PNC001
 micapipe -sub PNC001 -ses 01 -bids bids_PNC \
          -out bids_PNC/derivatives/ \
          -uni -t1wStr acq-uni_T1map \
-         -proc_structural –mf 3 -qsub \
-         -threads 15
+         -proc_structural –mf 3 \
+         -threads 15 -qsub
 
 ```
 
-2.  Once is ready run the surface processing module
+Surface processing
+-------
+2.  Here we run a denoising algorithm on the `t1nativepro` to enhance contrast in grey/white matter to facilitate the surface generation.
+> This step might be incorporated into the pipeline in the future but is still work on progress...
+
 ```bash
-micapipe -sub PNC001 -ses 01 -bids bids_PNC \
-         -out bids_PNC/derivatives/ \
-         -proc_surf \
-         -threads 15
+id=sub-PNC001_ses-01
+Nifti=${id}/anat/${id/\//_}_space-nativepro_t1w.nii.gz
+outStr=${id/\//_}_space-nativepro_t1w_nlm
+outdir=${id}/anat
+  
+denoiseN4 $Nifti $outStr $outdir
 ```
 
-3. Then the post structural processing and `dwi_proc`
+2.  Once the denoise is ready run the surface processing module with the `-fastsurfer` and `-t1` flags
 ```bash
-micapipe -sub ${sub} -ses 01 \
-         -bids /data_/mica3/BIDS_PNC/rawdata \
-         -out /data_/mica3/BIDS_PNC/derivatives \
-         -post_structural \
-         -proc_dwi \
-         -dwi_rpe rawdata/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-b0_dir-PA_epi.nii.gz \ 
-         -qsub
+sub=PNC001
+ses=01
+bids=/data_/mica3/BIDS_PNI/rawdata
+out=/data_/mica3/BIDS_PNI/derivatives
+t1nlm=${out}/micapipe_v0.2.0/sub-${sub}/ses-${ses}/anat/sub-${sub}_ses-${ses}_space-nativepro_t1w_nlm.nii.gz
+
+micapipe -sub ${sub} -ses ${ses} \
+  -bids ${bids} \
+  -out ${out} \
+  -proc_surf -threads 15 \
+  -fastsurfer -t1 ${t1nlm} -qsub
 ```
 
-4. Once the post structural processing is ready run the `-GD` `-Morphology`, `-SC` and `-proc_func` with the corresponding arguments
-```bash
-# set the bids directory as a variable
-rawdata=/data_/mica3/BIDS_PNC/rawdata
-
-micapipe -sub ${sub} -ses 01 \
-         -bids ${rawdata} \
-         -out /data_/mica3/BIDS_PNC/derivatives \
-         -SC -tracts 10M \
-         -proc_func \
-         -mainScanStr task-rest_echo-1_bold,task-rest_echo-2_bold,task-rest_echo-3_bold \
-         -fmri_pe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-AP_epi.nii.gz \
-         -fmri_rpe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-PA_epi.nii.gz \
-         -MPC -mpc_acq T1map \
-         -microstructural_img ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-inv1_T1map.nii.gz \
-         -microstructural_reg ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-T1_T1map.nii.gz
-         -qsub -threads 15 \
-```
-
-Fastsurfer surface workflow with QC
-=======
+Fastsurfer QC
+-------
 The main outputs of `fastsurfer` deep volumetric segmentation are found under the `mri/` directory: `aparc.DKTatlas+aseg.deep.mgz`, `mask.mgz`, and `orig.mgz`. The equivalent of freesurfer's brainmask.mgz now is called `norm.mgz`.
 
-1. Run `run_fastsurfer.sh` deep segmentation first separately from micapipe using the singularity container:
-```bash
-# Define variables
-sub=sub-PNA002
-ses=ses-01
-PNI_DIR=/data_/mica3/BIDS_PNI/derivatives
-SUBJECTS_DIR=${PNI_DIR}/fastsurfer
-t1nativepro=${PNI_DIR}/micapipe_v0.2.0/${sub}/${ses}/anat
-fastsurfer_img=/data_/mica1/01_programs/fastsurfer/fastsurfer-cpu-v2.0.0.sif
-fs_licence=/data_/mica1/01_programs/freesurfer-7.3.2/
-threads=15
-unset TMPDIR
-
-# create the output directory if it doesn't exist yet
-mkdir "${SUBJECTS_DIR}"/${sub}_${ses}
-
-# Run the singularity container
-singularity exec --nv -B ${SUBJECTS_DIR}/${sub}_${ses}:/data \
-                      -B "${SUBJECTS_DIR}":/output \
-                      -B "${fs_licence}":/fs \
-                      -B "${t1nativepro}":/anat \
-                       ${fastsurfer_img} \
-                       /fastsurfer/run_fastsurfer.sh \
-                      --fs_license /fs/license.txt \
-                      --t1 /anat/${sub}_${ses}_space-nativepro_t1w.nii.gz \
-                      --sid ${sub}_${ses} --sd /output --no_fs_T1 \
-                      --parallel --threads ${threads}
-                      
-# Change the outputs permission, in case that someone else has to work on them
-chmod aug+wr -R ${SUBJECTS_DIR}/${sub}_${ses}
-```
-
-2. The edits should be perfom on the `mask.mgz` file. However, maybe it's easier to correct over the file called `norm.mgz`. Once the edits are perform you can replace `mask.mgz` with the binarized version of the corrected `norm.mgz`.
+1. The edits should be perfom on the `mask.mgz` file. However, maybe it's easier to correct over the file called `norm.mgz`. Once the edits are perform you can replace `mask.mgz` with the binarized version of the corrected `norm.mgz`.
 
 ```bash
 # Convert from mgz to nifti
@@ -122,7 +84,7 @@ rm mask.nii.gz norm.nii.gz
 rm wm.mgz aparc.DKTatlas+aseg.orig.mgz
 ```
 
-3. Run the command `recon-surf.sh` using a singularity container to generate the new surfaces:
+2. Run the command `recon-surf.sh` using a singularity container to generate the new surfaces:
 ```
 # Subject id
 sub=sub-PNA002
@@ -140,7 +102,7 @@ fs_licence=/data_/mica1/01_programs/freesurfer-7.3.2/
 # Number of threads for parallel processing
 threads=15
 
-# Remove this variable from `env` cos it could lead to an error withing the container
+# Remove this variable from `env` because it could lead to an error withing the container
 unset TMPDIR
 
 # Run only the surface recontruction with spectral spherical projection (fastsurfer default algorithm instead of freesurfer)
@@ -156,6 +118,38 @@ singularity exec --nv -B ${SUBJECTS_DIR}/${sub}_${ses}:/data \
                       
 # Change the outputs permission, in case that someone else has to work on them
 chmod aug+wr -R ${SUBJECTS_DIR}/${sub}_${ses}
+```
+
+`micapipe` second stage modules
+-------
+1. Then the post structural processing and `dwi_proc`
+```bash
+micapipe -sub ${sub} -ses 01 \
+         -bids /data_/mica3/BIDS_PNC/rawdata \
+         -out /data_/mica3/BIDS_PNC/derivatives \
+         -post_structural \
+         -proc_dwi \
+         -dwi_rpe rawdata/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-b0_dir-PA_epi.nii.gz \ 
+         -qsub
+```
+
+2. Once the post structural processing is ready run the `-GD` `-Morphology`, `-SC` and `-proc_func` with the corresponding arguments
+```bash
+# set the bids directory as a variable
+rawdata=/data_/mica3/BIDS_PNC/rawdata
+
+micapipe -sub ${sub} -ses 01 \
+         -bids ${rawdata} \
+         -out /data_/mica3/BIDS_PNC/derivatives \
+         -SC -tracts 10M \
+         -proc_func \
+         -mainScanStr task-rest_echo-1_bold,task-rest_echo-2_bold,task-rest_echo-3_bold \
+         -fmri_pe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-AP_epi.nii.gz \
+         -fmri_rpe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-PA_epi.nii.gz \
+         -MPC -mpc_acq T1map \
+         -microstructural_img ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-inv1_T1map.nii.gz \
+         -microstructural_reg ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-T1_T1map.nii.gz
+         -qsub -threads 15 \
 ```
 
 # 7T MRI acquisition protocol
