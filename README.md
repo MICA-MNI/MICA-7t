@@ -94,7 +94,7 @@ ses=ses-01
 SUBJECTS_DIR=/data_/mica3/BIDS_PNI/derivatives/fastsurfer
 
 # path to singularity image
-fastsurfer_img=/data_/mica1/01_programs/fastsurfer/run_fastsurfer.sh
+fastsurfer_img=/data_/mica1/01_programs/fastsurfer/fastsurfer-cpu-v2.0.0.sif
 
 # freesurfer licence
 fs_licence=/data_/mica1/01_programs/freesurfer-7.3.2/
