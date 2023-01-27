@@ -2,15 +2,19 @@
 Scripts for sorting, organizing and processing the 7T database
 =======
 
+## 1 . Transfering the data
 The files from the 7t scan are in `/data/transfer/dicoms`.  
 
-1. The first step is to sort the dicoms to `/data_/mica3/MICA-7T/sorted`
+## 2. Sorting the dicoms
+The first step is to sort the dicoms to `/data_/mica3/BIDS_PNI/sorted` using the `dcmSort` script.
 ```bash
-dcmSort /data/transfer/dicom/pilot3 /data_/mica3/MICA-7T/sorted/sub-pilot3
+dcmSort <dicoms_directory> /data_/mica3/BIDS_PNI/sorted/PNC001_ses-01
 ```
-2. From sorted to BIDS
+
+## 3. From sorted dicoms to BIDS
+Once the dicoms are sorted we can run the `7t2bids` to transform all the dicoms into NIFTIS and rename and organize the files  accoding to BIDS. 
 ```bash
-7t2bids -in /data_/mica3/MICA-7T/sorted/sub-pilot3 -id PNC001 -bids /data_/mica3/MICA-7T/rawdata -ses 01
+7t2bids -in /data_/mica3/BIDS_PNI/sorted/PNC001_ses-01 -id PNC001 -bids /data_/mica3/MICA-7T/rawdata -ses 01
 ```
 
 Processing 7T with `micapipe`
