@@ -29,9 +29,11 @@ You can run any module of the pipeline locally (`-mica`), on the mica.q (`-qsub`
 # Subject's ID
 sub=PNC001
 ses=01
+bids=bids_PNC/rawdata
+out=bids_PNC/derivatives
 
-micapipe -sub ${sub} -ses ${ses} -bids bids_PNC \
-         -out bids_PNC/derivatives/ \
+micapipe -sub ${sub} -ses ${ses} -bids ${bids} \
+         -out ${out} \
          -uni -t1wStr acq-uni_T1map \
          -proc_structural –mf 3 \
          -threads 15 -qsub
