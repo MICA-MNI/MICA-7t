@@ -74,7 +74,7 @@ The main outputs of `fastsurfer` deep volumetric segmentation are found under th
 
 ```bash
 # Convert from mgz to nifti
-mri_convert.bin norm.mgz norm.nii.gz
+mri_convert norm.mgz norm.nii.gz
 
 # Binarize nifti
 fslmaths norm.nii.gz -bin mask.nii.gz
