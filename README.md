@@ -30,7 +30,7 @@ You can run any module of the pipeline locally (`-mica`), on the mica.q (`-qsub`
 sub=PNC001
 ses=01
 
-micapipe -sub PNC001 -ses ${ses} -bids bids_PNC \
+micapipe -sub ${sub} -ses ${ses} -bids bids_PNC \
          -out bids_PNC/derivatives/ \
          -uni -t1wStr acq-uni_T1map \
          -proc_structural –mf 3 \
