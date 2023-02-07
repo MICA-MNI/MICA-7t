@@ -86,7 +86,7 @@ fslmaths norm.nii.gz -bin mask.nii.gz
 mri_convert mask.nii.gz mask.mgz
 
 # removed intermediate files
-rm mask.nii.gz norm.nii.gz
+rm mask.nii.gz norm.nii.gz norm.mgz~
 
 # remove files previouslly created by the first run of recon-surf
 rm wm.mgz aparc.DKTatlas+aseg.orig.mgz
