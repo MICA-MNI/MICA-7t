@@ -34,7 +34,7 @@ out=bids_PNC/derivatives
 
 micapipe -sub ${sub} -ses ${ses} -bids ${bids} \
          -out ${out} \
-         -uni -t1wStr acq-uni_T1map \
+         -uni -T1wStr acq-uni_T1map \
          -proc_structural –mf 3 \
          -threads 15 -qsub
 
@@ -47,26 +47,26 @@ Surface processing
 
 ```bash
 id=sub-PNC001_ses-01
-Nifti=${id}/anat/${id/\//_}_space-nativepro_t1w.nii.gz
-outStr=${id/\//_}_space-nativepro_t1w_nlm
+Nifti=${id}/anat/${id/\//_}_space-nativepro_T1w.nii.gz
+outStr=${id/\//_}_space-nativepro_T1w_nlm
 outdir=${id}/anat
   
 denoiseN4 $Nifti $outStr $outdir
 ```
 
-2.  Once the denoise is ready run the surface processing module with the `-fastsurfer` and `-t1` flags
+2.  Once the denoise is ready run the surface processing module with the `-fastsurfer` and `-T1` flags
 ```bash
 sub=PNC001
 ses=01
 bids=/data_/mica3/BIDS_PNI/rawdata
 out=/data_/mica3/BIDS_PNI/derivatives
-t1nlm=${out}/micapipe_v0.2.0/sub-${sub}/ses-${ses}/anat/sub-${sub}_ses-${ses}_space-nativepro_t1w_nlm.nii.gz
+t1nlm=${out}/micapipe_v0.2.0/sub-${sub}/ses-${ses}/anat/sub-${sub}_ses-${ses}_space-nativepro_T1w_nlm.nii.gz
 
 micapipe -sub ${sub} -ses ${ses} \
   -bids ${bids} \
   -out ${out} \
   -proc_surf -threads 15 \
-  -fastsurfer -t1 ${t1nlm} -qsub
+  -fastsurfer -T1 ${t1nlm} -qsub
 ```
 
 Fastsurfer QC
