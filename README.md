@@ -83,6 +83,7 @@ mri_convert norm.mgz norm.nii.gz
 fslmaths norm.nii.gz -bin mask.nii.gz
 
 # Replace mask
+rm mask.mgz
 mri_convert mask.nii.gz mask.mgz
 
 # removed intermediate files
