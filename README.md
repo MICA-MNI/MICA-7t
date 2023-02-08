@@ -73,6 +73,8 @@ Fastsurfer QC
 -------
 The main outputs of `fastsurfer` deep volumetric segmentation are found under the `mri/` directory: `aparc.DKTatlas+aseg.deep.mgz`, `mask.mgz`, and `orig.mgz`. The equivalent of freesurfer's brainmask.mgz now is called `norm.mgz`.
 
+Warning!! Please make sure your eraser values when editing is set to zero or tick the Recon Editing box, otherwise, it will create issues on the subsequent steps.
+
 1. The edits should be perfom on the `mask.mgz` file. However, maybe it's easier to correct over the file called `norm.mgz`. Once the edits are perform you can replace `mask.mgz` with the binarized version of the corrected `norm.mgz`.
 
 ```bash
