@@ -133,6 +133,7 @@ chmod aug+wr -R ${SUBJECTS_DIR}/${sub}_${ses}
 
 `micapipe` second stage modules
 -------
+## `post_structural` and `proc_dwi`
 1. Then the post structural processing and `dwi_proc`
 ```bash
 micapipe -sub ${sub} -ses 01 \
@@ -147,16 +148,19 @@ micapipe -sub ${sub} -ses 01 \
 2. Once the post structural processing is ready run the `-GD` `-Morphology`, `-SC` and `-proc_func` with the corresponding arguments
 ```bash
 # set the bids directory as a variable
-rawdata=/data_/mica3/BIDS_PNC/rawdata
+rawdata=/data_/mica3/BIDS_PNI/rawdata
+out=/data_/mica3/BIDS_PNI/derivatives
+sub=PNC001
+ses=01
 
-micapipe -sub ${sub} -ses 01 \
+micapipe -sub ${sub} -ses ${ses} \
          -bids ${rawdata} \
-         -out /data_/mica3/BIDS_PNC/derivatives \
-         -SC -tracts 10M \
+         -out ${out} \
          -proc_func \
          -mainScanStr task-rest_echo-1_bold,task-rest_echo-2_bold,task-rest_echo-3_bold \
-         -fmri_pe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-AP_epi.nii.gz \
-         -fmri_rpe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-PA_epi.nii.gz \
+         -func_pe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-AP_epi.nii.gz \
+         -func_rpe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-PA_epi.nii.gz \
+         -SC -tracts 10M \
          -MPC -mpc_acq T1map \
          -microstructural_img ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-inv1_T1map.nii.gz \
          -microstructural_reg ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-T1_T1map.nii.gz
