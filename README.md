@@ -81,15 +81,20 @@ Warning!! Please make sure your eraser values when editing is set to zero or tic
 # Convert from mgz to nifti
 mri_convert norm.mgz norm.nii.gz
 
-# Binarize nifti
-fslmaths norm.nii.gz -bin mask.nii.gz
+# --- IF YOU EDIT THE norm.mgz
+# Binarize the mask edits
+fslmaths norm.nii.gz -thr 1 -uthr 1 -binv mask_edited.nii.gz
+
+# Generate the new mask
+fslmaths norm.nii.gz -mul mask_edited.nii.gz -bin mask.nii.gz
+
+# Generate the new mask
+fslmaths norm.nii.gz -mul mask.nii.gz norm.nii.gz
 
 # Replace mask
-rm mask.mgz
+rm mask.mgz norm.mgz norm.mgz~
 mri_convert mask.nii.gz mask.mgz
-
-# removed intermediate files
-rm mask.nii.gz norm.nii.gz norm.mgz~
+mri_convert norm.nii.gz norm.mgz
 
 # remove files previouslly created by the first run of recon-surf
 rm wm.mgz aparc.DKTatlas+aseg.orig.mgz
