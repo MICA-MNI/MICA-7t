@@ -85,10 +85,10 @@ mri_convert norm.mgz norm.nii.gz
 # Binarize the mask edits
 fslmaths norm.nii.gz -thr 1 -uthr 1 -binv mask_edited.nii.gz
 
-# Generate the new mask
+# Generate the new mask from the norm.nii.gz edited
 fslmaths norm.nii.gz -mul mask_edited.nii.gz -bin mask.nii.gz
 
-# Generate the new mask
+# Generate the new norm multiplying the mask
 fslmaths norm.nii.gz -mul mask.nii.gz norm.nii.gz
 
 # Replace mask
