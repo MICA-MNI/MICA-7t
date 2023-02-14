@@ -106,6 +106,9 @@ rm mask.mgz norm.mgz norm.mgz~
 mri_convert mask.nii.gz mask.mgz
 mri_convert norm.nii.gz norm.mgz
 
+# remove nifitis
+rm mask_edited.nii.gz mask.nii.gz norm.nii.gz
+
 # remove files previouslly created by the first run of recon-surf
 rm wm.mgz aparc.DKTatlas+aseg.orig.mgz
 ```
@@ -144,6 +147,8 @@ singularity exec --nv -B ${SUBJECTS_DIR}/${sub}_${ses}:/data \
                       
 # Change the outputs permission, in case that someone else has to work on them
 chmod aug+wr -R ${SUBJECTS_DIR}/${sub}_${ses}
+
+touch ${SUBJECTS_DIR}/${sub}_${ses}/qc_done.txt
 ```
 
 `micapipe` second stage modules
