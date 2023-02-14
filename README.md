@@ -77,6 +77,16 @@ Warning!! Please make sure your eraser and brush values when editing are set to 
 
 1. The edits should be perfom on the `mask.mgz` file. However, maybe it's easier to correct over the file called `norm.mgz`. Once the edits are perform you can replace `mask.mgz` with the binarized version of the corrected `norm.mgz`.
 
+2. Run the next script after you are done with the edits:
+
+```bash
+sub=PNA002
+ses=01
+/data/mica1/01_programs/MICA-7t/functions/post-qc_fastsurfer.sh -sub ${sub} -ses ${ses} \
+         -out /data_/mica3/BIDS_PNI/derivatives/fastsurfer
+```
+
+The latter script will do the next steps:
 ```bash
 # Convert from mgz to nifti
 mri_convert norm.mgz norm.nii.gz
@@ -100,7 +110,7 @@ mri_convert norm.nii.gz norm.mgz
 rm wm.mgz aparc.DKTatlas+aseg.orig.mgz
 ```
 
-2. Run the command `recon-surf.sh` using a singularity container to generate the new surfaces:
+Run the command `recon-surf.sh` using a singularity container to generate the new surfaces:
 ```
 # Subject id
 sub=sub-PNA002
