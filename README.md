@@ -77,7 +77,7 @@ Warning!! Please make sure your eraser and brush values when editing are set to 
 
 1. The edits should be perfom on the `mask.mgz` file. However, maybe it's easier to correct over the file called `norm.mgz`. Once the edits are perform you can replace `mask.mgz` with the binarized version of the corrected `norm.mgz`.
 
-2. Run the next script after you are done with the edits:
+2. Run the next script after you are done with the edits. It will create new surfaces based on on the edits and generate a file named `qc_done.txt` under the subject's directory e.g. `fastsurfer/sub-PNA002_ses-01`.
 
 ```bash
 sub=PNA002
