@@ -85,8 +85,10 @@ ses=01
 /data/mica1/01_programs/MICA-7t/functions/post-qc_fastsurfer.sh -sub ${sub} -ses ${ses} \
          -out /data_/mica3/BIDS_PNI/derivatives/fastsurfer
 ```
+<details><summary>post-qc_fastsurfer.sh details</summary>
+<p>
 
-The latter script will do the next steps:
+#### `post-qc_fastsurfer.sh` will do the next steps:
 ```bash
 # Convert from mgz to nifti
 mri_convert norm.mgz norm.nii.gz
@@ -150,22 +152,24 @@ chmod aug+wr -R ${SUBJECTS_DIR}/${sub}_${ses}
 
 touch ${SUBJECTS_DIR}/${sub}_${ses}/qc_done.txt
 ```
+</p>
+</details>
+
 
 `micapipe` second stage modules
 -------
-## `post_structural` and `proc_dwi`
-1. Then the post structural processing and `dwi_proc`
+## `post_structural`
+1. Then the post structural processing 
 ```bash
-micapipe -sub ${sub} -ses 01 \
+micapipe -sub ${sub} -ses ${ses} \
          -bids /data_/mica3/BIDS_PNC/rawdata \
          -out /data_/mica3/BIDS_PNC/derivatives \
          -post_structural \
-         -proc_dwi \
-         -dwi_rpe rawdata/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-b0_dir-PA_epi.nii.gz \ 
+         -fastsurfer -threads 10 \
          -qsub
 ```
 
-2. Once the post structural processing is ready run the `-GD` `-Morphology`, `-SC` and `-proc_func` with the corresponding arguments
+2. Once the post structural processing is ready run the `-GD`, `-MPC` and `-proc_func` with the corresponding arguments
 ```bash
 # set the bids directory as a variable
 rawdata=/data_/mica3/BIDS_PNI/rawdata
@@ -180,11 +184,23 @@ micapipe -sub ${sub} -ses ${ses} \
          -mainScanStr task-rest_echo-1_bold,task-rest_echo-2_bold,task-rest_echo-3_bold \
          -func_pe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-AP_epi.nii.gz \
          -func_rpe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-PA_epi.nii.gz \
-         -SC -tracts 10M \
          -MPC -mpc_acq T1map \
          -microstructural_img ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-inv1_T1map.nii.gz \
          -microstructural_reg ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-T1_T1map.nii.gz
          -qsub -threads 15 \
+```
+
+## `proc_dwi` and `-SC` WORK IN PROGRESS
+3. Then the post DWI processing module
+```bash
+micapipe -sub ${sub} -ses ${ses} \
+         -bids /data_/mica3/BIDS_PNC/rawdata \
+         -out /data_/mica3/BIDS_PNC/derivatives \
+         -post_structural \
+         -proc_dwi \
+         -SC -tracts 10M \
+         -dwi_rpe rawdata/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-b0_dir-PA_epi.nii.gz \ 
+         -qsub
 ```
 
 # Processing times
