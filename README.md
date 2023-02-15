@@ -194,12 +194,19 @@ micapipe -sub ${sub} -ses ${ses} \
 3. Then the post DWI processing module
 ```bash
 micapipe -sub ${sub} -ses ${ses} \
+         -bids ${bids} -out ${out} \
+         -proc_dwi \
+         -dwi_rpe rawdata/sub-${sub}/ses-01/dwi/sub-${sub}_ses-01_acq-b0_dir-PA_epi.nii.gz \ 
+         -qsub
+```
+
+## `-SC` Structural Connectomes WORK IN PROGRESS
+4. Then the post DWI processing module
+```bash
+micapipe -sub ${sub} -ses ${ses} \
          -bids /data_/mica3/BIDS_PNI/rawdata \
          -out /data_/mica3/BIDS_PNI/derivatives \
-         -post_structural \
-         -proc_dwi \
          -SC -tracts 10M \
-         -dwi_rpe rawdata/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-b0_dir-PA_epi.nii.gz \ 
          -qsub
 ```
 
@@ -209,13 +216,13 @@ micapipe -sub ${sub} -ses ${ses} \
 | `proc_struct` |   15     | 122 ± 16  |
 | `proc_surf`   |   15     | 188 ± 36  |
 | `post_struct` |   15     | 303 ± 41  |
-| `proc_func`   |   15     |     ?     |
+| `proc_func`   |   15     |  94 ± 8   |
 | `proc_dwi`    |   15     |     ?     |
 | `SC`          |   15     |     ?     |
 | `MPC`         |   10     |  14 ± 3   |
 | `Morphology`  |   10     |   1 ± 0   |
 | `GD`          |   10     |  96 ± 21  |
-| *Total*       |    -     | 724 ± 117 |
+| *Total*       |    -     | 818 ± 125 |
 
 
 # Rawdata size
