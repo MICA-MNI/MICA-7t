@@ -162,8 +162,8 @@ touch ${SUBJECTS_DIR}/${sub}_${ses}/qc_done.txt
 1. Then the post structural processing 
 ```bash
 micapipe -sub ${sub} -ses ${ses} \
-         -bids /data_/mica3/BIDS_PNC/rawdata \
-         -out /data_/mica3/BIDS_PNC/derivatives \
+         -bids /data_/mica3/BIDS_PNI/rawdata \
+         -out /data_/mica3/BIDS_PNI/derivatives \
          -post_structural \
          -fastsurfer -threads 10 \
          -qsub
@@ -194,8 +194,8 @@ micapipe -sub ${sub} -ses ${ses} \
 3. Then the post DWI processing module
 ```bash
 micapipe -sub ${sub} -ses ${ses} \
-         -bids /data_/mica3/BIDS_PNC/rawdata \
-         -out /data_/mica3/BIDS_PNC/derivatives \
+         -bids /data_/mica3/BIDS_PNI/rawdata \
+         -out /data_/mica3/BIDS_PNI/derivatives \
          -post_structural \
          -proc_dwi \
          -SC -tracts 10M \
