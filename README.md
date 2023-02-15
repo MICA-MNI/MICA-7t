@@ -204,7 +204,6 @@ micapipe -sub ${sub} -ses ${ses} \
 ```
 
 # Processing times
-# Rawdata size
 | **Module**    | **Cores**| **Time min** |
 |---------------|----------|--------------|
 | `proc_struct` |   15     | 122 ± 16  |
@@ -217,6 +216,30 @@ micapipe -sub ${sub} -ses ${ses} \
 | `Morphology`  |   10     |   1 ± 0   |
 | `GD`          |   10     |  96 ± 21  |
 | *Total*       |    -     | 724 ± 117 |
+
+
+# Rawdata size
+| **Directory** | **size** |
+|---------------|----------|
+| anat          | 495M     |
+| dwi           | 1.2G     |
+| fmap          | 15M      |
+| func          | 7.7G     |
+| *Total*       | 9.4G     |
+
+
+# Derivatives size
+| **Directory** | **size** |
+|---------------|----------|
+| freesurfer    | ~830     |
+| micapipe/anat | ~820M    |
+| micapipe/dwi  | 13G      |
+| micapipe/func | 24G      |
+| micapipe/logs | 31M      |
+| micapipe/xfm  | 2.6G     |
+| micapipe/QC   | 46M      |
+| micapipe/     | ~10-40G  |
+
 
 # 7T MRI acquisition protocol
 | Session  | Acquisition                                | BIDS dir | BIDS name              |
@@ -260,25 +283,3 @@ micapipe -sub ${sub} -ses ${ses} \
 | 03       | "*_MTON"                                   | anat     | mt-on_MTR              |
 | 03       | "*_MTOFF"                                  | anat     | mt-off_MTR             |
 | 03       | "*_T1W"                                    | anat     | acq-T1w_MTR            |
-
-
-# Rawdata size
-| **Directory** | **size** |
-|---------------|----------|
-| anat          | 495M     |
-| dwi           | 1.2G     |
-| fmap          | 15M      |
-| func          | 7.7G     |
-| *Total*       | 9.4G     |
-
-# Derivatives size
-| **Directory** | **size** |
-|---------------|----------|
-| freesurfer    | ~830     |
-| micapipe/anat | ~820M    |
-| micapipe/dwi  | 13G      |
-| micapipe/func | 24G      |
-| micapipe/logs | 31M      |
-| micapipe/xfm  | 2.6G     |
-| micapipe/QC   | 46M      |
-| micapipe/     | ~10-40G  |
