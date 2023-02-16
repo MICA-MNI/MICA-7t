@@ -186,8 +186,8 @@ micapipe -sub ${sub} -ses ${ses} \
          -func_rpe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-PA_epi.nii.gz \
          -MPC -mpc_acq T1map \
          -microstructural_img ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-inv1_T1map.nii.gz \
-         -microstructural_reg ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-T1_T1map.nii.gz
-         -qsub -threads 15 \
+         -microstructural_reg ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-T1_T1map.nii.gz \
+         -qsub -threads 15
 ```
 
 ## `proc_dwi` DWI processing
