@@ -190,14 +190,14 @@ micapipe -sub ${sub} -ses ${ses} \
          -qsub -threads 15 \
 ```
 
-## `proc_dwi` and `-SC` WORK IN PROGRESS
+## `proc_dwi` DWI processing
 3. Then the post DWI processing module
 ```bash
 micapipe -sub ${sub} -ses ${ses} \
          -bids ${bids} -out ${out} \
          -proc_dwi \
          -dwi_rpe rawdata/sub-${sub}/ses-01/dwi/sub-${sub}_ses-01_acq-b0_dir-PA_epi.nii.gz \ 
-         -qsub
+         -threads 15 -qsub
 ```
 
 ## `-SC` Structural Connectomes WORK IN PROGRESS
@@ -205,9 +205,9 @@ micapipe -sub ${sub} -ses ${ses} \
 ```bash
 micapipe -sub ${sub} -ses ${ses} \
          -bids /data_/mica3/BIDS_PNI/rawdata \
-         -out /data_/mica3/BIDS_PNI/derivatives \
-         -SC -tracts 10M \
-         -qsub
+         -out /data_/mica3/BIDS_PNI/derivatives_dev \
+         -SC -tracts 40M \
+         -threads 15 -qsub
 ```
 
 # Processing times
