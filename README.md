@@ -168,7 +168,7 @@ micapipe -sub ${sub} -ses ${ses} \
          -fastsurfer -threads 10 \
          -qsub
 ```
-
+## `proc_func`
 2. Once the post structural processing is ready run the `-GD`, `-MPC` and `-proc_func` with the corresponding arguments
 ```bash
 # set the bids directory as a variable
@@ -184,10 +184,17 @@ micapipe -sub ${sub} -ses ${ses} \
          -mainScanStr task-rest_echo-1_bold,task-rest_echo-2_bold,task-rest_echo-3_bold \
          -func_pe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-AP_epi.nii.gz \
          -func_rpe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-PA_epi.nii.gz \
-         -MPC -mpc_acq T1map \
+         -threads 15 -qsub
+```
+## `GD` and `MPC`
+```
+micapipe -sub ${sub} -ses ${ses} \
+         -bids ${rawdata} \
+         -out ${out} \
+         -GD -MPC -mpc_acq T1map \
          -microstructural_img ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-inv1_T1map.nii.gz \
          -microstructural_reg ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-T1_T1map.nii.gz \
-         -qsub -threads 15
+         -threads 15 -qsub
 ```
 
 ## `proc_dwi` DWI processing
