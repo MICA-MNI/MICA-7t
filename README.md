@@ -46,12 +46,14 @@ Surface processing
 > This step might be incorporated into the pipeline in the future but is still work on progress...
 
 ```bash
-id=sub-PNC001_ses-01
-Nifti=${id}/anat/${id/\//_}_space-nativepro_T1w.nii.gz
+id1=sub-PNC010/ses-02/
+id=sub-PNC010_ses-02
+
+Nifti=${id1}/anat/${id/\//_}_space-nativepro_T1w.nii.gz
 outStr=${id/\//_}_space-nativepro_T1w_nlm
-outdir=${id}/anat
-  
-denoiseN4 $Nifti $outStr $outdir
+outdir=${id1}/anat
+
+./host/yeatman/local_raid/rcruces/git_here/MRI_analytic_tools/Freesurfer_preprocessing/denoiseN4 $Nifti $outStr $outdir
 ```
 
 2.  Once the denoise is ready run the surface processing module with the `-fastsurfer` and `-T1` flags
