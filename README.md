@@ -188,14 +188,23 @@ micapipe -sub ${sub} -ses ${ses} \
          -func_rpe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-PA_epi.nii.gz \
          -threads 15 -qsub
 ```
-## Microstructural profile covariance | `MPC`
+##  `MPC`: Microstructural profile covariance
 ```
 micapipe -sub ${sub} -ses ${ses} \
          -bids ${rawdata} \
          -out ${out} \
-         -MPC -mpc_acq T1map \
+         -MPC -mpc_acq qT1 \
          -microstructural_img ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-T1_T1map.nii.gz \ # Quantitative MRI qT1
          -microstructural_reg ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-inv1_T1map.nii.gz \ # MRI to register
+         -threads 15 -qsub
+```
+
+##  `GD`: Geodesic distance
+```
+micapipe -sub ${sub} -ses ${ses} \
+         -bids ${rawdata} \
+         -out ${out} \
+         -GC \
          -threads 15 -qsub
 ```
 
