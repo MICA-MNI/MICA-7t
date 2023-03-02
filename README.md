@@ -1,4 +1,4 @@
-# MICA-7t
+# Precision NeuroImaging 7T
 Scripts for sorting, organizing and processing the 7T database
 =======
 
