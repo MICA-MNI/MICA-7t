@@ -229,18 +229,17 @@ micapipe -sub ${sub} -ses ${ses} \
 ```
 
 # Processing times
-| **Module**    | **Cores**| **Time min** |
-|---------------|----------|--------------|
-| `proc_struct` |   15     | 122 ± 16  |
-| `proc_surf`   |   15     | 188 ± 36  |
-| `post_struct` |   15     | 303 ± 41  |
-| `proc_func`   |   15     |  94 ± 8   |
-| `proc_dwi`    |   15     |     ?     |
-| `SC`          |   15     |     ?     |
-| `MPC`         |   10     |  14 ± 3   |
-| `Morphology`  |   10     |   1 ± 0   |
-| `GD`          |   10     |  96 ± 21  |
-| *Total*       |    -     | 818 ± 125 |
+| **Module**    | **Cores**| **Time min** | **CPU**|
+|---------------|----------|--------------|--------|
+| `proc_struct` |   15     |   122 ± 16   |   yes  |
+| `proc_surf`   |   15     |   188 ± 36   |   yes  |
+| `post_struct` |   15     |   303 ± 41   |   yes  |
+| `proc_func`   |   15     |    94 ± 8    |   yes  |
+| `proc_dwi`    |   15     |       ?      |   yes  |
+| `SC`          |   15     |       ?      |   yes  |
+| `MPC`         |   10     |    14 ± 3    |   no   |
+| `GD`          |   10     |    96 ± 21   |   yes  |
+| *Total*       |    -     |   818 ± 125  |    -   |
 
 
 # Rawdata size
