@@ -223,23 +223,54 @@ micapipe -sub ${sub} -ses ${ses} \
 ```bash
 micapipe -sub ${sub} -ses ${ses} \
          -bids /data_/mica3/BIDS_PNI/rawdata \
-         -out /data_/mica3/BIDS_PNI/derivatives_dev \
+         -out /data_/mica3/BIDS_PNI/derivatives \
          -SC -tracts 40M \
          -threads 15 -qsub
 ```
 
+
 # Processing times
-| **Module**    | **Cores**| **Time min** | **CPU**|
-|---------------|----------|--------------|--------|
-| `proc_struct` |   15     |   122 ± 16   |   yes  |
-| `proc_surf`   |   15     |   188 ± 36   |   yes  |
-| `post_struct` |   15     |   303 ± 41   |   yes  |
-| `proc_func`   |   15     |    94 ± 8    |   yes  |
-| `proc_dwi`    |   15     |       ?      |   yes  |
-| `SC`          |   15     |       ?      |   yes  |
-| `MPC`         |   10     |    14 ± 3    |   no   |
-| `GD`          |   10     |    96 ± 21   |   yes  |
-| *Total*       |    -     |   818 ± 125  |    -   |
+| **Module**    | **Cores**|  **7T-PNI**  |  **3T-MICs** | **CPU**|
+|---------------|----------|--------------|--------------|--------|
+| `proc_struct` |   15     |   122 ± 16   |   48 ± 10    |   yes  |
+| `proc_surf`   |   15     |   188 ± 36   |   961 ± 205  |   yes  |
+| `post_struct` |   15     |   303 ± 41   |   75 ± 13    |   yes  |
+| `proc_func`   |   15     |    94 ± 8    |   103 ± 7    |   yes  |
+| `proc_dwi`    |   15     |       ?      |   184 ± 11   |   yes  |
+| `SC`          |   15     |       ?      |   918 ± 299  |   yes  |
+| `MPC`         |   10     |    14 ± 3    |   8 ± 2      |   no   |
+| `GD`          |   10     |    96 ± 21   |   171 ± 25   |   yes  |
+| `proc_flair`  |   10     |       -      |     2 ± 0    |   yes  |
+| *Total*       |    -     |   818 ± 125  |       ±      |    -   |
+
+
+## Processing times diferences between versions
+|  `micapipe`      | `v0.1.4`   | `v0.2.0`   | Difference |
+|------------------|------------|------------|------------|
+|  `proc_struct`   | 88 ± 17    | 48 ± 10    | faster     |
+|  `proc_surf`     | 961 ± 205  | ~120       | faster     |
+|  `post_struct`   | 125 ± 14   | 75 ± 13    | faster     |
+|  `proc_func`     | 101 ± 8    | 103 ± 7    | similar    |
+|  `proc_dwi`      | 246 ± 37   | 184 ± 11   | faster     |
+|  `SC`            | 906 ± 427  | 918 ± 299  | similar    |
+|  `MPC`           | 7 ± 1      | 8 ± 2      | similar    |
+|  `GD`            | 159 ± 21   | 171 ± 25   | slower     |
+| *Total*          | 2593 ± 730 | 1627 ± 367 | 966 ± 363  |
+
+
+# Derivatives size
+| **Directory** | **size** |
+|---------------|----------|
+| freesurfer    | ~830     |
+| micapipe/anat | ~820M    |
+| micapipe/dwi  | 13G      |
+| micapipe/func | 24G      |
+| micapipe/maps |          |
+| micapipe/surf |          |
+| micapipe/logs | 31M      |
+| micapipe/xfm  | 2.6G     |
+| micapipe/QC   | 46M      |
+| micapipe/     | ~10-40G  |
 
 
 # Rawdata size
@@ -250,20 +281,6 @@ micapipe -sub ${sub} -ses ${ses} \
 | fmap          | 15M      |
 | func          | 7.7G     |
 | *Total*       | 9.4G     |
-
-
-# Derivatives size
-| **Directory** | **size** |
-|---------------|----------|
-| freesurfer    | ~830     |
-| micapipe/anat | ~820M    |
-| micapipe/dwi  | 13G      |
-| micapipe/func | 24G      |
-| micapipe/logs | 31M      |
-| micapipe/xfm  | 2.6G     |
-| micapipe/QC   | 46M      |
-| micapipe/     | ~10-40G  |
-
 
 # 7T MRI acquisition protocol
 | Session  | Acquisition                                | BIDS dir | BIDS name              |
