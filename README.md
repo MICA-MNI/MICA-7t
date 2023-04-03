@@ -3,7 +3,7 @@ Scripts for sorting, organizing and processing the 7T database
 =======
 
 ## 1 . Transfering the data
-The files from the 7t scan are in `/data/dicom/PNC001_Day1_?????. First, find and claim data using `find_mri` and  `find_mri -claim` script. Then copy 7T data to our folder /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms.
+The files from the 7t scan are in `/data/dicom/PNC001_Day1_?????`. First, find and claim data using `find_mri` and  `find_mri -claim` script. Then copy 7T data to our folder /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms.
 ```bash
 SUBID=PNC001
 ses1=01
