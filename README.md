@@ -3,19 +3,26 @@ Scripts for sorting, organizing and processing the 7T database
 =======
 
 ## 1 . Transfering the data
->  Update this step
-The files from the 7t scan are in `/data/transfer/dicoms?????`.   
+The files from the 7t scan are in `/data/dicom/PNC001_Day1_?????. First, find and claim data using `find_mri` and  `find_mri -claim` script. Then copy 7T data to our folder /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms.
+```bash
+SUBID=PNC001
+ses1=01
+ses=ses-${ses1}
+find_mri ${SUBID}
+find_mri -claim ${dicoms_directory}
+cp -r ${dicoms_directory_returned_from_previous_command} /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms
+```
 
 ## 2. Sorting the dicoms
-The first step is to sort the dicoms to `/data_/mica3/BIDS_PNI/sorted` using the `dcmSort` script.
+This step is to sort the dicoms to `/data_/mica3/BIDS_PNI/sorted` using the `dcmSort` script.
 ```bash
-dcmSort <dicoms_directory> /data_/mica3/BIDS_PNI/sorted/PNC001_ses-01
+dcmSort /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms_sorted
 ```
 
 ## 3. From sorted dicoms to BIDS
 Once the dicoms are sorted we can run the `7t2bids` to transform all the dicoms into NIFTIS and rename and organize the files  accoding to BIDS. 
 ```bash
-7t2bids -in /data_/mica3/BIDS_PNI/sorted/PNC001_ses-01 -id PNC001 -bids /data_/mica3/MICA-7T/rawdata -ses 01
+7t2bids -in /data_/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms_sorted -id ${SUBID} -bids /data_/mica3/BIDS_PNI/rawdata -ses ${ses1}
 ```
 
 Processing 7T with `micapipe`
