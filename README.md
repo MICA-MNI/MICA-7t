@@ -10,6 +10,10 @@ ses1=01
 ses=ses-${ses1}
 find_mri ${SUBID}
 find_mri -claim ${dicoms_directory}
+mkdir /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}
+mkdir /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/beh
+mkdir /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms
+mkdir /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms_sorted
 cp -r ${dicoms_directory_returned_from_previous_command} /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms
 ```
 
@@ -23,6 +27,16 @@ dcmSort /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms /data/mica3/BIDS_
 Once the dicoms are sorted we can run the `7t2bids` to transform all the dicoms into NIFTIS and rename and organize the files  accoding to BIDS. 
 ```bash
 7t2bids -in /data_/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms_sorted -id ${SUBID} -bids /data_/mica3/BIDS_PNI/rawdata -ses ${ses1}
+```
+## 4. Copy behavior data
+This step is to copy the behavior data from cognitive tasks.
+```bash
+cp -r /data/mica3/7T_task_fMRI/7T_task_fMRI/logs/sub-${SUBID}/$ses/beh/* /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/beh/
+```
+Please note that for Day3 we use different folder for now, and the rs-fMRI data is also named as different name (ses-03_2). The script should be therefore replace with:
+```bash
+cp -r /data/mica3/7T_task_fMRI/7T_task_fMRI_NE/logs/sub-${SUBID}/$ses/beh/* /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/beh/
+cp -r /data/mica3/7T_task_fMRI/7T_task_fMRI_NE/logs/sub-${SUBID}/${ses}2/beh/* /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/beh/
 ```
 
 Processing 7T with `micapipe`
