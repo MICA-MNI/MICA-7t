@@ -1,21 +1,42 @@
-# MICA-7t
+# Precision NeuroImaging 7T
 Scripts for sorting, organizing and processing the 7T database
 =======
 
 ## 1 . Transfering the data
->  Update this step
-The files from the 7t scan are in `/data/transfer/dicoms?????`.   
+The files from the 7t scan are in `/data/dicom/PNC001_Day1_?????`. First, find and claim data using `find_mri` and  `find_mri -claim` script. Then copy 7T data to our folder /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms.
+```bash
+SUBID=PNC001
+ses1=01
+ses=ses-${ses1}
+find_mri ${SUBID}
+find_mri -claim ${dicoms_directory}
+mkdir /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}
+mkdir /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/beh
+mkdir /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms
+mkdir /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms_sorted
+cp -r ${dicoms_directory_returned_from_previous_command} /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms
+```
 
 ## 2. Sorting the dicoms
-The first step is to sort the dicoms to `/data_/mica3/BIDS_PNI/sorted` using the `dcmSort` script.
+This step is to sort the dicoms to `/data_/mica3/BIDS_PNI/sorted` using the `dcmSort` script.
 ```bash
-dcmSort <dicoms_directory> /data_/mica3/BIDS_PNI/sorted/PNC001_ses-01
+dcmSort /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms_sorted
 ```
 
 ## 3. From sorted dicoms to BIDS
 Once the dicoms are sorted we can run the `7t2bids` to transform all the dicoms into NIFTIS and rename and organize the files  accoding to BIDS. 
 ```bash
-7t2bids -in /data_/mica3/BIDS_PNI/sorted/PNC001_ses-01 -id PNC001 -bids /data_/mica3/MICA-7T/rawdata -ses 01
+7t2bids -in /data_/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms_sorted -id ${SUBID} -bids /data_/mica3/BIDS_PNI/rawdata -ses ${ses1}
+```
+## 4. Copy behavior data
+This step is to copy the behavior data from cognitive tasks.
+```bash
+cp -r /data/mica3/7T_task_fMRI/7T_task_fMRI/logs/sub-${SUBID}/$ses/beh/* /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/beh/
+```
+Please note that for Day3 we use different folder for now, and the rs-fMRI data is also named as different name (ses-03_2). The script should be therefore replace with:
+```bash
+cp -r /data/mica3/7T_task_fMRI/7T_task_fMRI_NE/logs/sub-${SUBID}/$ses/beh/* /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/beh/
+cp -r /data/mica3/7T_task_fMRI/7T_task_fMRI_NE/logs/sub-${SUBID}/${ses}2/beh/* /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/beh/
 ```
 
 Processing 7T with `micapipe`
@@ -29,8 +50,8 @@ You can run any module of the pipeline locally (`-mica`), on the mica.q (`-qsub`
 # Subject's ID
 sub=PNC001
 ses=01
-bids=bids_PNC/rawdata
-out=bids_PNC/derivatives
+bids=/data/mica3/BIDS_PNI/rawdata/
+out=/data/mica3/BIDS_PNI/derivatives/
 
 micapipe -sub ${sub} -ses ${ses} -bids ${bids} \
          -out ${out} \
@@ -46,12 +67,14 @@ Surface processing
 > This step might be incorporated into the pipeline in the future but is still work on progress...
 
 ```bash
-id=sub-PNC001_ses-01
-Nifti=${id}/anat/${id/\//_}_space-nativepro_T1w.nii.gz
+id1=sub-PNC010/ses-02/
+id=sub-PNC010_ses-02
+
+Nifti=${id1}/anat/${id/\//_}_space-nativepro_T1w.nii.gz
 outStr=${id/\//_}_space-nativepro_T1w_nlm
-outdir=${id}/anat
-  
-denoiseN4 $Nifti $outStr $outdir
+outdir=${id1}/anat
+
+./host/yeatman/local_raid/rcruces/git_here/MRI_analytic_tools/Freesurfer_preprocessing/denoiseN4 $Nifti $outStr $outdir
 ```
 
 2.  Once the denoise is ready run the surface processing module with the `-fastsurfer` and `-T1` flags
@@ -66,7 +89,7 @@ micapipe -sub ${sub} -ses ${ses} \
   -bids ${bids} \
   -out ${out} \
   -proc_surf -threads 15 \
-  -fastsurfer -T1 ${t1nlm} -qsub
+  -fastsurfer -T1 ${t1nlm} -mica -qsub
 ```
 
 Fastsurfer QC
@@ -77,6 +100,18 @@ Warning!! Please make sure your eraser and brush values when editing are set to 
 
 1. The edits should be perfom on the `mask.mgz` file. However, maybe it's easier to correct over the file called `norm.mgz`. Once the edits are perform you can replace `mask.mgz` with the binarized version of the corrected `norm.mgz`.
 
+2. Run the next script after you are done with the edits. It will create new surfaces based on on the edits and generate a file named `qc_done.txt` under the subject's directory e.g. `fastsurfer/sub-PNA002_ses-01`.
+
+```bash
+sub=PNA002
+ses=01
+/data/mica1/01_programs/MICA-7t/functions/post-qc_fastsurfer.sh -sub ${sub} -ses ${ses} \
+         -out /data_/mica3/BIDS_PNI/derivatives/fastsurfer
+```
+<details><summary>post-qc_fastsurfer.sh details</summary>
+<p>
+
+#### `post-qc_fastsurfer.sh` will do the next steps:
 ```bash
 # Convert from mgz to nifti
 mri_convert norm.mgz norm.nii.gz
@@ -96,11 +131,14 @@ rm mask.mgz norm.mgz norm.mgz~
 mri_convert mask.nii.gz mask.mgz
 mri_convert norm.nii.gz norm.mgz
 
+# remove nifitis
+rm mask_edited.nii.gz mask.nii.gz norm.nii.gz
+
 # remove files previouslly created by the first run of recon-surf
 rm wm.mgz aparc.DKTatlas+aseg.orig.mgz
 ```
 
-2. Run the command `recon-surf.sh` using a singularity container to generate the new surfaces:
+Run the command `recon-surf.sh` using a singularity container to generate the new surfaces:
 ```
 # Subject id
 sub=sub-PNA002
@@ -134,23 +172,27 @@ singularity exec --nv -B ${SUBJECTS_DIR}/${sub}_${ses}:/data \
                       
 # Change the outputs permission, in case that someone else has to work on them
 chmod aug+wr -R ${SUBJECTS_DIR}/${sub}_${ses}
+
+touch ${SUBJECTS_DIR}/${sub}_${ses}/qc_done.txt
 ```
+</p>
+</details>
+
 
 `micapipe` second stage modules
 -------
-## `post_structural` and `proc_dwi`
-1. Then the post structural processing and `dwi_proc`
+## `post_structural`
+1. Then the post structural processing 
 ```bash
-micapipe -sub ${sub} -ses 01 \
-         -bids /data_/mica3/BIDS_PNC/rawdata \
-         -out /data_/mica3/BIDS_PNC/derivatives \
+micapipe -sub ${sub} -ses ${ses} \
+         -bids /data_/mica3/BIDS_PNI/rawdata \
+         -out /data_/mica3/BIDS_PNI/derivatives \
          -post_structural \
-         -proc_dwi \
-         -dwi_rpe rawdata/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-b0_dir-PA_epi.nii.gz \ 
+         -fastsurfer -threads 10 \
          -qsub
 ```
-
-2. Once the post structural processing is ready run the `-GD` `-Morphology`, `-SC` and `-proc_func` with the corresponding arguments
+## `proc_func`
+2. Once the post structural processing is ready run the `-GD`, `-MPC` and `-proc_func` with the corresponding arguments
 ```bash
 # set the bids directory as a variable
 rawdata=/data_/mica3/BIDS_PNI/rawdata
@@ -165,27 +207,101 @@ micapipe -sub ${sub} -ses ${ses} \
          -mainScanStr task-rest_echo-1_bold,task-rest_echo-2_bold,task-rest_echo-3_bold \
          -func_pe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-AP_epi.nii.gz \
          -func_rpe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-PA_epi.nii.gz \
-         -SC -tracts 10M \
-         -MPC -mpc_acq T1map \
-         -microstructural_img ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-inv1_T1map.nii.gz \
-         -microstructural_reg ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-T1_T1map.nii.gz
-         -qsub -threads 15 \
+         -threads 15 -qsub
+```
+##  `MPC`: Microstructural profile covariance
+```
+micapipe -sub ${sub} -ses ${ses} \
+         -bids ${rawdata} \
+         -out ${out} \
+         -MPC -mpc_acq qT1 \
+         -microstructural_img ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-T1_T1map.nii.gz \ # Quantitative MRI qT1
+         -microstructural_reg ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-inv1_T1map.nii.gz \ # MRI to register
+         -threads 15 -qsub
 ```
 
+##  `GD`: Geodesic distance
+```
+micapipe -sub ${sub} -ses ${ses} \
+         -bids ${rawdata} \
+         -out ${out} \
+         -GC \
+         -threads 15 -qsub
+```
+
+## `proc_dwi` DWI processing
+3. Then the post DWI processing module
+```bash
+micapipe -sub ${sub} -ses ${ses} \
+         -bids ${bids} -out ${out} \
+         -proc_dwi \
+         -dwi_rpe rawdata/sub-${sub}/ses-01/dwi/sub-${sub}_ses-01_acq-b0_dir-PA_epi.nii.gz \ 
+         -threads 15 -qsub
+```
+
+## `-SC` Structural Connectomes WORK IN PROGRESS
+4. Then the post DWI processing module
+```bash
+micapipe -sub ${sub} -ses ${ses} \
+         -bids /data_/mica3/BIDS_PNI/rawdata \
+         -out /data_/mica3/BIDS_PNI/derivatives \
+         -SC -tracts 40M \
+         -threads 15 -qsub
+```
+
+
 # Processing times
+| **Module**    | **Cores**|  **7T-PNI**  |  **3T-MICs** | **CPU**|
+|---------------|----------|--------------|--------------|--------|
+| `proc_struct` |   15     |   122 ± 16   |   48 ± 10    |   yes  |
+| `proc_surf`   |   15     |   188 ± 36   |   961 ± 205  |   yes  |
+| `post_struct` |   15     |   303 ± 41   |   75 ± 13    |   yes  |
+| `proc_func`   |   15     |    94 ± 8    |   103 ± 7    |   yes  |
+| `proc_dwi`    |   15     |       ?      |   184 ± 11   |   yes  |
+| `SC`          |   15     |       ?      |   918 ± 299  |   yes  |
+| `MPC`         |   10     |    14 ± 3    |   8 ± 2      |   no   |
+| `GD`          |   10     |    96 ± 21   |   171 ± 25   |   yes  |
+| `proc_flair`  |   10     |       -      |     2 ± 0    |   yes  |
+| *Total*       |    -     |   818 ± 125  |       ±      |    -   |
+
+
+## Processing times diferences between versions
+|  `micapipe`      | `v0.1.4`   | `v0.2.0`   | Difference |
+|------------------|------------|------------|------------|
+|  `proc_struct`   | 88 ± 17    | 48 ± 10    | faster     |
+|  `proc_surf`     | 961 ± 205  | ~120       | faster     |
+|  `post_struct`   | 125 ± 14   | 75 ± 13    | faster     |
+|  `proc_func`     | 101 ± 8    | 103 ± 7    | similar    |
+|  `proc_dwi`      | 246 ± 37   | 184 ± 11   | faster     |
+|  `SC`            | 906 ± 427  | 918 ± 299  | similar    |
+|  `MPC`           | 7 ± 1      | 8 ± 2      | similar    |
+|  `GD`            | 159 ± 21   | 171 ± 25   | slower     |
+| *Total*          | 2593 ± 730 | 1627 ± 367 | 966 ± 363  |
+
+
+# Derivatives size
+| **Directory** | **size** |
+|---------------|----------|
+| freesurfer    | ~830     |
+| micapipe/anat | ~820M    |
+| micapipe/dwi  | 13G      |
+| micapipe/func | 24G      |
+| micapipe/maps |          |
+| micapipe/surf |          |
+| micapipe/logs | 31M      |
+| micapipe/xfm  | 2.6G     |
+| micapipe/QC   | 46M      |
+| micapipe/     | ~10-40G  |
+
+
 # Rawdata size
-| **Module**    | **Cores**| **Time min** |
-|---------------|----------|--------------|
-| `proc_struct` |   15     | 122 ± 16  |
-| `proc_surf`   |   15     | 188 ± 36  |
-| `post_struct` |   15     | 303 ± 41  |
-| `proc_func`   |   15     |     ?     |
-| `proc_dwi`    |   15     |     ?     |
-| `SC`          |   15     |     ?     |
-| `MPC`         |   10     |  14 ± 3   |
-| `Morphology`  |   10     |   1 ± 0   |
-| `GD`          |   10     |  96 ± 21  |
-| *Total*       |    -     | 724 ± 117 |
+| **Directory** | **size** |
+|---------------|----------|
+| anat          | 495M     |
+| dwi           | 1.2G     |
+| fmap          | 15M      |
+| func          | 7.7G     |
+| *Total*       | 9.4G     |
 
 # 7T MRI acquisition protocol
 | Session  | Acquisition                                | BIDS dir | BIDS name              |
@@ -229,25 +345,3 @@ micapipe -sub ${sub} -ses ${ses} \
 | 03       | "*_MTON"                                   | anat     | mt-on_MTR              |
 | 03       | "*_MTOFF"                                  | anat     | mt-off_MTR             |
 | 03       | "*_T1W"                                    | anat     | acq-T1w_MTR            |
-
-
-# Rawdata size
-| **Directory** | **size** |
-|---------------|----------|
-| anat          | 495M     |
-| dwi           | 1.2G     |
-| fmap          | 15M      |
-| func          | 7.7G     |
-| *Total*       | 9.4G     |
-
-# Derivatives size
-| **Directory** | **size** |
-|---------------|----------|
-| freesurfer    | ~830     |
-| micapipe/anat | ~820M    |
-| micapipe/dwi  | 13G      |
-| micapipe/func | 24G      |
-| micapipe/logs | 31M      |
-| micapipe/xfm  | 2.6G     |
-| micapipe/QC   | 46M      |
-| micapipe/     | ~10-40G  |
