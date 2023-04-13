@@ -101,6 +101,7 @@ echo "[ERROR] One or more mandatory arguments are missing:
 # Inputs
 out=$(realpath "$out")
 id=${id/sub-/}
+subject="sub-${id}"
 here=$(pwd)
 
 # Number of session (Default is "ses-pre")
@@ -111,6 +112,12 @@ export idBIDS="${subject}${ses}"
 
 # test if the subjects directory exists
 if [[ ! -d ${out}/${idBIDS} ]]; then echo -e "[ERROR] subjects fastsurfer directory does not exist or the path is wrong:\n\t\t${out}/${idBIDS}"; exit 1; fi
+
+# output directory
+SUBJECTS_DIR=${out}
+
+# Check if the subject has been re-run 
+if [[ -f ${SUBJECTS_DIR}/${idBIDS}/qc_done.txt ]]; then echo "[WARNING] ${idBIDS} has been QC and run"; exit 1; fi
 
 # Move to the subjects directory
 cd ${out}/${idBIDS}/mri
@@ -133,13 +140,13 @@ rm mask.mgz norm.mgz norm.mgz~
 mri_convert mask.nii.gz mask.mgz
 mri_convert norm.nii.gz norm.mgz
 
+# remove nifitis
+rm mask_edited.nii.gz mask.nii.gz norm.nii.gz
+
 # remove files previouslly created by the first run of recon-surf
 rm wm.mgz aparc.DKTatlas+aseg.orig.mgz
 
 # Run the command recon-surf.sh using a singularity container to generate the new surfaces:
-# output directory
-SUBJECTS_DIR=${out}
-
 # path to singularity image
 fastsurfer_img=/data_/mica1/01_programs/fastsurfer/fastsurfer-cpu-v2.0.0.sif
 
@@ -167,3 +174,5 @@ singularity exec --nv -B ${SUBJECTS_DIR}/${idBIDS}:/data \
 chmod aug+wr -R ${SUBJECTS_DIR}/${idBIDS}
 
 cd ${here}
+
+touch ${SUBJECTS_DIR}/${idBIDS}/qc_done.txt
