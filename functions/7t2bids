@@ -153,7 +153,7 @@ for ((k=0; k<=n; k++)); do
        Do_cmd dcm2niix -b y -o "$BIDS" -f "$nom" ${nii}${orig[k]}
     done
   elif [ "$N" -eq 1 ]; then
-     Do_cmd dcm2niix -b y -o "$BIDS" -f ${id}${bids[k]} ${orig[k]}
+     Do_cmd dcm2niix -z y -b y -o "$BIDS" -f ${id}${bids[k]} ${orig[k]}
   fi
 done
 # move files to their corresponding directory
