@@ -184,10 +184,10 @@ for ((k=0; k<=n; k++)); do
        nom=${id}${bidsDWI[k]}
        dcm=$(echo ${nom##*_})
        nom=$(echo ${nom/$dcm/}run-${i}_${dcm})
-       Do_cmd dcm2niix -b y -o "$BIDS" -f $nom ${nii}${orig[k]}
+       Do_cmd dcm2niix -z y -b y -o "$BIDS" -f $nom ${nii}${orig[k]}
     done
   elif [ $N -eq 1 ]; then
-     Do_cmd dcm2niix -b y -o "$BIDS" -f ${id}${bidsDWI[k]} ${origDWI[k]}
+     Do_cmd dcm2niix -z y -b y -o "$BIDS" -f ${id}${bidsDWI[k]} ${origDWI[k]}
   fi
 done
 
