@@ -188,7 +188,7 @@ micapipe -sub ${sub} -ses ${ses} \
          -bids /data_/mica3/BIDS_PNI/rawdata \
          -out /data_/mica3/BIDS_PNI/derivatives \
          -post_structural \
-         -fastsurfer -threads 10 \
+         -threads 10 \
          -qsub
 ```
 ## `proc_func`
