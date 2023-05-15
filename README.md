@@ -1,7 +1,20 @@
 # Precision NeuroImaging 7T
 Scripts for sorting, organizing and processing the 7T database
 =======
+## 0 Running the protocol with Aaron
+```bash
+#log in to Aaron, source and activate conda environments 
+source /export02/local/conda/etc/profile.d/conda.sh
 
+#conda envt for Day 1 and 2 
+conda activate py383nv
+
+#conda envt for Day 3 and 4
+conda activate py382env
+
+#go to 7T dir
+cd /data/mica3/7T_fMRI/
+```
 ## 1 . Transfering the data
 The files from the 7t scan are in `/data/dicom/PNC001_Day1_?????`. First, find and claim data using `find_mri` and  `find_mri -claim` script. Then copy 7T data to our folder /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms.
 ```bash
