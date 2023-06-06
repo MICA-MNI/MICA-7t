@@ -7,7 +7,7 @@ Scripts for sorting, organizing and processing the 7T database
 source /export02/local/conda/etc/profile.d/conda.sh
 
 #conda envt for Day 1 and 2 
-conda activate py383nv
+conda activate py38nv
 
 #conda envt for Day 3 and 4
 conda activate py382env
