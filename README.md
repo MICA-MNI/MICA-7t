@@ -105,6 +105,7 @@ micapipe -sub ${sub} -ses ${ses} \
   -T1 ${t1nlm} -mica -qsub
 ```
 RUN CNN
+-------
 c/o Donna 
 
 Fastsurfer QC
