@@ -104,8 +104,35 @@ micapipe -sub ${sub} -ses ${ses} \
   -proc_surf -threads 15 \
   -T1 ${t1nlm} -mica -qsub
 ```
-RUN CNN
+Run CNN 
 -------
+Note: CNN generated masks should be applied to Fastsurfer before manual QC 
+To apply the mask: 
+# Generate the new binary mask from the CNN inference
+mask_inference=path_to_file
+fsdir=path_to_subject_surface_directory
+
+# Erase the mask and the norm
+rm ${fsdir}/mri/mask.mgz ${fsdir}/mri/norm.mgz
+
+# Replace the mask
+mri_convert $mask_inference ${fsdir}/mri/mask.mgz
+
+# Multiply the orig_nu.mgz with the inference_mask
+mrconvert ${fsdir}/mri/orig_nu.mgz ${fsdir}/mri/orig_nu.nii.gz
+fslmaths $mask_inference -mul ${fsdir}/mri/orig_nu.nii.gz ${fsdir}/mri/norm.nii.gz
+
+# Convert norm.nii.gz to mgz
+mrconvert ${fsdir}/mri/norm.nii.gz ${fsdir}/mri/norm.mgz
+
+# Remove files previouslly created by the first run of recon-surf
+rm ${fsdir}/mri/wm.mgz ${fsdir}/mri/aparc.DKTatlas+aseg.orig.mgz ${fsdir}/mri/orig_nu.nii.gz
+
+# re-run fastsurfer
+sub=PNA002
+ses=01
+/data/mica1/01_programs/MICA-7t/functions/post-qc_fastsurfer.sh -sub ${sub} -ses ${ses} \
+         -out /data_/mica3/BIDS_PNI/derivatives/fastsurfer
 c/o Donna 
 
 Fastsurfer QC
