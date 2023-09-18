@@ -106,35 +106,42 @@ micapipe -sub ${sub} -ses ${ses} \
 ```
 Run CNN 
 -------
+c/o Donna 
 Note: CNN generated masks should be applied to Fastsurfer before manual QC 
 To apply the mask: 
-# Generate the new binary mask from the CNN inference
+1. Generate the new binary mask from the CNN inference
+```bash
 mask_inference=path_to_file
 fsdir=path_to_subject_surface_directory
-
-# Erase the mask and the norm
+```
+2. Erase the mask and the norm
+```bash
 rm ${fsdir}/mri/mask.mgz ${fsdir}/mri/norm.mgz
-
-# Replace the mask
+```
+3. Replace the mask
+```bash
 mri_convert $mask_inference ${fsdir}/mri/mask.mgz
-
-# Multiply the orig_nu.mgz with the inference_mask
+```
+5. Multiply the orig_nu.mgz with the inference_mask
+```bash
 mrconvert ${fsdir}/mri/orig_nu.mgz ${fsdir}/mri/orig_nu.nii.gz
 fslmaths $mask_inference -mul ${fsdir}/mri/orig_nu.nii.gz ${fsdir}/mri/norm.nii.gz
-
-# Convert norm.nii.gz to mgz
+```
+6. Convert norm.nii.gz to mgz
+```bash
 mrconvert ${fsdir}/mri/norm.nii.gz ${fsdir}/mri/norm.mgz
-
-# Remove files previouslly created by the first run of recon-surf
+```
+7. Remove files previouslly created by the first run of recon-surf
+```bash
 rm ${fsdir}/mri/wm.mgz ${fsdir}/mri/aparc.DKTatlas+aseg.orig.mgz ${fsdir}/mri/orig_nu.nii.gz
-
-# re-run fastsurfer
+```
+8. re-run fastsurfer
+```bash
 sub=PNA002
 ses=01
 /data/mica1/01_programs/MICA-7t/functions/post-qc_fastsurfer.sh -sub ${sub} -ses ${ses} \
          -out /data_/mica3/BIDS_PNI/derivatives/fastsurfer
-c/o Donna 
-
+```
 Fastsurfer QC
 -------
 The main outputs of `fastsurfer` deep volumetric segmentation are found under the `mri/` directory: `aparc.DKTatlas+aseg.deep.mgz`, `mask.mgz`, and `orig.mgz`. The equivalent of freesurfer's brainmask.mgz now is called `norm.mgz`.
