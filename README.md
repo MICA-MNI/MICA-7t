@@ -102,8 +102,10 @@ micapipe -sub ${sub} -ses ${ses} \
   -bids ${bids} \
   -out ${out} \
   -proc_surf -threads 15 \
-  -fastsurfer -T1 ${t1nlm} -mica -qsub
+  -T1 ${t1nlm} -mica -qsub
 ```
+RUN CNN
+c/o Donna 
 
 Fastsurfer QC
 -------
