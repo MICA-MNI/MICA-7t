@@ -3,17 +3,25 @@ Scripts for sorting, organizing and processing the 7T database
 =======
 ## 0 Running the protocol with Aaron
 ```bash
-#log in to Aaron, source and activate conda environments 
+# 1. log in to Aaron, source and activate conda environments 
 source /export02/local/conda/etc/profile.d/conda.sh
 
-#conda envt for Day 1 and 2 
+# 2. conda envt for Day 1 and 2 
 conda activate py38nv
 
-#conda envt for Day 3 and 4
+# 3. conda envt for Day 3 and 4
 conda activate py382env
 
-#go to 7T dir
-cd /data/mica3/7T_fMRI/
+# 4. go to 7T dir
+cd /data/mica3/7T_task_fMRI/from_micaopen/micaopen/7T_task_fMRI
+
+# 5. open the GUI 
+python run_tasks.py
+
+# 6. if running Day 3 or 4, open another terminal and repeat the 1-4 steps then
+
+python test_vlc.py
+
 ```
 ## 1 . Transfering the data
 The files from the 7t scan are in `/data/dicom/PNC001_Day1_?????`. First, find and claim data using `find_mri` and  `find_mri -claim` script. Then copy 7T data to our folder /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms.
