@@ -7,7 +7,7 @@ Scripts for sorting, organizing and processing the 7T database
 source /export02/local/conda/etc/profile.d/conda.sh
 
 # 2. conda envt for Day 1 and 2 
-conda activate py38nv
+conda activate py38env
 
 # 3. conda envt for Day 3 and 4
 conda activate py382env
@@ -68,17 +68,31 @@ You can run any module of the pipeline locally (`-mica`), on the mica.q (`-qsub`
 -------
 1. First run the structural processing with the flag `-uni` for MP2RAGE 7T data
 ```bash
-# Subject's ID
-sub=PNC001
-ses=01
-bids=/data/mica3/BIDS_PNI/rawdata/
-out=/data/mica3/BIDS_PNI/derivatives/
+#!/bin/bash
+#
+# micapipe v0.2.0 "Northern Flicker"
+# 
+sub=$1
+ses=$2
 
-micapipe -sub ${sub} -ses ${ses} -bids ${bids} \
-         -out ${out} \
-         -uni -T1wStr acq-uni_T1map \
-         -proc_structural –mf 3 \
-         -threads 15 -qsub
+# Variables
+bids=/data/mica3/BIDS_PNI/rawdata
+out=/data/mica3/BIDS_PNI/derivatives/data_release_derivatives
+tmp=/data/mica2/temporaryNetworkProcessing
+fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
+
+# run this container
+micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.2.sif
+
+# call singularity
+singularity run --writable-tmpfs --containall \
+	-B ${bids}:/bids \
+	-B ${out}:/out \
+	-B ${tmp}:/tmp \
+	-B ${fs_lic}:/opt/licence.txt \
+	${micapipe_img} \
+	-bids /bids -out /out -fs_licence /opt/licence.txt -threads 6 -sub ${sub} -ses ${ses} \
+	-proc_structural -uni -T1wStr acq-uni_T1map
 
 ```
 
