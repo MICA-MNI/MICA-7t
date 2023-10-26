@@ -69,9 +69,7 @@ You can run any module of the pipeline locally (`-mica`), on the mica.q (`-qsub`
 1. First run the structural processing with the flag `-uni` for MP2RAGE 7T data
 ```bash
 #!/bin/bash
-#
 # micapipe v0.2.0 "Northern Flicker"
-# 
 sub=$1
 ses=$2
 
@@ -102,6 +100,7 @@ Surface processing
 > This step might be incorporated into the pipeline in the future but is still work on progress...
 
 ```bash
+# cd to micapipe subject directory
 id1=sub-PNC010/ses-02/
 id=sub-PNC010_ses-02
 
@@ -114,23 +113,34 @@ outdir=${id1}/anat
 
 2.  Once the denoise is ready run the surface processing module with the `-fastsurfer` and `-T1` flags
 ```bash
+# run this container
+micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.2.sif
+
 sub=PNC001
 ses=01
+
 bids=/data_/mica3/BIDS_PNI/rawdata
 out=/data_/mica3/BIDS_PNI/derivatives
 t1nlm=${out}/micapipe_v0.2.0/sub-${sub}/ses-${ses}/anat/sub-${sub}_ses-${ses}_space-nativepro_T1w_nlm.nii.gz
 
-micapipe -sub ${sub} -ses ${ses} \
-  -bids ${bids} \
-  -out ${out} \
-  -proc_surf -threads 15 \
-  -T1 ${t1nlm} -mica -qsub
+# call singularity
+singularity run --writable-tmpfs --containall \
+	-B ${bids}:/bids \
+	-B ${out}:/out \
+	-B ${tmp}:/tmp \
+	-B ${fs_lic}:/opt/licence.txt \
+	${micapipe_img} \
+	-bids /bids -out /out -fs_licence /opt/licence.txt -threads 6 -sub ${sub} -ses ${ses} \
+	-proc_surf T1 ${t1nlm}
+
 ```
 Run CNN 
 -------
 c/o Donna 
-Note: CNN generated masks should be applied to Fastsurfer before manual QC 
+Note: CNN generated masks should be applied to Fastsurfer before manual QC
+
 To apply the mask: 
+
 1. Generate the new binary mask from the CNN inference
 ```bash
 mask_inference=path_to_file
