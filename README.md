@@ -101,14 +101,14 @@ Surface processing
 
 ```bash
 # cd to micapipe subject directory
-id1=sub-PNC010/ses-02/
-id=sub-PNC010_ses-02
+id1=sub-PNC003/ses-04/
+id=sub-PNC003_ses-04
 
 Nifti=${id1}/anat/${id/\//_}_space-nativepro_T1w.nii.gz
 outStr=${id/\//_}_space-nativepro_T1w_nlm
 outdir=${id1}/anat
 
-./host/yeatman/local_raid/rcruces/git_here/MRI_analytic_tools/Freesurfer_preprocessing/denoiseN4 $Nifti $outStr $outdir 15
+bash /host/yeatman/local_raid/rcruces/git_here/MRI_analytic_tools/Freesurfer_preprocessing/denoiseN4 $Nifti $outStr $outdir 15
 ```
 
 2.  Once the denoise is ready run the surface processing module with the `-fastsurfer` and `-T1` flags
