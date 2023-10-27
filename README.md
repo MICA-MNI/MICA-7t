@@ -260,7 +260,41 @@ touch ${SUBJECTS_DIR}/${sub}_${ses}/qc_done.txt
 </p>
 </details>
 
+`micapipe` second stage modules
+# One shot processing after reconsurf
+```
 
+bids=/data/mica3/BIDS_PNI/rawdata
+out=/data/mica3/BIDS_PNI/derivatives/data_release_derivatives
+tmp=/data/mica2/temporaryNetworkProcessing
+fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
+fsdir=/data/mica3/BIDS_PNI/derivatives/fastsurfer/${sub}_${ses}
+
+# run this container
+micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.2.sif
+
+# call singularity
+singularity run --writable-tmpfs --containall \
+	-B ${bids}:/bids \
+	-B ${out}:/out \
+	-B ${tmp}:/tmp \
+	-B ${fsdir}:${fsdir} \
+	-B ${fs_lic}:/opt/licence.txt \
+	 ${micapipe_img} -bids /bids -out /out \
+	-sub ${sub} -ses ${ses} -proc_surf -surf_dir ${fsdir} -fs_licence /opt/licence.txt -threads 10 \
+	-proc_surf -surf_dir ${fsdir} -post_structural \
+	-proc_dwi -dwi_rpe /bids/${sub}/${ses}/dwi/${sub}_${ses}_acq-b0_dir-PA_epi.nii.gz \
+	-GD -proc_func \
+	-mainScanStr task-rest_echo-1_bold,task-rest_echo-2_bold,task-rest_echo-3_bold \
+	-func_pe /bids/${sub}/${ses}/fmap/${sub}_${ses}_acq-fmri_dir-AP_epi.nii.gz \
+	-func_rpe /bids/${sub}/${ses}/fmap/${sub}_${ses}_acq-fmri_dir-PA_epi.nii.gz \
+	-MPC -mpc_acq T1map -regSynth \
+	-microstructural_img /bids/${sub}/${ses}/anat/${sub}_${ses}_acq-T1_T1map.nii.gz \
+	-microstructural_reg /bids/${sub}/${ses}/anat/${sub}_${ses}_acq-inv1_T1map.nii.gz \
+	-SC -tracts 40M
+
+
+```
 `micapipe` second stage modules
 -------
 ## `post_structural`
