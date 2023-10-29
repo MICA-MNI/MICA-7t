@@ -63,15 +63,16 @@ cp -r /data/mica3/7T_task_fMRI/7T_task_fMRI_NE/logs/sub-${SUBID}/${ses}2/beh/* /
 Processing 7T with `micapipe`
 =======
 You can run any module of the pipeline locally (`-mica`), on the mica.q (`-qsub`) or all.q (`-qall`). But you should always use one of these flags.
+0. Set singularity environment and directories 
 
-`micapipe` first stage modules: structural processing
--------
-1. First run the structural processing with the flag `-uni` for MP2RAGE 7T data
 ```bash
 #!/bin/bash
 # micapipe v0.2.0 "Northern Flicker"
 sub=$1
 ses=$2
+
+sub=PNC001
+ses-01
 
 # Variables
 bids=/data/mica3/BIDS_PNI/rawdata
@@ -82,6 +83,12 @@ fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
 # run this container
 micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.2.sif
 
+```
+
+`micapipe` first stage modules: structural processing
+-------
+1. First run the structural processing with the flag `-uni` for MP2RAGE 7T data
+```
 # call singularity
 singularity run --writable-tmpfs --containall \
 	-B ${bids}:/bids \
@@ -101,8 +108,8 @@ Surface processing
 
 ```bash
 # cd to micapipe subject directory
-id1=sub-PNC003/ses-04/
-id=sub-PNC003_ses-04
+id1=sub-PNC022/ses-01/
+id=sub-PNC022_ses-01
 
 Nifti=${id1}/anat/${id/\//_}_space-nativepro_T1w.nii.gz
 outStr=${id/\//_}_space-nativepro_T1w_nlm
@@ -113,14 +120,8 @@ bash /host/yeatman/local_raid/rcruces/git_here/MRI_analytic_tools/Freesurfer_pre
 
 2.  Once the denoise is ready run the surface processing module with the `-fastsurfer` and `-T1` flags
 ```bash
-# run this container
-micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.2.sif
 
-sub=PNC001
-ses=01
-
-bids=/data_/mica3/BIDS_PNI/rawdata
-out=/data_/mica3/BIDS_PNI/derivatives
+# use the denoised T1
 t1nlm=${out}/micapipe_v0.2.0/sub-${sub}/ses-${ses}/anat/sub-${sub}_ses-${ses}_space-nativepro_T1w_nlm.nii.gz
 
 # call singularity
