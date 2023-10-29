@@ -63,7 +63,9 @@ cp -r /data/mica3/7T_task_fMRI/7T_task_fMRI_NE/logs/sub-${SUBID}/${ses}2/beh/* /
 Processing 7T with `micapipe`
 =======
 You can run any module of the pipeline locally (`-mica`), on the mica.q (`-qsub`) or all.q (`-qall`). But you should always use one of these flags.
+
 0. Set singularity environment and directories 
+
 
 ```bash
 #!/bin/bash
