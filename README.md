@@ -78,7 +78,7 @@ ses-01
 
 # Variables
 bids=/data/mica3/BIDS_PNI/rawdata
-out=/data/mica3/BIDS_PNI/derivatives/data_release_derivatives
+out=/data/mica3/BIDS_PNI/derivatives
 tmp=/data/mica2/temporaryNetworkProcessing
 fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
 
@@ -146,8 +146,8 @@ To apply the mask:
 
 1. Generate the new binary mask from the CNN inference
 ```bash
-mask_inference=path_to_file
-fsdir=path_to_subject_surface_directory
+mask_inference=/host/percy/local_raid/donna/7T_NNunet/new/nnUNet_results/Dataset500_Segmentation/nnUNetTrainer__nnUNetPlans__3d_fullres/inference/PNC_122.nii.gz
+fsdir=/data/mica3/BIDS_PNI/derivatives/fastsurfer/sub-PNC022_ses-01
 ```
 2. Erase the mask and the norm
 ```bash
@@ -330,13 +330,28 @@ micapipe -sub ${sub} -ses ${ses} \
 ```
 ##  `MPC`: Microstructural profile covariance
 ```
-micapipe -sub ${sub} -ses ${ses} \
-         -bids ${rawdata} \
-         -out ${out} \
-         -MPC -mpc_acq qT1 \
-         -microstructural_img ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-T1_T1map.nii.gz \ # Quantitative MRI qT1
-         -microstructural_reg ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-inv1_T1map.nii.gz \ # MRI to register
-         -threads 15 -qsub
+bids=/data/mica3/BIDS_PNI/rawdata
+out=/data/mica3/BIDS_PNI/derivatives/
+tmp=/data/mica2/temporaryNetworkProcessing
+fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
+fsdir=/data/mica3/BIDS_PNI/derivatives/fastsurfer/${sub}_${ses}
+
+# run this container
+micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.2.sif
+
+# call singularity
+singularity run --writable-tmpfs --containall \
+	-B ${bids}:/bids \
+	-B ${out}:/out \
+	-B ${tmp}:/tmp \
+	-B ${fsdir}:${fsdir} \
+	-B ${fs_lic}:/opt/licence.txt \
+	 ${micapipe_img} -bids /bids -out /out \
+	-sub ${sub} -ses ${ses} -proc_surf -surf_dir ${fsdir} -fs_licence /opt/licence.txt -threads 10 \
+	-MPC -mpc_acq T1map -regSynth \
+	-microstructural_img /bids/${sub}/${ses}/anat/${sub}_${ses}_acq-T1_T1map.nii.gz \
+	-microstructural_reg /bids/${sub}/${ses}/anat/${sub}_${ses}_acq-inv1_T1map.nii.gz
+
 ```
 
 ##  `GD`: Geodesic distance
