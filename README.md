@@ -268,7 +268,7 @@ touch ${SUBJECTS_DIR}/${sub}_${ses}/qc_done.txt
 ```
 
 bids=/data/mica3/BIDS_PNI/rawdata
-out=/data/mica3/BIDS_PNI/derivatives/data_release_derivatives
+out=/data/mica3/BIDS_PNI/derivatives
 tmp=/data/mica2/temporaryNetworkProcessing
 fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
 fsdir=/data/mica3/BIDS_PNI/derivatives/fastsurfer/${sub}_${ses}
@@ -285,7 +285,7 @@ singularity run --writable-tmpfs --containall \
 	-B ${fs_lic}:/opt/licence.txt \
 	 ${micapipe_img} -bids /bids -out /out \
 	-sub ${sub} -ses ${ses} -proc_surf -surf_dir ${fsdir} -fs_licence /opt/licence.txt -threads 10 \
-	-proc_surf -surf_dir ${fsdir} -post_structural \
+        -post_structural \
 	-proc_dwi -dwi_rpe /bids/${sub}/${ses}/dwi/${sub}_${ses}_acq-b0_dir-PA_epi.nii.gz \
 	-GD -proc_func \
 	-mainScanStr task-rest_echo-1_bold,task-rest_echo-2_bold,task-rest_echo-3_bold \
