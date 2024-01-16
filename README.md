@@ -23,7 +23,7 @@ python run_tasks.py
 python test_vlc.py
 
 ```
-## 1 . Transfering the data
+## 1 . Transfering the data (C
 The files from the 7t scan are in `/data/dicom/PNC001_Day1_?????`. First, find and claim data using `find_mri` and  `find_mri -claim` script. Then copy 7T data to our folder /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms.
 ```bash
 SUBID=PNC001
@@ -296,93 +296,21 @@ singularity run --writable-tmpfs --containall \
 	-microstructural_reg /bids/${sub}/${ses}/anat/${sub}_${ses}_acq-inv1_T1map.nii.gz \
 	-SC -tracts 40M
 
+# cleanup - Change the module name and subject name accordingly. 
 
-```
-`micapipe` second stage modules
--------
-## `post_structural`
-1. Then the post structural processing 
-```bash
-micapipe -sub ${sub} -ses ${ses} \
-         -bids /data_/mica3/BIDS_PNI/rawdata \
-         -out /data_/mica3/BIDS_PNI/derivatives \
-         -post_structural \
-         -threads 10 \
-         -qsub
-```
-## `proc_func`
-2. Once the post structural processing is ready run the `-GD`, `-MPC` and `-proc_func` with the corresponding arguments
-```bash
-# set the bids directory as a variable
-rawdata=/data_/mica3/BIDS_PNI/rawdata
-out=/data_/mica3/BIDS_PNI/derivatives
-sub=PNC001
-ses=01
-
-micapipe -sub ${sub} -ses ${ses} \
-         -bids ${rawdata} \
-         -out ${out} \
-         -proc_func \
-         -mainScanStr task-rest_echo-1_bold,task-rest_echo-2_bold,task-rest_echo-3_bold \
-         -func_pe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-AP_epi.nii.gz \
-         -func_rpe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-PA_epi.nii.gz \
-         -threads 15 -qsub
-```
-##  `MPC`: Microstructural profile covariance
-```
-bids=/data/mica3/BIDS_PNI/rawdata
-out=/data/mica3/BIDS_PNI/derivatives/
-tmp=/data/mica2/temporaryNetworkProcessing
-fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
-fsdir=/data/mica3/BIDS_PNI/derivatives/fastsurfer/${sub}_${ses}
-
-# run this container
 micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.2.sif
-
-# call singularity
-singularity run --writable-tmpfs --containall \
-	-B ${bids}:/bids \
-	-B ${out}:/out \
-	-B ${tmp}:/tmp \
-	-B ${fsdir}:${fsdir} \
-	-B ${fs_lic}:/opt/licence.txt \
-	 ${micapipe_img} -bids /bids -out /out \
-	-sub ${sub} -ses ${ses} -proc_surf -surf_dir ${fsdir} -fs_licence /opt/licence.txt -threads 10 \
-	-MPC -mpc_acq T1map -regSynth \
-	-microstructural_img /bids/${sub}/${ses}/anat/${sub}_${ses}_acq-T1_T1map.nii.gz \
-	-microstructural_reg /bids/${sub}/${ses}/anat/${sub}_${ses}_acq-inv1_T1map.nii.gz
-
-```
-
-##  `GD`: Geodesic distance
-```
-micapipe -sub ${sub} -ses ${ses} \
-         -bids ${rawdata} \
-         -out ${out} \
-         -GC \
-         -threads 15 -qsub
-```
-
-## `proc_dwi` DWI processing
-3. Then the post DWI processing module
-```bash
-micapipe -sub ${sub} -ses ${ses} \
-         -bids ${bids} -out ${out} \
-         -proc_dwi \
-         -dwi_rpe rawdata/sub-${sub}/ses-01/dwi/sub-${sub}_ses-01_acq-b0_dir-PA_epi.nii.gz \ 
-         -threads 15 -qsub
-```
-
-## `-SC` Structural Connectomes WORK IN PROGRESS
-4. Then the post DWI processing module
-```bash
-micapipe -sub ${sub} -ses ${ses} \
-         -bids /data_/mica3/BIDS_PNI/rawdata \
-         -out /data_/mica3/BIDS_PNI/derivatives \
-         -SC -tracts 40M \
-         -threads 15 -qsub
-```
-
+bids=/data/mica3/BIDS_PNI/rawdata/
+out=/data/mica3/BIDS_PNI/derivatives
+fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
+tmp=/data/mica2/temporaryNetworkProcessing
+sub=sub-PNC009
+ses=ses-04
+echo "cleaning ${idBIDS} directory"
+micapipe_cleanup -sub "${sub}" \
+        -ses "${ses}" \
+        -bids '/data/mica3/BIDS_PNI/rawdata' \
+        -out '/data/mica3/BIDS_PNI/derivatives' \
+        -post_structural
 
 # Processing times
 | **Module**    | **Cores**|  **7T-PNI**  |  **3T-MICs** | **CPU**|
