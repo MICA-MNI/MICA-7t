@@ -298,6 +298,7 @@ singularity run --writable-tmpfs --containall \
 
 ```
 # cleanup - Change the module name and subject name accordingly. 
+```
 
 micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.2.sif
 bids=/data/mica3/BIDS_PNI/rawdata/
@@ -312,6 +313,8 @@ micapipe_cleanup -sub "${sub}" \
         -bids '/data/mica3/BIDS_PNI/rawdata' \
         -out '/data/mica3/BIDS_PNI/derivatives' \
         -post_structural
+```
+
 
 # Processing times
 | **Module**    | **Cores**|  **7T-PNI**  |  **3T-MICs** | **CPU**|
