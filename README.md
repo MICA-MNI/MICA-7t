@@ -74,7 +74,7 @@ sub=$1
 ses=$2
 
 sub=PNC001
-ses-01
+ses=01
 
 # Variables
 bids=/data/mica3/BIDS_PNI/rawdata
