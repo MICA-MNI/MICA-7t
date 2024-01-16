@@ -296,6 +296,7 @@ singularity run --writable-tmpfs --containall \
 	-microstructural_reg /bids/${sub}/${ses}/anat/${sub}_${ses}_acq-inv1_T1map.nii.gz \
 	-SC -tracts 40M
 
+```
 # cleanup - Change the module name and subject name accordingly. 
 
 micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.2.sif
