@@ -30,11 +30,9 @@ raul.rodriguezcrcues@mcgill.ca
 "
 }
 
-# Source print functions from MICAPIPE
-#dir_functions=$(dirname $(realpath "$0"))
-#MICAPIPE=$(dirname $(realpath "$dir_functions"))
-MICAPIPE=/data_/mica1/01_programs/micapipe
-source "${MICAPIPE}/functions/utilities.sh"
+# Source print functions
+dir_functions=$(dirname $(realpath "$0"))
+source "${dir_functions}/utilities.sh"
 
 #------------------------------------------------------------------------------#
 #			ARGUMENTS
@@ -216,4 +214,3 @@ Do_cmd cd "$here"
 
 Info "Remember to validate your BIDS directory:
                 http://bids-standard.github.io/bids-validator/"
-bids_variables_unset

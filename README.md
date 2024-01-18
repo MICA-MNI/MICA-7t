@@ -3,19 +3,27 @@ Scripts for sorting, organizing and processing the 7T database
 =======
 ## 0 Running the protocol with Aaron
 ```bash
-#log in to Aaron, source and activate conda environments 
+# 1. log in to Aaron, source and activate conda environments 
 source /export02/local/conda/etc/profile.d/conda.sh
 
-#conda envt for Day 1 and 2 
-conda activate py38nv
+# 2. conda envt for Day 1 and 2 
+conda activate py38env
 
-#conda envt for Day 3 and 4
+# 3. conda envt for Day 3 and 4
 conda activate py382env
 
-#go to 7T dir
-cd /data/mica3/7T_fMRI/
+# 4. go to 7T dir
+cd /data/mica3/7T_task_fMRI/from_micaopen/micaopen/7T_task_fMRI
+
+# 5. open the GUI 
+python run_tasks.py
+
+# 6. if running Day 3 or 4, open another terminal and repeat the 1-4 steps then
+
+python test_vlc.py
+
 ```
-## 1 . Transfering the data
+## 1 . Transfering the data (C
 The files from the 7t scan are in `/data/dicom/PNC001_Day1_?????`. First, find and claim data using `find_mri` and  `find_mri -claim` script. Then copy 7T data to our folder /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms.
 ```bash
 SUBID=PNC001
@@ -56,21 +64,42 @@ Processing 7T with `micapipe`
 =======
 You can run any module of the pipeline locally (`-mica`), on the mica.q (`-qsub`) or all.q (`-qall`). But you should always use one of these flags.
 
+0. Set singularity environment and directories 
+
+
+```bash
+#!/bin/bash
+# micapipe v0.2.0 "Northern Flicker"
+sub=$1
+ses=$2
+
+sub=PNC001
+ses=01
+
+# Variables
+bids=/data/mica3/BIDS_PNI/rawdata
+out=/data/mica3/BIDS_PNI/derivatives
+tmp=/data/mica2/temporaryNetworkProcessing
+fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
+
+# run this container
+micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.2.sif
+
+```
+
 `micapipe` first stage modules: structural processing
 -------
 1. First run the structural processing with the flag `-uni` for MP2RAGE 7T data
-```bash
-# Subject's ID
-sub=PNC001
-ses=01
-bids=/data/mica3/BIDS_PNI/rawdata/
-out=/data/mica3/BIDS_PNI/derivatives/
-
-micapipe -sub ${sub} -ses ${ses} -bids ${bids} \
-         -out ${out} \
-         -uni -T1wStr acq-uni_T1map \
-         -proc_structural –mf 3 \
-         -threads 15 -qsub
+```
+# call singularity
+singularity run --writable-tmpfs --containall \
+	-B ${bids}:/bids \
+	-B ${out}:/out \
+	-B ${tmp}:/tmp \
+	-B ${fs_lic}:/opt/licence.txt \
+	${micapipe_img} \
+	-bids /bids -out /out -fs_licence /opt/licence.txt -threads 6 -sub ${sub} -ses ${ses} \
+	-proc_structural -uni -T1wStr acq-uni_T1map
 
 ```
 
@@ -80,31 +109,74 @@ Surface processing
 > This step might be incorporated into the pipeline in the future but is still work on progress...
 
 ```bash
-id1=sub-PNC010/ses-02/
-id=sub-PNC010_ses-02
+# cd to micapipe subject directory
+id1=sub-PNC022/ses-01/
+id=sub-PNC022_ses-01
 
 Nifti=${id1}/anat/${id/\//_}_space-nativepro_T1w.nii.gz
 outStr=${id/\//_}_space-nativepro_T1w_nlm
 outdir=${id1}/anat
 
-./host/yeatman/local_raid/rcruces/git_here/MRI_analytic_tools/Freesurfer_preprocessing/denoiseN4 $Nifti $outStr $outdir 15
+bash /host/yeatman/local_raid/rcruces/git_here/MRI_analytic_tools/Freesurfer_preprocessing/denoiseN4 $Nifti $outStr $outdir 15
 ```
 
 2.  Once the denoise is ready run the surface processing module with the `-fastsurfer` and `-T1` flags
 ```bash
-sub=PNC001
-ses=01
-bids=/data_/mica3/BIDS_PNI/rawdata
-out=/data_/mica3/BIDS_PNI/derivatives
+
+# use the denoised T1
 t1nlm=${out}/micapipe_v0.2.0/sub-${sub}/ses-${ses}/anat/sub-${sub}_ses-${ses}_space-nativepro_T1w_nlm.nii.gz
 
-micapipe -sub ${sub} -ses ${ses} \
-  -bids ${bids} \
-  -out ${out} \
-  -proc_surf -threads 15 \
-  -fastsurfer -T1 ${t1nlm} -mica -qsub
-```
+# call singularity
+singularity run --writable-tmpfs --containall \
+	-B ${bids}:/bids \
+	-B ${out}:/out \
+	-B ${tmp}:/tmp \
+	-B ${fs_lic}:/opt/licence.txt \
+	${micapipe_img} \
+	-bids /bids -out /out -fs_licence /opt/licence.txt -threads 6 -sub ${sub} -ses ${ses} \
+	-proc_surf T1 ${t1nlm}
 
+```
+Run CNN 
+-------
+c/o Donna 
+Note: CNN generated masks should be applied to Fastsurfer before manual QC
+
+To apply the mask: 
+
+1. Generate the new binary mask from the CNN inference
+```bash
+mask_inference=/host/percy/local_raid/donna/7T_NNunet/new/nnUNet_results/Dataset500_Segmentation/nnUNetTrainer__nnUNetPlans__3d_fullres/inference/PNC_122.nii.gz
+fsdir=/data/mica3/BIDS_PNI/derivatives/fastsurfer/sub-PNC022_ses-01
+```
+2. Erase the mask and the norm
+```bash
+rm ${fsdir}/mri/mask.mgz ${fsdir}/mri/norm.mgz
+```
+3. Replace the mask
+```bash
+mri_convert $mask_inference ${fsdir}/mri/mask.mgz
+```
+5. Multiply the orig_nu.mgz with the inference_mask
+```bash
+mrconvert ${fsdir}/mri/orig_nu.mgz ${fsdir}/mri/orig_nu.nii.gz
+fslmaths $mask_inference -mul ${fsdir}/mri/orig_nu.nii.gz ${fsdir}/mri/norm.nii.gz
+```
+6. Convert norm.nii.gz to mgz
+```bash
+mrconvert ${fsdir}/mri/norm.nii.gz ${fsdir}/mri/norm.mgz
+```
+7. Remove files previouslly created by the first run of recon-surf
+```bash
+rm ${fsdir}/mri/wm.mgz ${fsdir}/mri/aparc.DKTatlas+aseg.orig.mgz ${fsdir}/mri/orig_nu.nii.gz
+```
+8. re-run fastsurfer
+```bash
+sub=PNA002
+ses=01
+/data/mica1/01_programs/MICA-7t/functions/post-qc_fastsurfer.sh -sub ${sub} -ses ${ses} \
+         -out /data_/mica3/BIDS_PNI/derivatives/fastsurfer
+```
 Fastsurfer QC
 -------
 The main outputs of `fastsurfer` deep volumetric segmentation are found under the `mri/` directory: `aparc.DKTatlas+aseg.deep.mgz`, `mask.mgz`, and `orig.mgz`. The equivalent of freesurfer's brainmask.mgz now is called `norm.mgz`.
@@ -191,75 +263,56 @@ touch ${SUBJECTS_DIR}/${sub}_${ses}/qc_done.txt
 </p>
 </details>
 
-
 `micapipe` second stage modules
--------
-## `post_structural`
-1. Then the post structural processing 
-```bash
-micapipe -sub ${sub} -ses ${ses} \
-         -bids /data_/mica3/BIDS_PNI/rawdata \
-         -out /data_/mica3/BIDS_PNI/derivatives \
-         -post_structural \
-         -threads 10 \
-         -qsub
-```
-## `proc_func`
-2. Once the post structural processing is ready run the `-GD`, `-MPC` and `-proc_func` with the corresponding arguments
-```bash
-# set the bids directory as a variable
-rawdata=/data_/mica3/BIDS_PNI/rawdata
-out=/data_/mica3/BIDS_PNI/derivatives
-sub=PNC001
-ses=01
-
-micapipe -sub ${sub} -ses ${ses} \
-         -bids ${rawdata} \
-         -out ${out} \
-         -proc_func \
-         -mainScanStr task-rest_echo-1_bold,task-rest_echo-2_bold,task-rest_echo-3_bold \
-         -func_pe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-AP_epi.nii.gz \
-         -func_rpe ${rawdata}/sub-${sub}/ses-01/fmap/sub-${sub}_ses-01_acq-fmri_dir-PA_epi.nii.gz \
-         -threads 15 -qsub
-```
-##  `MPC`: Microstructural profile covariance
-```
-micapipe -sub ${sub} -ses ${ses} \
-         -bids ${rawdata} \
-         -out ${out} \
-         -MPC -mpc_acq qT1 \
-         -microstructural_img ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-T1_T1map.nii.gz \ # Quantitative MRI qT1
-         -microstructural_reg ${rawdata}/sub-${sub}/ses-01/anat/sub-${sub}_ses-01_acq-inv1_T1map.nii.gz \ # MRI to register
-         -threads 15 -qsub
+# One shot processing after reconsurf
 ```
 
-##  `GD`: Geodesic distance
+bids=/data/mica3/BIDS_PNI/rawdata
+out=/data/mica3/BIDS_PNI/derivatives
+tmp=/data/mica2/temporaryNetworkProcessing
+fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
+fsdir=/data/mica3/BIDS_PNI/derivatives/fastsurfer/${sub}_${ses}
+
+# run this container
+micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.2.sif
+
+# call singularity
+singularity run --writable-tmpfs --containall \
+	-B ${bids}:/bids \
+	-B ${out}:/out \
+	-B ${tmp}:/tmp \
+	-B ${fsdir}:${fsdir} \
+	-B ${fs_lic}:/opt/licence.txt \
+	 ${micapipe_img} -bids /bids -out /out \
+	-sub ${sub} -ses ${ses} -proc_surf -surf_dir ${fsdir} -fs_licence /opt/licence.txt -threads 10 \
+        -post_structural \
+	-proc_dwi -dwi_rpe /bids/${sub}/${ses}/dwi/${sub}_${ses}_acq-b0_dir-PA_epi.nii.gz \
+	-GD -proc_func \
+	-mainScanStr task-rest_echo-1_bold,task-rest_echo-2_bold,task-rest_echo-3_bold \
+	-func_pe /bids/${sub}/${ses}/fmap/${sub}_${ses}_acq-fmri_dir-AP_epi.nii.gz \
+	-func_rpe /bids/${sub}/${ses}/fmap/${sub}_${ses}_acq-fmri_dir-PA_epi.nii.gz \
+	-MPC -mpc_acq T1map -regSynth \
+	-microstructural_img /bids/${sub}/${ses}/anat/${sub}_${ses}_acq-T1_T1map.nii.gz \
+	-microstructural_reg /bids/${sub}/${ses}/anat/${sub}_${ses}_acq-inv1_T1map.nii.gz \
+	-SC -tracts 40M
+
 ```
-micapipe -sub ${sub} -ses ${ses} \
-         -bids ${rawdata} \
-         -out ${out} \
-         -GC \
-         -threads 15 -qsub
+# cleanup - Change the module name and subject name accordingly. 
 ```
 
-## `proc_dwi` DWI processing
-3. Then the post DWI processing module
-```bash
-micapipe -sub ${sub} -ses ${ses} \
-         -bids ${bids} -out ${out} \
-         -proc_dwi \
-         -dwi_rpe rawdata/sub-${sub}/ses-01/dwi/sub-${sub}_ses-01_acq-b0_dir-PA_epi.nii.gz \ 
-         -threads 15 -qsub
-```
-
-## `-SC` Structural Connectomes WORK IN PROGRESS
-4. Then the post DWI processing module
-```bash
-micapipe -sub ${sub} -ses ${ses} \
-         -bids /data_/mica3/BIDS_PNI/rawdata \
-         -out /data_/mica3/BIDS_PNI/derivatives \
-         -SC -tracts 40M \
-         -threads 15 -qsub
+micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.2.sif
+bids=/data/mica3/BIDS_PNI/rawdata/
+out=/data/mica3/BIDS_PNI/derivatives
+fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
+tmp=/data/mica2/temporaryNetworkProcessing
+sub=sub-PNC009
+ses=ses-04
+echo "cleaning ${idBIDS} directory"
+micapipe_cleanup -sub "${sub}" \
+        -ses "${ses}" \
+        -bids '/data/mica3/BIDS_PNI/rawdata' \
+        -out '/data/mica3/BIDS_PNI/derivatives' \
+        -post_structural
 ```
 
 
