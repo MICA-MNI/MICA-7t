@@ -83,7 +83,7 @@ tmp=/data/mica2/temporaryNetworkProcessing
 fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
 
 # run this container
-micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.2.sif
+micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.3.sif
 
 ```
 
@@ -284,7 +284,7 @@ fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
 fsdir=/data/mica3/BIDS_PNI/derivatives/fastsurfer/${sub}_${ses}
 
 # run this container
-micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.2.sif
+micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.3.sif
 
 # call singularity
 singularity run --writable-tmpfs --containall \
@@ -311,7 +311,7 @@ cleanup - Change the module name and subject name accordingly
 -------
 
 ```
-micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.2.sif
+micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.3.sif
 bids=/data/mica3/BIDS_PNI/rawdata/
 out=/data/mica3/BIDS_PNI/derivatives
 fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
