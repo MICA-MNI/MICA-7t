@@ -303,7 +303,7 @@ singularity run --writable-tmpfs --containall \
 	-func_rpe /bids/${sub}/${ses}/fmap/${sub}_${ses}_acq-fmri_dir-PA_epi.nii.gz \
 	-MPC -mpc_acq T1map -regSynth \
 	-microstructural_img /bids/${sub}/${ses}/anat/${sub}_${ses}_acq-T1_T1map.nii.gz \
-	-microstructural_reg /bids/${sub}/${ses}/anat/${sub}_${ses}_acq-inv1_T1map.nii.gz \
+	-microstructural_reg FALSE \
 	-SC -tracts 40M
 
 ```
