@@ -83,7 +83,7 @@ tmp=/data/mica2/temporaryNetworkProcessing
 fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
 
 # run this container
-micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.2.sif
+micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.3.sif
 
 ```
 
@@ -123,7 +123,16 @@ bash /host/yeatman/local_raid/rcruces/git_here/MRI_analytic_tools/Freesurfer_pre
 2.  Once the denoise is ready run the surface processing module with the `-fastsurfer` and `-T1` flags
 ```bash
 
-# use the denoised T1
+# Variables
+bids=/data/mica3/BIDS_PNI/rawdata
+out=/data/mica3/BIDS_PNI/derivatives
+tmp=/data/mica2/temporaryNetworkProcessing
+fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
+
+# run this container
+micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.3.sif
+
+#make sure to mount this, otherwise, it won't work
 t1nlm=${out}/micapipe_v0.2.0/sub-${sub}/ses-${ses}/anat/sub-${sub}_ses-${ses}_space-nativepro_T1w_nlm.nii.gz
 
 # call singularity
@@ -132,11 +141,12 @@ singularity run --writable-tmpfs --containall \
 	-B ${out}:/out \
 	-B ${tmp}:/tmp \
 	-B ${fs_lic}:/opt/licence.txt \
+    -B ${t1nlm}:/opt/T1.nii.gz \
 	${micapipe_img} \
 	-bids /bids -out /out -fs_licence /opt/licence.txt -threads 6 -sub ${sub} -ses ${ses} \
-	-proc_surf T1 ${t1nlm}
-
+	-proc_surf -T1 /opt/T1.nii.gz
 ```
+
 Run CNN 
 -------
 c/o Donna 
@@ -274,7 +284,7 @@ fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
 fsdir=/data/mica3/BIDS_PNI/derivatives/fastsurfer/${sub}_${ses}
 
 # run this container
-micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.2.sif
+micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.3.sif
 
 # call singularity
 singularity run --writable-tmpfs --containall \
@@ -286,21 +296,22 @@ singularity run --writable-tmpfs --containall \
 	 ${micapipe_img} -bids /bids -out /out \
 	-sub ${sub} -ses ${ses} -proc_surf -surf_dir ${fsdir} -fs_licence /opt/licence.txt -threads 10 \
         -post_structural \
-	-proc_dwi -dwi_rpe /bids/${sub}/${ses}/dwi/${sub}_${ses}_acq-b0_dir-PA_epi.nii.gz \
+	-proc_dwi -dwi_rpe /bids/${sub}/${ses}/dwi/${sub}_${ses}_acq-b0_dir-PA_epi.nii.gz -regSynth \
 	-GD -proc_func \
 	-mainScanStr task-rest_echo-1_bold,task-rest_echo-2_bold,task-rest_echo-3_bold \
 	-func_pe /bids/${sub}/${ses}/fmap/${sub}_${ses}_acq-fmri_dir-AP_epi.nii.gz \
 	-func_rpe /bids/${sub}/${ses}/fmap/${sub}_${ses}_acq-fmri_dir-PA_epi.nii.gz \
 	-MPC -mpc_acq T1map -regSynth \
 	-microstructural_img /bids/${sub}/${ses}/anat/${sub}_${ses}_acq-T1_T1map.nii.gz \
-	-microstructural_reg /bids/${sub}/${ses}/anat/${sub}_${ses}_acq-inv1_T1map.nii.gz \
+	-microstructural_reg FALSE \
 	-SC -tracts 40M
 
 ```
-# cleanup - Change the module name and subject name accordingly. 
-```
+cleanup - Change the module name and subject name accordingly 
+-------
 
-micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.2.sif
+```
+micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.3.sif
 bids=/data/mica3/BIDS_PNI/rawdata/
 out=/data/mica3/BIDS_PNI/derivatives
 fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
