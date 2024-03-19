@@ -154,34 +154,28 @@ Note: CNN generated masks should be applied to Fastsurfer before manual QC
 
 To apply the mask: 
 
-1. Generate the new binary mask from the CNN inference
+# 1. Generate the new binary mask from the CNN inference
 ```bash
 mask_inference=/host/percy/local_raid/donna/7T_NNunet/new/nnUNet_results/Dataset500_Segmentation/nnUNetTrainer__nnUNetPlans__3d_fullres/inference/PNC_122.nii.gz
 fsdir=/data/mica3/BIDS_PNI/derivatives/fastsurfer/sub-PNC022_ses-01
-```
-2. Erase the mask and the norm
-```bash
+
+#2. Erase the mask and the norm
 rm ${fsdir}/mri/mask.mgz ${fsdir}/mri/norm.mgz
-```
-3. Replace the mask
-```bash
+
+#3. Replace the mask
 mri_convert $mask_inference ${fsdir}/mri/mask.mgz
-```
-5. Multiply the orig_nu.mgz with the inference_mask
-```bash
+
+#4.  Multiply the orig_nu.mgz with the inference_mask
 mrconvert ${fsdir}/mri/orig_nu.mgz ${fsdir}/mri/orig_nu.nii.gz
 fslmaths $mask_inference -mul ${fsdir}/mri/orig_nu.nii.gz ${fsdir}/mri/norm.nii.gz
-```
-6. Convert norm.nii.gz to mgz
-```bash
+
+#5. Convert norm.nii.gz to mgz
 mrconvert ${fsdir}/mri/norm.nii.gz ${fsdir}/mri/norm.mgz
-```
-7. Remove files previouslly created by the first run of recon-surf
-```bash
+
+#6.  Remove files previouslly created by the first run of recon-surf
 rm ${fsdir}/mri/wm.mgz ${fsdir}/mri/aparc.DKTatlas+aseg.orig.mgz ${fsdir}/mri/orig_nu.nii.gz
-```
-8. re-run fastsurfer
-```bash
+
+#7. re-run fastsurfer
 sub=PNA002
 ses=01
 /data/mica1/01_programs/MICA-7t/functions/post-qc_fastsurfer.sh -sub ${sub} -ses ${ses} \
