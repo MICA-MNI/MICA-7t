@@ -154,8 +154,9 @@ Note: CNN generated masks should be applied to Fastsurfer before manual QC
 
 To apply the mask: 
 
-# 1. Generate the new binary mask from the CNN inference
 ```bash
+# 1. Generate the new binary mask from the CNN inference
+
 mask_inference=/host/percy/local_raid/donna/7T_NNunet/new/nnUNet_results/Dataset500_Segmentation/nnUNetTrainer__nnUNetPlans__3d_fullres/inference/PNC_122.nii.gz
 fsdir=/data/mica3/BIDS_PNI/derivatives/fastsurfer/sub-PNC022_ses-01
 
