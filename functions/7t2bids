@@ -223,7 +223,7 @@ fmap=$(ls -R ${BIDS}/fmap | grep gz | wc -l)
 # check mandatory inputs: -in Is $SUBJ_DIR found?
 tsv_file="$BIDS_DIR"/participants_7t2bids.tsv
 # CHeck if file exist
-if [ ! -f "$tsv_file" ]; then echo -e "sub\tses\date\tdicoms\tN.anat\tN.dwi\tN.func\tN.fmap" > "$tsv_file"; fi
+if [ ! -f "$tsv_file" ]; then echo -e "sub\tses\tdate\tdicoms\tN.anat\tN.dwi\tN.func\tN.fmap" > "$tsv_file"; fi
 # Add information about subject
 echo -e "${Subj}\t${SES/ses-/}\t${dat}\t${SUBJ_DIR}\t${anat}\t${dwi}\t${func}\t${fmap}" >> "$tsv_file"
 
