@@ -70,8 +70,6 @@ You can run any module of the pipeline locally (`-mica`), on the mica.q (`-qsub`
 ```bash
 #!/bin/bash
 # micapipe v0.2.0 "Northern Flicker"
-sub=$1
-ses=$2
 
 sub=PNC001
 ses=01
@@ -120,7 +118,7 @@ outdir=${id1}/anat
 bash /host/yeatman/local_raid/rcruces/git_here/MRI_analytic_tools/Freesurfer_preprocessing/denoiseN4 $Nifti $outStr $outdir 15
 ```
 
-2.  Once the denoise is ready run the surface processing module with the `-fastsurfer` and `-T1` flags
+2.  Once the denoised data is ready, run the surface processing module with the `-fastsurfer` and `-T1` flags
 ```bash
 
 # Variables
@@ -177,7 +175,7 @@ mrconvert ${fsdir}/mri/norm.nii.gz ${fsdir}/mri/norm.mgz
 rm ${fsdir}/mri/wm.mgz ${fsdir}/mri/aparc.DKTatlas+aseg.orig.mgz ${fsdir}/mri/orig_nu.nii.gz
 
 #7. re-run fastsurfer
-sub=PNA002
+sub=PNC022
 ses=01
 /data/mica1/01_programs/MICA-7t/functions/post-qc_fastsurfer.sh -sub ${sub} -ses ${ses} \
          -out /data_/mica3/BIDS_PNI/derivatives/fastsurfer
