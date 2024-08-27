@@ -69,7 +69,7 @@ do
    esac
 done
 
-# argument check out & WARNINGS
+# argument check out & WarningINGS
 arg=($SUBJ_DIR $Subj $BIDS_DIR)
 if [ "${#arg[@]}" -lt 3 ]; then help
 Error "One or more mandatory arguments are missing:
@@ -98,7 +98,7 @@ echo -e "\n\033[38;5;141m
         DICOM to BIDS - Subject $Subj - Session $SES
 -------------------------------------------------------------\033[0m"
 
-# argument check out & WARNINGS
+# argument check out & WarningINGS
 if [ "${#arg[@]}" -eq 0 ]; then help; exit 0; fi
 if [[ -z $(which dcm2niix) ]]; then Error "dcm2niix NOT found"; exit 0; else Info "dcm2niix was found and is ready to work."; fi
 
@@ -124,13 +124,18 @@ here=$(pwd)
 # New BIDS-naming, follow the BIDS specification:
 # https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html
 #orig=("*anat-T1w_acq-mprage_07mm_UP" "*anat-T1w_acq-mp2rage_05mm_UP_INV1" "*anat-T1w_acq-mp2rage_05mm_UP_INV2" "*anat-T1w_acq-mp2rage_05mm_UP_T1_Images" "*anat-T1w_acq-mp2rage_05mm_UP_UNI_Images" "*fmap-b1_acq-tra_p2" "*fmap-b1_acq-sag_p2" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA" "*func-rsfmri_acq-mbep2d_ME_19mm" "*func-epiencode_acq-mbep2d_ME_19mm" "*func-epiretrieve_acq-mbep2d_ME_19mm" "*func-pattersep1_acq-mbep2d_ME_19mm" "*func-patternsep2_acq-mbep2d_ME_19mm" "*func-semantic1_acq-mbep2d_ME_19mm" "*func-semantic2_acq-mbep2d_ME_19mm" "*func-spatial1_acq-mbep2d_ME_19mm" "*func-spatial2_acq-mbep2d_ME_19mm" "*anat-T2star_acq-me_gre_07mm" "*T2Star_Images" "*func-movies1_acq-mbep2d_ME_19mm" "*func-movies2_acq-mbep2d_ME_19mm" "*func-movies3_acq-mbep2d_ME_19mm" "*func-movies4_acq-mbep2d_ME_19mm" "*anat-angio_acq-tof_03mm_inplane" "*anat-angio_acq-tof_03mm_inplane_MIP_SAG" "*anat-angio_acq-tof_03mm_inplane_MIP_COR" "*anat-angio_acq-tof_03mm_inplane_MIP_TRA" "*_MTON" "*_MTOFF" "*_T1W" "*func-semphon1_acq-mbep2d_ME_19mm" "*func-semphon2_acq-mbep2d_ME_19mm" "*func-audiobook1_acq-mbep2d_ME_19mm" "*func-audiobook2_acq-mbep2d_ME_19mm" "*func-smallFOV_ax_0.8mm_MB2" "*func-smallFOV_cor_0.8mm_MB2" "*func-smallFOV_ax_0.8mm_MB2_TE22" "*func-smallFOV_ax_0.8mm_MB2_TE31NoSat" "*func-movie1_acq-mbep2d_ME_19mm" "*func-movie2_acq-mbep2d_ME_19mm" "*cmrr_mbep2d_bold_6mm_SE" "*cmrr_mbep2d_bold_5mm_SE" "*func-rsfmri_acq-singleE_1.2mm_ax_A-P_advb0" "*cmrr_mbep2d_bold_5mm_MEcho")
-orig=("*anat-T1w_acq-mprage_07mm_UP" "*anat-T1w_acq-mp2rage_05mm_UP_INV1" "*anat-T1w_acq-mp2rage_05mm_UP_INV2" "*anat-T1w_acq-mp2rage_05mm_UP_T1_Images" "*anat-T1w_acq-mp2rage_05mm_UP_UNI_Images" "*fmap-b1_acq-tra_p2" "*fmap-b1_acq-sag_p2" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA" "*func-rsfmri_acq-mbep2d_ME_19mm" "*func-epiencode_acq-mbep2d_ME_19mm" "*func-epiretrieve_acq-mbep2d_ME_19mm" "*func-pattersep1_acq-mbep2d_ME_19mm" "*func-patternsep2_acq-mbep2d_ME_19mm" "*func-semantic1_acq-mbep2d_ME_19mm" "*func-semantic2_acq-mbep2d_ME_19mm" "*func-spatial1_acq-mbep2d_ME_19mm" "*func-spatial2_acq-mbep2d_ME_19mm" "*anat-T2star_acq-me_gre_07mm" "*T2Star_Images" "*func-movies1_acq-mbep2d_ME_19mm" "*func-movies2_acq-mbep2d_ME_19mm" "*func-movies3_acq-mbep2d_ME_19mm" "*func-movies4_acq-mbep2d_ME_19mm" "*anat-angio_acq-tof_03mm_inplane" "*anat-angio_acq-tof_03mm_inplane_MIP_SAG" "*anat-angio_acq-tof_03mm_inplane_MIP_COR" "*anat-angio_acq-tof_03mm_inplane_MIP_TRA" "*_MTON" "*_MTOFF" "*_T1W" "*func-semphon1_acq-mbep2d_ME_19mm" "*func-semphon2_acq-mbep2d_ME_19mm" "*func-audiobook1_acq-mbep2d_ME_19mm" "*func-audiobook2_acq-mbep2d_ME_19mm" "*func-smallFOV_ax_0.8mm_MB2" "*func-smallFOV_cor_0.8mm_MB2" "*func-smallFOV_ax_0.8mm_MB2_TE22" "*func-smallFOV_ax_0.8mm_MB2_TE31NoSat" "*cmrr_mbep2d_bold_6mm_SE" "*cmrr_mbep2d_bold_5mm_SE" "*func-rsfmri_acq-singleE_1.2mm_ax_A-P_advb0" "*cmrr_mbep2d_bold_5mm_MEcho" "*func-resting_acq-mbep2d_SE_1.2mm" "*cmrr_mbep2d_bold_5x5x2.5mm_SE" "*cmrr_mbep2d_bold_5x5x2.5mm_ME")
-
 #bids=(acq-mprage_T1w acq-inv1_T1map acq-inv2_T1map acq-T1_T1map acq-uni_T1map acq-b1tra_fieldmap acq-b1sag_fieldmap acq-fmri_dir-AP_epi acq-fmri_dir-PA_epi task-rest_bold task-epiencode_bold task-epiretrieve_bold task-patternsep1_bold task-patternsep2_bold task-semantic1_bold task-semantic2_bold task-spatial1_bold task-spatial2_bold T2starw T2starmap task-movies1_bold task-movies2_bold task-movies3_bold task-movies4_bold angio acq-sag_angio acq-cor_angio acq-tra_angio mt-on_MTR mt-off_MTR acq-MTR_T1w  task-semphon1_bold task-semphon2_bold task-audiobook1_bold task-audiobook2_bold task-smallFOV_axMB2_bold task-smallFOV_corMB2_bold task-smallFOV_axTE22_bold task-smallFOV_corTE22_bold task-movies1_bold task-movies2_bold task-cmrr6mm_bold task-cmrr5mm_bold task-rest_singleE_bold)
-bids=(acq-mprage_T1w acq-inv1_T1map acq-inv2_T1map acq-T1_T1map acq-uni_T1map acq-b1tra_fieldmap acq-b1sag_fieldmap acq-fmri_dir-AP_epi acq-fmri_dir-PA_epi task-rest_bold task-epiencode_bold task-epiretrieve_bold task-patternsep1_bold task-patternsep2_bold task-semantic1_bold task-semantic2_bold task-spatial1_bold task-spatial2_bold T2starw T2starmap task-movies1_bold task-movies2_bold task-movies3_bold task-movies4_bold angio acq-sag_angio acq-cor_angio acq-tra_angio mt-on_MTR mt-off_MTR acq-MTR_T1w  task-semphon1_bold task-semphon2_bold task-audiobook1_bold task-audiobook2_bold task-smallFOV_axMB2_bold task-smallFOV_corMB2_bold task-smallFOV_axTE22_bold task-smallFOV_corTE22_bold task-cmrr6mm_bold task-cmrr5mm_bold_SE task-rest_singleE_bold task-cmrr5mm_bold_ME task-resting_acq-mbep2d_SE_1.2mm task-cmrr_mbep2d_bold_5x5x2.5mm_SE task-cmrr_mbep2d_bold_5x5x2.5mm_ME)
 
-origDWI=("*dwi_acq_b0-dir_PA_SBRef" "*dwi_acq_b0-dir_PA" "*dwi_acq_b2000_90d-dir_AP_SBRef" "*dwi_acq_b2000_90d-dir_AP" "*dwi_acq_b700_40d-dir_AP_SBRef" "*dwi_acq_b700_40d-dir_AP" "*dwi_acq_b300_10d-dir_AP_SBRef" "*dwi_acq_b300_10d-dir_AP")
-bidsDWI=(acq-b0_dir-PA_sbref acq-b0_dir-PA_epi acq-b2000_dir-AP_sbref acq-b2000_dir-AP_dwi acq-b700_dir-AP_sbref acq-b700_dir-AP_dwi acq-b300_dir-AP_sbref acq-b300_dir-AP_dwi)
+# bash array of SORTED DICOMS acquisition names
+orig=("*anat-T1w_acq-mprage_07mm_UP" "*anat-T1w_acq-mp2rage_05mm_UP_INV1" "*anat-T1w_acq-mp2rage_05mm_UP_INV2" "*anat-T1w_acq-mp2rage_05mm_UP_T1_Images" "*anat-T1w_acq-mp2rage_05mm_UP_UNI_Images" "*fmap-b1_acq-tra_p2" "*fmap-b1_acq-sag_p2" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA" "*func-rsfmri_acq-mbep2d_ME_19mm" "*func-epiencode_acq-mbep2d_ME_19mm" "*func-epiretrieve_acq-mbep2d_ME_19mm" "*func-pattersep1_acq-mbep2d_ME_19mm" "*func-patternsep2_acq-mbep2d_ME_19mm" "*func-semantic1_acq-mbep2d_ME_19mm" "*func-semantic2_acq-mbep2d_ME_19mm" "*func-spatial1_acq-mbep2d_ME_19mm" "*func-spatial2_acq-mbep2d_ME_19mm" "*anat-T2star_acq-me_gre_07mm" "*T2Star_Images" "*func-movies1_acq-mbep2d_ME_19mm" "*func-movies2_acq-mbep2d_ME_19mm" "*func-movies3_acq-mbep2d_ME_19mm" "*func-movies4_acq-mbep2d_ME_19mm" "*anat-angio_acq-tof_03mm_inplane" "*anat-angio_acq-tof_03mm_inplane_MIP_SAG" "*anat-angio_acq-tof_03mm_inplane_MIP_COR" "*anat-angio_acq-tof_03mm_inplane_MIP_TRA" "*_MTON" "*_MTOFF" "*_T1W" "*func-semphon1_acq-mbep2d_ME_19mm" "*func-semphon2_acq-mbep2d_ME_19mm" "*func-audiobook1_acq-mbep2d_ME_19mm" "*func-audiobook2_acq-mbep2d_ME_19mm" "*func-smallFOV_ax_0.8mm_MB2" "*func-smallFOV_cor_0.8mm_MB2" "*func-smallFOV_ax_0.8mm_MB2_TE22" "*func-smallFOV_ax_0.8mm_MB2_TE31NoSat" "*cmrr_mbep2d_bold_6mm_SE" "*cmrr_mbep2d_bold_5mm_SE" "*func-rsfmri_acq-singleE_1.2mm_ax_A-P_advb0" "*cmrr_mbep2d_bold_5mm_MEcho" "*func-resting_acq-mbep2d_SE_1.2mm" "*cmrr_mbep2d_bold_5x5x2.5mm_SE" "*cmrr_mbep2d_bold_5x5x2.5mm_ME" "*cmrr-movie5_mbep2d_bold_5mm_MEcho" "*cmrr_rsfmri_mbep2d_bold_5mm_MEcho" "*func-rest_acq-mbep2d_ME19mm" "*func-movie1_acq-mbep2d_ME_19mm" "*func-movie2_acq-mbep2d_ME_19mm" "*func-sens1_acq-mbep2d_ME_19mm" "*func-sens2_acq-mbep2d_ME_19mm" "*anat-T1w_acq-mp2rage_0.7mm_CSptx_INV1" "*anat-T1w_acq-mp2rage_0.7mm_CSptx_INV2" "*anat-T1w_acq-mp2rage_05mm_UP_T1_Images" "*anat-T1w_acq-mp2rage_0.7mm_CSptx_UNI_Images" "*anat-flair_acq-0.7iso_dev3_5SD_UP","*func-rest_acq-mbep2d_ME_19mm", "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP" "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA" "*fmap-b1_acq-sag_p2")
+# bash array of BIDS names , it MUST match 'orig'
+bids=(acq-mprage_T1w acq-inv1_T1map acq-inv2_T1map acq-T1_T1map acq-uni_T1map acq-b1tra_fieldmap acq-b1sag_fieldmap acq-fmri_dir-AP_epi acq-fmri_dir-PA_epi task-rest_bold task-epiencode_bold task-epiretrieve_bold task-patternsep1_bold task-patternsep2_bold task-semantic1_bold task-semantic2_bold task-spatial1_bold task-spatial2_bold T2starw T2starmap task-movies1_bold task-movies2_bold task-movies3_bold task-movies4_bold angio acq-sag_angio acq-cor_angio acq-tra_angio mt-on_MTR mt-off_MTR acq-MTR_T1w  task-semphon1_bold task-semphon2_bold task-audiobook1_bold task-audiobook2_bold task-smallFOV_axMB2_bold task-smallFOV_corMB2_bold task-smallFOV_axTE22_bold task-smallFOV_corTE22_bold task-cmrr6mm_bold task-cmrr5mm_bold_SE task-rest_singleE_bold task-cmrr5mm_bold_ME task-resting_acq-mbep2d_SE_1.2mm task-cmrr_mbep2d_bold_5x5x2.5mm_SE task-cmrr_mbep2d_bold_5x5x2.5mm_ME task-cmrr-movie5_mbep2d_bold_5mm_MEcho task-cmrr_rsfmri_mbep2d_bold_5mm_MEcho task-rest_acq-mbep2d_ME19mm task-movies1_bold task-movies2_bold task-sens1_bold task-sens2_bold acq-inv1_0p7T1map acq-inv2_0p7T1map acq-T1_0p7T1map acq-uni_0p7T1map acq-FLAIR task-rest_bold acq-fmri_dir-AP_epi acq-fmri_dir-PA_epi acq-b1sag_fieldmap)
+
+# bash array of SORTED DICOMS acquisition names ONLY DWI
+origDWI=("*dwi_acq_b0-dir_PA_SBRef" "*dwi_acq_b0-dir_PA" "*dwi_acq_b2000_90d-dir_AP_SBRef" "*dwi_acq_b2000_90d-dir_AP" "*dwi_acq_b700_40d-dir_AP_SBRef" "*dwi_acq_b700_40d-dir_AP" "*dwi_acq_b300_10d-dir_AP_SBRef" "*dwi_acq_b300_10d-dir_AP" "*dwi_acq_b0_PA_SBRef" "*dwi_acq_b0_PA" "*dwi_acq_multib_38dir_AP_acc9_SBRef" "*dwi_acq_multib_38dir_AP_acc9" "*dwi_acq_multib_70dir_AP_acc9_SBRef" "*dwi_acq_multib_70dir_AP_acc9")
+
+# bash array of BIDS names , it MUST match 'orig' ONLY DWI
+bidsDWI=(acq-b0_dir-PA_sbref acq-b0_dir-PA_epi acq-b2000_dir-AP_sbref acq-b2000_dir-AP_dwi acq-b700_dir-AP_sbref acq-b700_dir-AP_dwi acq-b300_dir-AP_sbref acq-b300_dir-AP_dwi acq-b0_dir-PA_sbref acq-b0_dir-PA_epi acq_multib_38d_dir-AP_sbref acq_multib_38d_dir-AP_dwi acq_multib_70d_dir-AP_sbref acq_multib_70d_dir-AP_dwi)
 
 # -----------------------------------------------------------------------------------------------
 # Create BIDS/subj_dir
@@ -139,12 +144,12 @@ if [ ! -d "$BIDS" ]; then Error "Could not create subject BIDS directory, check 
 
 # dicomx to Nifti with BIDS Naming
 Do_cmd cd $SUBJ_DIR
-# Warning lenght
+# Warninging lenght
 n=$((${#orig[@]} - 1))
 for ((k=0; k<=n; k++)); do
   N=$(ls -d ${orig[k]} | wc -l)
   if [ "$N" -eq 0 ]; then
-    Warn "No directories were found with the following name: ${orig[k]}"
+    Warning "No directories were found with the following name: ${orig[k]}"
   elif [ "$N" -gt 1 ]; then
     Names=($(ls -d ${orig[k]}))
     for ((i = 1; i <= N; i++)); do
@@ -162,56 +167,68 @@ done
 # remove runs from MTR acquisitions
 Info "removing run string from MTR"
 for i in "${BIDS}/"*MTR*; do
-    Do_cmd mv -v "${i}" "${i/run-1_/}"
-    Do_cmd mv -v "${i}" "${i/run-2_/}"
+    Do_cmd mv "${i}" "${i/run-1_/}"
+    Do_cmd mv "${i}" "${i/run-2_/}"
 done
 
 # move files to their corresponding directory
-Do_cmd mv -v "$BIDS"/*mp2rage* "$BIDS"/anat
-Do_cmd mv -v "$BIDS"/*bold* "$BIDS"/func
-Do_cmd mv -v "$BIDS"/*T1* "$BIDS"/anat
-Do_cmd mv -v "$BIDS"/*T2* "$BIDS"/anat
-Do_cmd mv -v "$BIDS"/*fieldmap* "$BIDS"/fmap
+Do_cmd mv "$BIDS"/*mp2rage* "$BIDS"/anat
+Do_cmd mv "$BIDS"/*bold* "$BIDS"/func
+Do_cmd mv "$BIDS"/*T1* "$BIDS"/anat
+Do_cmd mv "$BIDS"/*T2* "$BIDS"/anat
+Do_cmd mv "$BIDS"/*FLAIR* "$BIDS"/anat
+Do_cmd mv "$BIDS"/*fieldmap* "$BIDS"/fmap
 
 # Rename echos: echo-1_bold.nii.gz
 for i in {1..3}; do
     str="bold_e${i}"
     for f in ${BIDS}/func/*${str}*; do
-        mv -v $f ${f/${str}/echo-${i}_bold}
+        mv $f ${f/${str}/echo-${i}_bold}
     done
 done
 
-# BIDS names of DWI including NUM_dwi: Number of Directions
+# -----------------------------------------------------------------------------------------------
+# DWI acquisitions
+# -----------------------------------------------------------------------------------------------
+# Loop through the directories of DWI acquisitions
 n=$((${#origDWI[@]} - 1))
 for ((k=0; k<=n; k++)); do
-  N=$(ls -d ${origDWI[k]} | wc -l)
+  N=$(ls -d ${origDWI[k]} 2>/dev/null | wc -l) # make it quiet
   if [ "$N" -eq 0 ]; then
-    Warn "No directories were found with the following name: ${origDWI[k]}"
+    Warning "No directories were found with the following name: ${origDWI[k]}"
   elif [ "$N" -gt 1 ]; then
-    Names=($(ls -d ${origDWI[k]}))
-    for ((i = 1; i <= N; i++)); do
-       nii=$(echo ${Names[((i-2))]} | awk -F '_' '{print $1 "_" $2}')
-       nom=${id}${bidsDWI[k]}
-       dcm=$(echo ${nom##*_})
-       nom=$(echo ${nom/$dcm/}run-${i}_${dcm})
-       Do_cmd dcm2niix -z y -b y -o "$BIDS" -f $nom ${nii}${orig[k]}
+    Names=($(ls -d ${origDWI[k]} 2>/dev/null))
+    for ((i = 0; i < N; i++)); do
+      nii=$(echo ${Names[i]} | awk -F '_' '{print $1 "_" $2}')
+      nom=${id}${bidsDWI[k]}
+      dcm=$(echo ${nom##*_})
+      nom=$(echo ${nom/$dcm/}run-$((i+1))_${dcm})
+      Do_cmd dcm2niix -z y -b y -o "$BIDS" -f "$nom" "${nii}${origDWI[k]}"
     done
-  elif [ $N -eq 1 ]; then
-     Do_cmd dcm2niix -z y -b y -o "$BIDS" -f ${id}${bidsDWI[k]} ${origDWI[k]}
+  elif [ "$N" -eq 1 ]; then
+     Do_cmd dcm2niix -z y -b y -o "$BIDS" -f "${id}${bidsDWI[k]}" "${origDWI[k]}"
   fi
 done
 
 Do_cmd cd "$BIDS"
 for n in $(ls *bval); do Dir=0
   for i in $(cat $n); do if [[ "$i" == 0.00 ]] || [[ "$i" == 0 ]]; then Dir=$((Dir+1)); else Dir=$((Dir+1)); fi; done
-  for j in ${n/bval/}*; do mv -v "$j" dwi/${j/NUM/$Dir}; done
+  for j in ${n/bval/}*; do mv "$j" dwi/${j/NUM/$Dir}; done
 done
-Do_cmd mv -v "$BIDS"/*b0* "$BIDS"/dwi
-Do_cmd mv -v "$BIDS"/*sbref* "$BIDS"/dwi
-Do_cmd mv -v "$BIDS"/*epi* "$BIDS"/fmap
-Do_cmd mv -v "$BIDS"/*angio* "$BIDS"/anat
-Do_cmd mv -v "$BIDS"/*MTR* "$BIDS"/anat
-Do_cmd rm -v "$BIDS"/anat/*ROI*
+
+# REMOVE run-1 string from new 7T DWI acquisition
+for dwi in $(ls "$BIDS"/dwi/*"acq_multib_"*"d_dir-AP_run-1_dwi"*); do mv -v $dwi ${dwi/run-1_/}; done
+
+# REPLACE run-2 string to  from new 7T DWI acquisition
+for dwi in $(ls "$BIDS"/dwi/*"acq_multib_"*"d_dir-AP_run-2_dwi"*); do mv -v $dwi ${dwi/run-2_/part-phase_}; done
+
+# Moving files to their correct directory location
+Do_cmd mv "$BIDS"/*b0* "$BIDS"/dwi
+Do_cmd mv "$BIDS"/*sbref* "$BIDS"/dwi
+Do_cmd mv "$BIDS"/*epi* "$BIDS"/fmap
+Do_cmd mv "$BIDS"/*angio* "$BIDS"/anat
+Do_cmd mv "$BIDS"/*MTR* "$BIDS"/anat
+Do_cmd rm "$BIDS"/anat/*ROI*
 
 # QC, count the number of Niftis (json) per subject
 dat=$(stat ${BIDS} | awk 'NR==6 {print $2}')
