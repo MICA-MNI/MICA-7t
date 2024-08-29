@@ -89,6 +89,7 @@ micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.3.sif
 -------
 1. First run the structural processing with the flag `-uni` for MP2RAGE 7T data
 ```
+#There are two uni images with 0.5mm and 0.7mm, so make sure to process both 
 # call singularity
 singularity run --writable-tmpfs --containall \
 	-B ${bids}:/bids \
@@ -97,7 +98,7 @@ singularity run --writable-tmpfs --containall \
 	-B ${fs_lic}:/opt/licence.txt \
 	${micapipe_img} \
 	-bids /bids -out /out -fs_licence /opt/licence.txt -threads 6 -sub ${sub} -ses ${ses} \
-	-proc_structural -uni -T1wStr acq-uni_T1map
+	-proc_structural -uni -T1wStr acq-uni_0p7-T1map,acq-inv1_0p7-T1map,acq-inv2_0p7-T1map
 
 ```
 
