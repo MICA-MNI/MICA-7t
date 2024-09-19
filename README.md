@@ -89,7 +89,7 @@ micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.3.sif
 -------
 1. First run the structural processing with the flag `-uni` for MP2RAGE 7T data
 ```
-#There are two uni images with 0.5mm and 0.7mm, so make sure to process both 
+#There are two uni images with 0.5mm and 0.7mm, for our purposes, we only process 0.5mm
 # call singularity
 singularity run --writable-tmpfs --containall \
 	-B ${bids}:/bids \
@@ -98,7 +98,7 @@ singularity run --writable-tmpfs --containall \
 	-B ${fs_lic}:/opt/licence.txt \
 	${micapipe_img} \
 	-bids /bids -out /out -fs_licence /opt/licence.txt -threads 6 -sub ${sub} -ses ${ses} \
-	-proc_structural -uni -T1wStr acq-uni_0p7-T1map,acq-inv1_0p7-T1map,acq-inv2_0p7-T1map
+	-proc_structural -uni -T1wStr acq-uni_0p5-T1map,acq-inv1_0p5-T1map,acq-inv2_0p5-T1map
 
 ```
 
@@ -292,11 +292,11 @@ singularity run --writable-tmpfs --containall \
         -post_structural \
 	-proc_dwi -dwi_rpe /bids/${sub}/${ses}/dwi/${sub}_${ses}_acq-b0_dir-PA_epi.nii.gz -regSynth \
 	-GD -proc_func \
-	-mainScanStr task-rest_echo-1_bold,task-rest_echo-2_bold,task-rest_echo-3_bold \
+	-mainScanStr task-rest_run-2_echo-1_bold,task-rest_run-2_echo-2_bold,task-rest_run-2_echo-3_bold \
 	-func_pe /bids/${sub}/${ses}/fmap/${sub}_${ses}_acq-fmri_dir-AP_epi.nii.gz \
 	-func_rpe /bids/${sub}/${ses}/fmap/${sub}_${ses}_acq-fmri_dir-PA_epi.nii.gz \
 	-MPC -mpc_acq T1map -regSynth \
-	-microstructural_img /bids/${sub}/${ses}/anat/${sub}_${ses}_acq-T1_T1map.nii.gz \
+	-microstructural_img /bids/${sub}/${ses}/anat/${sub}_${ses}_acq-T1_0p5-T1map.nii.gz \
 	-microstructural_reg FALSE \
 	-SC -tracts 40M
 
