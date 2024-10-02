@@ -22,6 +22,12 @@ python run_tasks.py
 
 python test_vlc.py
 
+# Running GUI with mica laptop
+source /home/mica/Desktop/conda/etc/profile.d/conda.sh
+conda activate py39env
+cd 7T
+python run_tasks.py
+
 ```
 ## 1 . Transfering the data (C
 The files from the 7t scan are in `/data/dicom/PNC001_Day1_?????`. First, find and claim data using `find_mri` and  `find_mri -claim` script. Then copy 7T data to our folder /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms.
