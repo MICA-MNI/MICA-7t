@@ -69,7 +69,7 @@ do
    esac
 done
 
-# argument check out & WARNINGS
+# argument check out & WarningINGS
 arg=($SUBJ_DIR $Subj $BIDS_DIR)
 if [ "${#arg[@]}" -lt 3 ]; then help
 Error "One or more mandatory arguments are missing:
@@ -98,7 +98,7 @@ echo -e "\n\033[38;5;141m
         DICOM to BIDS - Subject $Subj - Session $SES
 -------------------------------------------------------------\033[0m"
 
-# argument check out & WARNINGS
+# argument check out & WarningINGS
 if [ "${#arg[@]}" -eq 0 ]; then help; exit 0; fi
 if [[ -z $(which dcm2niix) ]]; then Error "dcm2niix NOT found"; exit 0; else Info "dcm2niix was found and is ready to work."; fi
 
@@ -225,12 +225,12 @@ if [ ! -d "$BIDS" ]; then Error "Could not create subject BIDS directory, check 
 
 # dicomx to Nifti with BIDS Naming
 Do_cmd cd $SUBJ_DIR
-# Warning lenght
+# Warninging lenght
 n=$((${#orig[@]} - 1))
 for ((k=0; k<=n; k++)); do
   N=$(ls -d ${orig[k]} | wc -l)
   if [ "$N" -eq 0 ]; then
-    Warn "No directories were found with the following name: ${orig[k]}"
+    Warning "No directories were found with the following name: ${orig[k]}"
   elif [ "$N" -gt 1 ]; then
     Names=($(ls -d ${orig[k]}))
     for ((i = 1; i <= N; i++)); do
@@ -248,8 +248,8 @@ done
 # remove runs from MTR acquisitions
 Info "removing run string from MTR"
 for i in "${BIDS}/"*MTR*; do
-    Do_cmd mv -v "${i}" "${i/run-1_/}"
-    Do_cmd mv -v "${i}" "${i/run-2_/}"
+    Do_cmd mv "${i}" "${i/run-1_/}"
+    Do_cmd mv "${i}" "${i/run-2_/}"
 done
 
 # Moving files to their correct directory location
@@ -265,7 +265,7 @@ if ls "$BIDS"/*TB1TFL* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*TB1TFL* "$BIDS"/f
 for i in {1..3}; do
     str="bold_e${i}"
     for f in ${BIDS}/func/*${str}*; do
-        mv -v $f ${f/${str}/echo-${i}_bold}
+        mv $f ${f/${str}/echo-${i}_bold}
     done
 done
 
@@ -280,31 +280,46 @@ for i in {1..4}; do
   done
 done
 
-# BIDS names of DWI including NUM_dwi: Number of Directions
+# REPLACE "_sbref_ph" with "part-phase_bold"
+for func in $(ls "$BIDS"/func/*"bold_ph"*); do mv -v $func ${func/bold_ph/part-phase_bold}; done
+
+# -----------------------------------------------------------------------------------------------
+# DWI acquisitions
+# -----------------------------------------------------------------------------------------------
+# Loop through the directories of DWI acquisitions
 n=$((${#origDWI[@]} - 1))
 for ((k=0; k<=n; k++)); do
-  N=$(ls -d ${origDWI[k]} | wc -l)
+  N=$(ls -d ${origDWI[k]} 2>/dev/null | wc -l) # make it quiet
   if [ "$N" -eq 0 ]; then
-    Warn "No directories were found with the following name: ${origDWI[k]}"
+    Warning "No directories were found with the following name: ${origDWI[k]}"
   elif [ "$N" -gt 1 ]; then
-    Names=($(ls -d ${origDWI[k]}))
-    for ((i = 1; i <= N; i++)); do
-       nii=$(echo ${Names[((i-2))]} | awk -F '_' '{print $1 "_" $2}')
-       nom=${id}${bidsDWI[k]}
-       dcm=$(echo ${nom##*_})
-       nom=$(echo ${nom/$dcm/}run-${i}_${dcm})
-       Do_cmd dcm2niix -z y -b y -o "$BIDS" -f $nom ${nii}${orig[k]}
+    Names=($(ls -d ${origDWI[k]} 2>/dev/null))
+    for ((i = 0; i < N; i++)); do
+      nii=$(echo ${Names[i]} | awk -F '_' '{print $1 "_" $2}')
+      nom=${id}${bidsDWI[k]}
+      dcm=$(echo ${nom##*_})
+      nom=$(echo ${nom/$dcm/}run-$((i+1))_${dcm})
+      Do_cmd dcm2niix -z y -b y -o "$BIDS" -f "$nom" "${nii}${origDWI[k]}"
     done
-  elif [ $N -eq 1 ]; then
-     Do_cmd dcm2niix -z y -b y -o "$BIDS" -f ${id}${bidsDWI[k]} ${origDWI[k]}
+  elif [ "$N" -eq 1 ]; then
+     Do_cmd dcm2niix -z y -b y -o "$BIDS" -f "${id}${bidsDWI[k]}" "${origDWI[k]}"
   fi
 done
 
 Do_cmd cd "$BIDS"
 for n in $(ls *bval); do Dir=0
   for i in $(cat $n); do if [[ "$i" == 0.00 ]] || [[ "$i" == 0 ]]; then Dir=$((Dir+1)); else Dir=$((Dir+1)); fi; done
-  for j in ${n/bval/}*; do mv -v "$j" dwi/${j/NUM/$Dir}; done
+  for j in ${n/bval/}*; do mv "$j" dwi/${j/NUM/$Dir}; done
 done
+
+# REMOVE run-1 string from new 7T DWI acquisition
+for dwi in $(ls "$BIDS"/dwi/*"acq_multib_"*"d_dir-AP_run-1_dwi"*); do mv -v $dwi ${dwi/run-1_/}; done
+
+# REPLACE run-2 string to  from new 7T DWI acquisition
+for dwi in $(ls "$BIDS"/dwi/*"acq_multib_"*"d_dir-AP_run-2_dwi"*); do mv -v $dwi ${dwi/run-2_/part-phase_}; done
+
+# REPLACE "_sbref_ph" with "_part-phase_sbref"
+for dwi in $(ls "$BIDS"/dwi/*"_sbref_ph"*); do mv -v $dwi ${dwi/_sbref_ph/_part-phase_sbref}; done
 
 # Moving files to their correct directory location
 if ls "$BIDS"/*b0* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*b0* "$BIDS"/dwi; fi
@@ -313,7 +328,6 @@ if ls "$BIDS"/*epi* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*epi* "$BIDS"/fmap; f
 if ls "$BIDS"/*angio* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*angio* "$BIDS"/anat; fi
 if ls "$BIDS"/*MTR* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*MTR* "$BIDS"/anat; fi
 if ls "$BIDS"/anat/*ROI* 1> /dev/null 2>&1; then cmd rm "$BIDS"/anat/*ROI*; fi
-
 
 # QC, count the number of Niftis (json) per subject
 dat=$(stat ${BIDS} | awk 'NR==6 {print $2}')
@@ -332,7 +346,7 @@ done
 # check mandatory inputs: -in Is $SUBJ_DIR found?
 tsv_file="$BIDS_DIR"/participants_7t2bids.tsv
 # CHeck if file exist
-if [ ! -f "$tsv_file" ]; then echo -e "sub\tses\date\tdicoms\tN.anat\tN.dwi\tN.func\tN.fmap" > "$tsv_file"; fi
+if [ ! -f "$tsv_file" ]; then echo -e "sub\tses\tdate\tdicoms\tN.anat\tN.dwi\tN.func\tN.fmap" > "$tsv_file"; fi
 # Add information about subject
 echo -e "${Subj}\t${SES/ses-/}\t${dat}\t${SUBJ_DIR}\t${anat}\t${dwi}\t${func}\t${fmap}" >> "$tsv_file"
 

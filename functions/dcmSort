@@ -44,6 +44,9 @@ copyLog=$(echo "$copyLog" | sed '/^$/d')
 
 # Add session numbers
 C2=$(echo "$C" | sort | uniq | sed '/^$/d')
+
+echo "C2: $C2"
+
 prevId=0; session=1; C3=''
 
 while read -r line; do
@@ -55,6 +58,8 @@ while read -r line; do
 done <<< "$C2"
 C3=$(echo "$C3" | sed '/^$/d')
 
+echo "C3: $C3"
+
 # Copy to correct directory.
 echo "Sorting DICOMS..."
 while read -r line; do
@@ -63,6 +68,8 @@ while read -r line; do
     name=`echo $line | awk '{print $4}'`
     file=`echo $line | awk '{print $5}'`
     directory=`echo "$C3" | grep "$timeStamp" | grep " $num " | grep "$name" |  awk '{print $5 "_" $3 "_" $4}'`
+
+    echo "file: ${file}, directory: ${directory}"
 
     [[ ! -d "${outputDirectory}/${directory}/" ]] && mkdir -p ${outputDirectory}/${directory}
     cp ${file} ${outputDirectory}/${directory}
