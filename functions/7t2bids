@@ -253,13 +253,13 @@ for i in "${BIDS}/"*MTR*; do
 done
 
 # Moving files to their correct directory location
-if ls "$BIDS"/*MP2RAGE* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*MP2RAGE* "$BIDS"/anat; fi
-if ls "$BIDS"/*UNIT1* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*UNIT1* "$BIDS"/anat; fi
-if ls "$BIDS"/*bold* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*bold* "$BIDS"/func; fi
-if ls "$BIDS"/*T1* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*T1* "$BIDS"/anat; fi
-if ls "$BIDS"/*T2* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*T2* "$BIDS"/anat; fi
-if ls "$BIDS"/*fieldmap* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*fieldmap* "$BIDS"/fmap; fi
-if ls "$BIDS"/*TB1TFL* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*TB1TFL* "$BIDS"/fmap; fi
+if ls "$BIDS"/*MP2RAGE* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*MP2RAGE* "$BIDS"/anat; fi
+if ls "$BIDS"/*UNIT1* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*UNIT1* "$BIDS"/anat; fi
+if ls "$BIDS"/*bold* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*bold* "$BIDS"/func; fi
+if ls "$BIDS"/*T1* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*T1* "$BIDS"/anat; fi
+if ls "$BIDS"/*T2* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*T2* "$BIDS"/anat; fi
+if ls "$BIDS"/*fieldmap* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*fieldmap* "$BIDS"/fmap; fi
+if ls "$BIDS"/*TB1TFL* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*TB1TFL* "$BIDS"/fmap; fi
 
 # Rename echos: echo-1_bold.nii.gz
 for i in {1..3}; do
@@ -322,12 +322,12 @@ for dwi in $(ls "$BIDS"/dwi/*"acq_multib_"*"d_dir-AP_run-2_dwi"*); do mv -v $dwi
 for dwi in $(ls "$BIDS"/dwi/*"_sbref_ph"*); do mv -v $dwi ${dwi/_sbref_ph/_part-phase_sbref}; done
 
 # Moving files to their correct directory location
-if ls "$BIDS"/*b0* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*b0* "$BIDS"/dwi; fi
-if ls "$BIDS"/*sbref* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*sbref* "$BIDS"/dwi; fi
-if ls "$BIDS"/*epi* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*epi* "$BIDS"/fmap; fi
-if ls "$BIDS"/*angio* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*angio* "$BIDS"/anat; fi
-if ls "$BIDS"/*MTR* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*MTR* "$BIDS"/anat; fi
-if ls "$BIDS"/anat/*ROI* 1> /dev/null 2>&1; then cmd rm "$BIDS"/anat/*ROI*; fi
+if ls "$BIDS"/*b0* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*b0* "$BIDS"/dwi; fi
+if ls "$BIDS"/*sbref* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*sbref* "$BIDS"/dwi; fi
+if ls "$BIDS"/*epi* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*epi* "$BIDS"/fmap; fi
+if ls "$BIDS"/*angio* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*angio* "$BIDS"/anat; fi
+if ls "$BIDS"/*MTR* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*MTR* "$BIDS"/anat; fi
+if ls "$BIDS"/anat/*ROI* 1> /dev/null 2>&1; then Do_cmd rm "$BIDS"/anat/*ROI*; fi
 
 # QC, count the number of Niftis (json) per subject
 dat=$(stat ${BIDS} | awk 'NR==6 {print $2}')
