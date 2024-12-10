@@ -69,7 +69,7 @@ do
    esac
 done
 
-# argument check out & WarningINGS
+# argument check out & Warning
 arg=($SUBJ_DIR $Subj $BIDS_DIR)
 if [ "${#arg[@]}" -lt 3 ]; then help
 Error "One or more mandatory arguments are missing:
@@ -124,6 +124,7 @@ here=$(pwd)
 # New BIDS-naming, follow the BIDS specification:
 # https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html
 orig=(
+  "*anat-flair_acq-0p7mm_UPAdia"
   "*anat-T1w_acq-mprage_07mm_UP"
   "*anat-T1w_acq-mp2rage_05mm_UP_INV1"
   "*anat-T1w_acq-mp2rage_05mm_UP_INV2"
@@ -161,13 +162,14 @@ orig=(
   "*func-audiobook2_acq-mbep2d_ME_19mm"
 )
 bids=(
+  FLAIR
   acq-mprage_T1w
   inv-1_MP2RAGE
   inv-2_MP2RAGE
   T1map
   UNIT1
-  acq-anatTra_TB1TFL
-  acq-anatSag_TB1TFL
+  acq-anat_chunk-tra_TB1TFL
+  acq-anat_chunk-sag_TB1TFL
   acq-fmri_dir-AP_epi
   acq-fmri_dir-PA_epi
   task-rest_bold
@@ -201,11 +203,17 @@ origDWI=(
   "*dwi_acq_b0-dir_PA_SBRef"
   "*dwi_acq_b0-dir_PA"
   "*dwi_acq_b2000_90d-dir_AP_SBRef"
-  "*dwi_acq_b2000_90d-dir_AP"
+  "*dwi_acq_b2000_90d-dir_AP"cc
   "*dwi_acq_b700_40d-dir_AP_SBRef"
   "*dwi_acq_b700_40d-dir_AP"
   "*dwi_acq_b300_10d-dir_AP_SBRef"
   "*dwi_acq_b300_10d-dir_AP"
+  "*dwi_acq_b0_PA"
+  "*dwi_acq_b0_PA_SBRef"
+  "*dwi_acq_multib_38dir_AP_acc9"
+  "*dwi_acq_multib_38dir_AP_acc9_SBRef"
+  "*dwi_acq_multib_70dir_AP_acc9"
+  "*dwi_acq_multib_70dir_AP_acc9_SBRef"
 )
 bidsDWI=(
   acq-b0_dir-PA_sbref
@@ -216,6 +224,12 @@ bidsDWI=(
   acq-b700_dir-AP_dwi
   acq-b300_dir-AP_sbref
   acq-b300_dir-AP_dwi
+  acq-b0_dir-PA_dwi
+  acq-b0_dir-PA_sbref
+  acq-multib38_dir-AP_sbref
+  acq-multib38_dir-AP_dwi
+  acq-multib70_dir-AP_sbref
+  acq-multib70_dir-AP_dwi
 )
 
 # -----------------------------------------------------------------------------------------------
@@ -269,6 +283,12 @@ for i in {1..3}; do
     done
 done
 
+# REPLACE "_sbref_ph" with "part-phase_bold"
+for func in $(ls "$BIDS"/func/*"bold_ph"*); do mv ${func} ${func/bold_ph/part-phase_bold}; done
+
+# REMOVE the run-?
+for func in $(ls "$BIDS"/func/*"_run-"*); do mv ${func} ${func/_run-?/}; done
+
 Info "Remove MP2RAGE bval and bvecs"
 rm "$BIDS"/anat/*MP2RAGE.bv*
 
@@ -280,12 +300,10 @@ for i in {1..4}; do
   done
 done
 
-# REPLACE "_sbref_ph" with "part-phase_bold"
-for func in $(ls "$BIDS"/func/*"bold_ph"*); do mv -v $func ${func/bold_ph/part-phase_bold}; done
+# -----------------------------------------------------------------------------------------------
+Info "DWI acquisitions"
+# -----------------------------------------------------------------------------------------------
 
-# -----------------------------------------------------------------------------------------------
-# DWI acquisitions
-# -----------------------------------------------------------------------------------------------
 # Loop through the directories of DWI acquisitions
 n=$((${#origDWI[@]} - 1))
 for ((k=0; k<=n; k++)); do
@@ -312,22 +330,22 @@ for n in $(ls *bval); do Dir=0
   for j in ${n/bval/}*; do mv "$j" dwi/${j/NUM/$Dir}; done
 done
 
-# REMOVE run-1 string from new 7T DWI acquisition
+# Moving files to their correct directory location
+if ls "$BIDS"/*b0* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*b0* "$BIDS"/dwi; fi
+if ls "$BIDS"/*sbref* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*sbref* "$BIDS"/dwi; fi
+if ls "$BIDS"/*epi* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*epi* "$BIDS"/fmap; fi
+if ls "$BIDS"/*angio* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*angio* "$BIDS"/anat; fi
+if ls "$BIDS"/*MTR* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*MTR* "$BIDS"/anat; fi
+if ls "$BIDS"/anat/*ROI* 1> /dev/null 2>&1; then cmd rm "$BIDS"/anat/*ROI*; fi
+
+Info "REMOVE run-1 string from new 7T DWI acquisition"
 for dwi in $(ls "$BIDS"/dwi/*"acq_multib_"*"d_dir-AP_run-1_dwi"*); do mv -v $dwi ${dwi/run-1_/}; done
 
-# REPLACE run-2 string to  from new 7T DWI acquisition
+Info "REPLACE run-2 string to  from new 7T DWI acquisition"
 for dwi in $(ls "$BIDS"/dwi/*"acq_multib_"*"d_dir-AP_run-2_dwi"*); do mv -v $dwi ${dwi/run-2_/part-phase_}; done
 
-# REPLACE "_sbref_ph" with "_part-phase_sbref"
+Info "REPLACE \"_sbref_ph\" with \"_part-phase_sbref\""
 for dwi in $(ls "$BIDS"/dwi/*"_sbref_ph"*); do mv -v $dwi ${dwi/_sbref_ph/_part-phase_sbref}; done
-
-# Moving files to their correct directory location
-if ls "$BIDS"/*b0* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*b0* "$BIDS"/dwi; fi
-if ls "$BIDS"/*sbref* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*sbref* "$BIDS"/dwi; fi
-if ls "$BIDS"/*epi* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*epi* "$BIDS"/fmap; fi
-if ls "$BIDS"/*angio* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*angio* "$BIDS"/anat; fi
-if ls "$BIDS"/*MTR* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*MTR* "$BIDS"/anat; fi
-if ls "$BIDS"/anat/*ROI* 1> /dev/null 2>&1; then Do_cmd rm "$BIDS"/anat/*ROI*; fi
 
 # QC, count the number of Niftis (json) per subject
 dat=$(stat ${BIDS} | awk 'NR==6 {print $2}')
@@ -343,15 +361,70 @@ for file in "$BIDS"/*/*phase*json; do
   jq '. + {"Units": "arbitrary"}' "$file" > tmp.$$.json && mv tmp.$$.json "$file"
 done
 
+# -----------------------------------------------------------------------------------------------
+# QC, count the number of Niftis (json) per subject
+dat=$(stat ${BIDS} | awk 'NR==6 {print $2}')
+anat=$(ls -R ${BIDS}/anat | grep gz | wc -l)
+dwi=$(ls -R ${BIDS}/dwi | grep gz | wc -l)
+func=$(ls -R ${BIDS}/func | grep gz | wc -l)
+fmap=$(ls -R ${BIDS}/fmap | grep gz | wc -l)
+
 # check mandatory inputs: -in Is $SUBJ_DIR found?
 tsv_file="$BIDS_DIR"/participants_7t2bids.tsv
-# CHeck if file exist
-if [ ! -f "$tsv_file" ]; then echo -e "sub\tses\tdate\tdicoms\tN.anat\tN.dwi\tN.func\tN.fmap" > "$tsv_file"; fi
+# Check if file exist
+if [ ! -f "$tsv_file" ]; then echo -e "sub\tses\date\tdicoms\tN.anat\tN.dwi\tN.func\tN.fmap" > "$tsv_file"; fi
 # Add information about subject
 echo -e "${Subj}\t${SES/ses-/}\t${dat}\t${SUBJ_DIR}\t${anat}\t${dwi}\t${func}\t${fmap}" >> "$tsv_file"
 
+# -----------------------------------------------------------------------------------------------
+# Gitignore file
+bidsignore="$BIDS_DIR"/.bidsignore
+# Check if file exist
+if [ ! -f "$bidsignore" ]; then echo -e "participants_7t2bids.tsv\nbids_validator_output.txt\nbeh_taskscores.csv" > "$bidsignore"; fi
+
+# -----------------------------------------------------------------------------------------------
+# Add the new subject to the participants.tsv file
+participants_tsv="$BIDS_DIR"/participants.tsv
+# Check if file exist
+if [ ! -f "$participants_tsv" ]; then echo -e "participant_id\tsession_id\tsite\tgroup" > "$participants_tsv"; fi
+# Add information about subject
+group=${Subj:0:3}
+echo -e "sub-${Subj}\t${SES/ses-/}\tSiemmensTerra7T\t${group}" >> "$participants_tsv"
+
+# -----------------------------------------------------------------------------------------------
+# Get the repository path
+gitrepo=$(dirname $(dirname $(realpath "$0")))
+
+# Copy json files to the BIDS directory
+if [ ! -f "$BIDS_DIR"/participants.json ]; then cp -v "$gitrepo"/files/participants.json "$BIDS_DIR"/participants.json; fi
+
+# Add the task jsons
+tasks_protocols=(func-rsfmri_acq-mbep2d_ME_19mm func-epiencode_acq-mbep2d_ME_19mm func-epiretrieve_acq-mbep2d_ME_19mm func-pattersep1_acq-mbep2d_ME_19mm func-patternsep2_acq-mbep2d_ME_19mm func-semantic1_acq-mbep2d_ME_19mm func-semantic2_acq-mbep2d_ME_19mm func-spatial1_acq-mbep2d_ME_19mm func-spatial2_acq-mbep2d_ME_19mm func-movies1_acq-mbep2d_ME_19mm func-movies2_acq-mbep2d_ME_19mm func-movies3_acq-mbep2d_ME_19mm func-movies4_acq-mbep2d_ME_19mm func-semphon1_acq-mbep2d_ME_19mm func-semphon2_acq-mbep2d_ME_19mm func-audiobook1_acq-mbep2d_ME_19mm func-audiobook2_acq-mbep2d_ME_19mm)
+tasks=(rest epiencode epiretrieve patternsep1 patternsep2 semantic1 semantic2 spatial1 spatial2 movies1 movies2 movies3 movies4 semphon1 semphon2 audiobook1 audiobook2)
+for i in ${!tasks[@]}; do
+
+    if [ ! -f "$BIDS_DIR"/task-${tasks[$i]}.json ]; then 
+    # Create task json files
+    cp -v "$gitrepo"/files/task-template.json "$BIDS_DIR"/task-${tasks[$i]}.json
+    # Replace strings
+    sed -i 's/PROTOCOL_NAME/${tasks_protocols[$i]}/g' "$BIDS_DIR"/task-${tasks[$i]}.json
+    sed -i 's/TASK_NAME/${tasks[$i]}/g' "$BIDS_DIR"/task-${tasks[$i]}.json
+    fi
+  
+done
+
+# Copy the data_set_description.json file to the BIDS directory
+if [ ! -f "$BIDS_DIR"/dataset_description.json ]; then cp -v "$gitrepo"/files/dataset_description.json "$BIDS_DIR"/dataset_description.json; fi
+
+# Copy the data_set_description.json file to the BIDS directory
+if [ ! -f "$BIDS_DIR"/CITATION.cff ]; then cp -v "$gitrepo"/files/CITATION.cff "$BIDS_DIR"/CITATION.cff; fi
+
+# Create README
+echo -e "This dataset was provided by the Montreal Paris Neurobanque initiative.\n\nIf you reference this dataset in your publications, please acknowledge its authors." > "$BIDS_DIR"/README
+
+# -----------------------------------------------------------------------------------------------
 # Go back to initial directory
-Do_cmd cd "$here"
+cd "$here"
 
 Info "Remember to validate your BIDS directory:
-                http://bids-standard.github.io/bids-validator/"
+      http://bids-standard.github.io/bids-validator/"

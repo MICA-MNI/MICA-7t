@@ -1,0 +1,75 @@
+# schema: https://github.com/citation-file-format/citation-file-format/blob/main/schema-guide.md
+
+cff-version: 1.2.0
+
+title: Precision NeuroImaging and Connectomics (PNC)
+
+license: CC0 1.0 Universal
+
+type: "software"
+
+repository-code: https://github.com/MICA-MNI/MICA-7t
+
+message: MICA lab, Brain Imaging Center, Montreal Neurologial Institute and Hospital.
+
+identifiers:
+  - description: "The concept DOI of the pre-release version."
+    type: doi
+    value: 10.17605/OSF.IO/MHQ3F
+
+keywords:
+  - dataset
+  - open data
+  - brain imaging data structure
+  - BIDS
+  - neuroscience
+  - neuroimaging
+  - neuroinformatics
+
+authors:
+  - family-names: Cabalo
+    given-names: Donna Gift
+    email: donna.cabalo@mail.mcgill.ca
+    orcid: http://orcid.org/0000-0001-9568-1723
+  - family-names: Smith
+    given-names: Meaghan
+    orcid: http://orcid.org/0009-0007-0838-6947
+  - family-names: Hwang
+    given-names: Youngeun
+    orcid: http://orcid.org/0000-0002-6921-0423
+  - family-names: Royer
+    given-names: Jessica
+    orcid: http://orcid.org/0000-0002-4448-8998
+  - family-names: DeKraker
+    given-names: Jordan
+    orcid: http://orcid.org/0000-0002-4093-0582
+  - family-names: Wang
+    given-names: Yezhou
+    orcid: http://orcid.org/0000-0003-3650-5476
+  - family-names: Eichert
+    given-names: Nicole
+    orcid: http://orcid.org/0000-0001-7818-5787
+  - family-names: Paquola
+    given-names: Casey
+    orcid: http://orcid.org/0000-0002-0190-4103
+  - family-names: Leppert
+    given-names: Ilana Ruth
+  - family-names: Thevakumaran
+    given-names: Risa
+  - family-names: Tardif
+    given-names: Christine Lucas
+    orcid: http://orcid.org/0000-0001-8356-6808
+  - family-names: Rudko
+    given-names: David
+    orcid: http://orcid.org/0000-0002-1299-954X
+  - family-names: Smallwood
+    given-names: Jonathan
+    orcid: http://orcid.org/0000-0002-7298-2459
+  - family-names: Rodriguez-Cruces
+    given-names: Raul
+    email: raul.rodriguezcruces@mcgill.ca
+    orcid: http://orcid.org/0000-0001-8002-0877
+  - family-names: Bernhardt
+    given-names: Boris C.
+    email: boris.bernhardt@mcgill.ca
+    orcid: http://orcid.org/0000-0001-9256-6041

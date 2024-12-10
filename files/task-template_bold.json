@@ -1,0 +1,9 @@
+{
+    "Manufacturer": "Siemens",
+      "ManufacturersModelName": "Terra",
+      "ProcedureStepDescription": "MICA lab | Presicion NeuroImaging PNI",
+      "BodyPartExamined": "BRAIN",
+      "ProtocolName": "PROTOCOL_NAME",
+      "MagneticFieldStrength": 7.0,
+      "TaskName": "TASK_NAME"
+  }
