@@ -124,6 +124,11 @@ here=$(pwd)
 # New BIDS-naming, follow the BIDS specification:
 # https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html
 orig=(
+  "*anat-T1w_acq-mp2rage_07mm_CSptx_INV1"
+  "*anat-T1w_acq-mp2rage_07mm_CSptx_INV2"
+  "*anat-T1w_acq-mp2rage_07mm_CSptx_T1_Images"
+  "*anat-T1w_acq-mp2rage_07mm_CSptx_UNI_Images"
+  "*anat-T1w_acq-mp2rage_07mm_CSptx_UNI-DEN"
   "*anat-flair_acq-0p7mm_UPAdia"
   "*anat-T1w_acq-mprage_07mm_UP"
   "*anat-T1w_acq-mp2rage_05mm_UP_INV1"
@@ -162,6 +167,11 @@ orig=(
   "*func-audiobook2_acq-mbep2d_ME_19mm"
 )
 bids=(
+  acq-07mm_inv-1_MP2RAGE
+  acq-07mm_inv-2_MP2RAGE
+  acq-07mm_T1map
+  acq-07mm_UNIT1
+  acq-07mm_chunk-denoised_UNIT1
   FLAIR
   acq-mprage_T1w
   inv-1_MP2RAGE
@@ -208,29 +218,33 @@ origDWI=(
   "*dwi_acq_b700_40d-dir_AP"
   "*dwi_acq_b300_10d-dir_AP_SBRef"
   "*dwi_acq_b300_10d-dir_AP"
-  "*dwi_acq_b0_PA"
   "*dwi_acq_b0_PA_SBRef"
-  "*dwi_acq_multib_38dir_AP_acc9"
+  "*dwi_acq_b0_PA"
   "*dwi_acq_multib_38dir_AP_acc9_SBRef"
-  "*dwi_acq_multib_70dir_AP_acc9"
+  "*dwi_acq_multib_38dir_AP_acc9"
   "*dwi_acq_multib_70dir_AP_acc9_SBRef"
+  "*dwi_acq_multib_70dir_AP_acc9"
 )
 bidsDWI=(
   acq-b0_dir-PA_sbref
-  acq-b0_dir-PA_epi
+  acq-b0_dir-PA_dwi
   acq-b2000_dir-AP_sbref
   acq-b2000_dir-AP_dwi
   acq-b700_dir-AP_sbref
   acq-b700_dir-AP_dwi
   acq-b300_dir-AP_sbref
   acq-b300_dir-AP_dwi
-  acq-b0_dir-PA_dwi
   acq-b0_dir-PA_sbref
+  acq-b0_dir-PA_dwi
   acq-multib38_dir-AP_sbref
   acq-multib38_dir-AP_dwi
   acq-multib70_dir-AP_sbref
   acq-multib70_dir-AP_dwi
 )
+
+# -----------------------------------------------------------------------------------------------
+# time stamp
+start_time=$(date +%s)
 
 # -----------------------------------------------------------------------------------------------
 # Create BIDS/subj_dir
@@ -274,6 +288,7 @@ if ls "$BIDS"/*T1* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*T1* "$BIDS"/anat; 
 if ls "$BIDS"/*T2* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*T2* "$BIDS"/anat; fi
 if ls "$BIDS"/*fieldmap* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*fieldmap* "$BIDS"/fmap; fi
 if ls "$BIDS"/*TB1TFL* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*TB1TFL* "$BIDS"/fmap; fi
+if ls "$BIDS"/*FLAIR* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*TB1TFL* "$BIDS"/fmap; fi
 
 # Rename echos: echo-1_bold.nii.gz
 for i in {1..3}; do
@@ -293,11 +308,10 @@ Info "Remove MP2RAGE bval and bvecs"
 rm "$BIDS"/anat/*MP2RAGE.bv*
 
 Info "Organize TB1TFL acquisitions"
-TB1TFL=(acq-famp_run-1_TB1TFL acq-anat_run-1_TB1TFL acq-famp_run-2_TB1TFL acq-anat_run-2_TB1TFL)
-for i in {1..4}; do
-  for b1 in $(ls "$BIDS"/fmap/*"acq-anat_run-${i}_TB1TFL"*); do
-  mv ${b1} ${b1/acq-anat_run-${i}_TB1TFL/${TB1TFL[$((i-1))]}};
-  done
+for b1 in $(ls "$BIDS"/fmap/*"run-2_TB1TFL"*); do mv ${b1} ${b1/run-2_/}; done
+for b1 in $(ls "$BIDS"/fmap/*"run-1_TB1TFL"*); do
+b1_famp=$(echo "$b1" | sed -e 's/run-1_//' -e 's/acq-anat/acq-famp/')
+mv ${b1} ${b1_famp}
 done
 
 # -----------------------------------------------------------------------------------------------
@@ -331,12 +345,14 @@ for n in $(ls *bval); do Dir=0
 done
 
 # Moving files to their correct directory location
-if ls "$BIDS"/*b0* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*b0* "$BIDS"/dwi; fi
-if ls "$BIDS"/*sbref* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*sbref* "$BIDS"/dwi; fi
-if ls "$BIDS"/*epi* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*epi* "$BIDS"/fmap; fi
-if ls "$BIDS"/*angio* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*angio* "$BIDS"/anat; fi
-if ls "$BIDS"/*MTR* 1> /dev/null 2>&1; then cmd mv "$BIDS"/*MTR* "$BIDS"/anat; fi
-if ls "$BIDS"/anat/*ROI* 1> /dev/null 2>&1; then cmd rm "$BIDS"/anat/*ROI*; fi
+if ls "$BIDS"/*b0* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*b0* "$BIDS"/dwi; fi
+if ls "$BIDS"/*dwi* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*dwi* "$BIDS"/dwi; fi
+if ls "$BIDS"/*sbref* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*sbref* "$BIDS"/dwi; fi
+if ls "$BIDS"/*epi* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*epi* "$BIDS"/fmap; fi
+if ls "$BIDS"/*FLAIR* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*FLAIR* "$BIDS"/anat; fi
+if ls "$BIDS"/*angio* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*angio* "$BIDS"/anat; fi
+if ls "$BIDS"/*MTR* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*MTR* "$BIDS"/anat; fi
+if ls "$BIDS"/anat/*ROI* 1> /dev/null 2>&1; then Do_cmd rm "$BIDS"/anat/*ROI*; fi
 
 Info "REMOVE run-1 string from new 7T DWI acquisition"
 for dwi in $(ls "$BIDS"/dwi/*"acq_multib_"*"d_dir-AP_run-1_dwi"*); do mv -v $dwi ${dwi/run-1_/}; done
@@ -345,7 +361,8 @@ Info "REPLACE run-2 string to  from new 7T DWI acquisition"
 for dwi in $(ls "$BIDS"/dwi/*"acq_multib_"*"d_dir-AP_run-2_dwi"*); do mv -v $dwi ${dwi/run-2_/part-phase_}; done
 
 Info "REPLACE \"_sbref_ph\" with \"_part-phase_sbref\""
-for dwi in $(ls "$BIDS"/dwi/*"_sbref_ph"*); do mv -v $dwi ${dwi/_sbref_ph/_part-phase_sbref}; done
+for dwi in $(ls "$BIDS"/dwi/*"_sbref_ph"*); do mv $dwi ${dwi/_sbref_ph/_part-phase_sbref}; done
+for dwi in $(ls "$BIDS"/dwi/*"_dwi_ph"*); do mv $dwi ${dwi/_dwi_ph/_part-phase_dwi}; done
 
 # QC, count the number of Niftis (json) per subject
 dat=$(stat ${BIDS} | awk 'NR==6 {print $2}')
@@ -405,10 +422,10 @@ for i in ${!tasks[@]}; do
 
     if [ ! -f "$BIDS_DIR"/task-${tasks[$i]}.json ]; then 
     # Create task json files
-    cp -v "$gitrepo"/files/task-template.json "$BIDS_DIR"/task-${tasks[$i]}.json
+    cp "$gitrepo"/files/task-template_bold.json "$BIDS_DIR"/task-${tasks[$i]}_bold.json
     # Replace strings
-    sed -i 's/PROTOCOL_NAME/${tasks_protocols[$i]}/g' "$BIDS_DIR"/task-${tasks[$i]}.json
-    sed -i 's/TASK_NAME/${tasks[$i]}/g' "$BIDS_DIR"/task-${tasks[$i]}.json
+    sed -i "s/PROTOCOL_NAME/${tasks_protocols[$i]}/g" "$BIDS_DIR"/task-${tasks[$i]}_bold.json
+    sed -i "s/TASK_NAME/${tasks[$i]}/g" "$BIDS_DIR"/task-${tasks[$i]}_bold.json
     fi
   
 done
@@ -426,5 +443,10 @@ echo -e "This dataset was provided by the Montreal Paris Neurobanque initiative.
 # Go back to initial directory
 cd "$here"
 
-Info "Remember to validate your BIDS directory:
-      http://bids-standard.github.io/bids-validator/"
+
+# -----------------------------------------------------------------------------------------------#
+#			 Total Running Time
+end_time=$(date +%s)
+time_difference=$(echo "$end_time - $start_time" | bc)
+time_difference=$(echo print $time_difference/60 | perl)
+Info "GLOBAL micapipe running time with $PROC processing:\033[38;5;220m $(printf "%0.3f\n" ${time_difference}) minutes \033[38;5;141m"
