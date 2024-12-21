@@ -4,7 +4,7 @@
 #
 
 # Print command
-function Do_cmd() {
+function cmd() {
 # do_cmd sends command to stdout before executing it.
 str="$(whoami) @ $(uname -n) $(date)"
 local l_command=""
