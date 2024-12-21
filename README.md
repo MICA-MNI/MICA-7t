@@ -1,7 +1,14 @@
 # Precision NeuroImaging 7T
+
+[![version](https://img.shields.io/github/v/tag/MICA-MNI/MICA-7t)](https://github.com/MICA-MNI/MICA-7t)
+[![License: GPL v3](https://img.shields.io/github/license/MICA-MNI/MICA-7t?color=blue)](https://www.gnu.org/licenses/gpl-3.0)
+[![GitHub issues](https://img.shields.io/github/issues/MICA-MNI/MICA-7t)](https://github.com/MICA-MNI/MICA-7t/issues)
+[![GitHub stars](https://img.shields.io/github/stars/MICA-MNI/MICA-7t.svg?style=flat&label=⭐%EF%B8%8F%20stars&color=brightgreen)](https://github.com/rcruces/7T_pipeline/stargazers)
+
+
 Scripts for sorting, organizing and processing the 7T database
 =======
-## 0 Running the protocol with Aaron
+## 0 Running the protocol with `Aaron`
 ```bash
 # 1. log in to Aaron, source and activate conda environments 
 source /export02/local/conda/etc/profile.d/conda.sh
@@ -29,7 +36,7 @@ cd 7T
 python run_tasks.py
 
 ```
-## 1 . Transfering the data (C
+## 1 . Transfering the data
 The files from the 7t scan are in `/data/dicom/PNC001_Day1_?????`. First, find and claim data using `find_mri` and  `find_mri -claim` script. Then copy 7T data to our folder /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms.
 ```bash
 SUBID=PNC001
