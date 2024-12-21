@@ -380,45 +380,105 @@ micapipe_cleanup -sub "${sub}" \
 | func          | 7.7G     |
 | *Total*       | 9.4G     |
 
-# 7T MRI acquisition protocol
+# PNI 7T MRI acquisition protocol
+
+## Anatomical
 | Session  | Acquisition                                | BIDS dir | BIDS name              |
 |----------|--------------------------------------------|----------|------------------------|
 | 01/02/03 | "*anat-T1w_acq-mprage_07mm_UP"             | anat     | acq-mprage_T1w         |
-| 01/02/03 | "*anat-T1w_acq-mp2rage_05mm_UP_INV1"       | anat     | acq-inv1_T1map         |
-| 01/02/03 | "*anat-T1w_acq-mp2rage_05mm_UP_INV2"       | anat     | acq-inv2_T1map         |
-| 01/02/03 | "*anat-T1w_acq-mp2rage_05mm_UP_T1_Images"  | anat     | acq-T1_T1map           |
-| 01/02/03 | "*anat-T1w_acq-mp2rage_05mm_UP_UNI_Images" | anat     | acq-uni_T1map          |
-| 01/02    | "*dwi_acq_b0-dir_PA_SBRef"                 | dwi      | acq-b0_dir-PA_sbref    |
-| 01/02    | "*dwi_acq_b0-dir_PA"                       | dwi      | acq-b0_dir-PA_epi      |
-| 01/02    | "*dwi_acq_b2000_90d-dir_AP_SBRef"          | dwi      | acq-b2000_dir-AP_sbref |
-| 01/02    | "*dwi_acq_b2000_90d-dir_AP"                | dwi      | acq-b2000_dir-AP_dwi   |
-| 01/02    | "*dwi_acq_b700_40d-dir_AP_SBRef"           | dwi      | acq-b700_dir-AP_sbref  |
-| 01/02    | "*dwi_acq_b700_40d-dir_AP"                 | dwi      | acq-b700_dir-AP_dwi    |
-| 01/02    | "*dwi_acq_b300_10d-dir_AP_SBRef"           | dwi      | acq-b300_dir-AP_sbref  |
-| 01/02    | "*dwi_acq_b300_10d-dir_AP"                 | dwi      | acq-b300_dir-AP_dwi    |
+| ?        | "*anat-T1w_acq-mp2rage_07mm_CSptx_INV1"    | anat     | inv-1_MP2RAGE          |
+| ?        | "*anat-T1w_acq-mp2rage_07mm_CSptx_INV2"    | anat     | inv-2_MP2RAGE          |
+| ?        | "*anat-T1w_acq-mp2rage_07mm_CSptx_T1_Images" | anat   | T1map                  |
+| ?        | "*anat-T1w_acq-mp2rage_07mm_CSptx_UNI_Images" | anat   | UNIT1                  |
+| ?        | "*anat-T1w_acq-mp2rage_07mm_CSptx_UNI-DEN" | anat     | acq-denoised_UNIT1     |
+| ?        | "*cstfl-mp2rage-05mm_INV1"                 | anat     | acq-05mm_inv-1_MP2RAGE |
+| ?        | "*cstfl-mp2rage-05mm_INV2"                 | anat     | acq-05mm_inv-2_MP2RAGE |
+| ?        | "*cstfl-mp2rage-05mm_T1_Images"            | anat     | acq-05mm_T1map         |
+| ?        | "*cstfl-mp2rage-05mm_UNI_Images"           | anat     | acq-05mm_UNIT1         |
+| ?        | "*cstfl-mp2rage-05mm_UNI-DEN"              | anat     | acq-05mmDenoised_UNIT1 |
+| 01/02/03 | "*anat-T1w_acq-mp2rage_05mm_UP*_INV1"       | anat     | acq-inv1_T1map         |
+| 01/02/03 | "*anat-T1w_acq-mp2rage_05mm_UP*_INV2"       | anat     | acq-inv2_T1map         |
+| 01/02/03 | "*anat-T1w_acq-mp2rage_05mm_UP*_T1_Images"  | anat     | acq-T1_T1map           |
+| 01/02/03 | "*anat-T1w_acq-mp2rage_05mm_UP*_UNI_Images" | anat     | acq-uni_T1map          |
+| a1       | "*anat-flair_acq-0p7mm_UPAdia"             | anat     | FLAIR                  |
+| ?        | "*anat-flair_acq-07iso_dev3_5SD_UP"        | anat     | FLAIR                  |
+| a1       | "*Romeo_Mask_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-mask_T2starw      |
+| a1       | "*Aspire_M_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-aspire_T2starw    |
+| a1       | "*Aspire_P_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-aspire_T2starw    |
+| a1       | "*EchoCombined_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-combined_part-echo_T2starw |
+| a1       | "*T2star_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | T2starw               |
+| a1       | "*Romeo_P_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-romeo_T2starw     |
+| a1       | "*Romeo_B0_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-romeoUnwrapped_T2starw |
+| a1       | "*sensitivity_corrected_mag_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-SensitivityCorrected_part-mag_T2starw |
+| a1       | "*CLEAR-SWI_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-clearSWI_T2starmap |
+| 02/03    | "*anat-T2star_acq-me_gre_07mm"             | anat     | T2starw                |
+| 02/03    | "*T2Star_Images"                           | anat     | T2starmap              |
+| 03       | "*_MTON"                                   | anat     | mt-on_MTR              |
+| 03       | "*_MTOFF"                                  | anat     | mt-off_MTR             |
+| 03       | "*_T1W"                                    | anat     | acq-MTR_T1w            |
+| ?        | "*anat-mtw_acq-MTON_07mm"                  | anat     | mt-on_MTR              |
+| ?        | "*anat-mtw_acq-MTOFF_07mm"                 | anat     | mt-off_MTR             |
+| ?        | "*anat-mtw_acq-T1w_07mm"                   | anat     | acq-MTR_T1w            |
+| 03       | "*anat-angio_acq-tof_03mm_inplane"         | anat     | angio                  |
+| 03       | "*anat-angio_acq-tof_03mm_inplane_MIP_SAG" | anat     | acq-sag_angio          |
+| 03       | "*anat-angio_acq-tof_03mm_inplane_MIP_COR" | anat     | acq-cor_angio          |
+| 03       | "*anat-angio_acq-tof_03mm_inplane_MIP_TRA" | anat     | acq-tra_angio          |
+
+## Field maps
+| Session     | Acquisition                                | BIDS dir | BIDS name              |
+|-------------|--------------------------------------------|----------|------------------------|
+| 01/02/03/a1 | "*fmap-b1_acq-tra_p2"                      | fmap     | acq-anat_TB1TFL        |
+| 01/02/03/a1 | "*fmap-b1_acq-sag_p2"                      | fmap     | acq-anat_TB1TFL        |
+| 01/02/03    | "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP*"    | fmap     | acq-fmri_dir-AP_epi    |
+| 01/02/03    | "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA*"    | fmap     | acq-fmri_dir-PA_epi    |
+
+## Functional MRI
+| Session  | Acquisition                                | BIDS dir | BIDS name              |
+|----------|--------------------------------------------|----------|------------------------|
+| ?        | "*func-rsfmri_acq-singleE_1*"              | func     | acq-singleE_task-rest_bold |
 | 01/02/03 | "*func-rsfmri_acq-mbep2d_ME_19mm"          | func     | task-rest_bold         |
 | 01       | "*func-epiencode_acq-mbep2d_ME_19mm"       | func     | task-epiencode_bold    |
 | 01       | "*func-epiretrieve_acq-mbep2d_ME_19mm"     | func     | task-epiretrieve_bold  |
 | 01       | "*func-pattersep1_acq-mbep2d_ME_19mm"      | func     | task-patternsep1_bold  |
 | 01       | "*func-patternsep2_acq-mbep2d_ME_19mm"     | func     | task-patternsep2_bold  |
-| 01/02/03 | "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP"     | fmap     | acq-fmri_dir-AP_epi    |
-| 01/02/03 | "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA"     | fmap     | acq-fmri_dir-PA_epi    |
-| 01/02/03 | "*fmap-b1_acq-tra_p2"                      | fmap     | acq-b1tra_fieldmap     |
-| 01/02/03 | "*fmap-b1_acq-sag_p2"                      | fmap     | acq-b1sag_fieldmap     |
 | 02       | "*func-semantic1_acq-mbep2d_ME_19mm"       | func     | task-semantic1_bold    |
 | 02       | "*func-semantic2_acq-mbep2d_ME_19mm"       | func     | task-semantic2_bold    |
 | 02       | "*func-spatial1_acq-mbep2d_ME_19mm"        | func     | task-spatial1_bold     |
 | 02       | "*func-spatial2_acq-mbep2d_ME_19mm"        | func     | task-spatial2_bold     |
-| 02/03    | "*anat-T2star_acq-me_gre_07mm"             | anat     | T2starw                |
-| 02/03    | "*T2Star_Images"                           | anat     | T2starmap              |
-| 03       | "*func-movies1_acq-mbep2d_ME_19mm"         | func     | task-movies1_bold      |
-| 03       | "*func-movies2_acq-mbep2d_ME_19mm"         | func     | task-movies2_bold      |
+| 03       | "*func-movie*1_acq-mbep2d_ME_19mm"         | func     | task-movies1_bold      |
+| 03       | "*func-movie*2_acq-mbep2d_ME_19mm"         | func     | task-movies2_bold      |
 | 03       | "*func-movies3_acq-mbep2d_ME_19mm"         | func     | task-movies3_bold      |
 | 03       | "*func-movies4_acq-mbep2d_ME_19mm"         | func     | task-movies4_bold      |
-| 03       | "*anat-angio_acq-tof_03mm_inplane"         | anat     | angio                  |
-| 03       | "*anat-angio_acq-tof_03mm_inplane_MIP_SAG" | anat     | acq-sag_angio          |
-| 03       | "*anat-angio_acq-tof_03mm_inplane_MIP_COR" | anat     | acq-cor_angio          |
-| 03       | "*anat-angio_acq-tof_03mm_inplane_MIP_TRA" | anat     | acq-tra_angio          |
-| 03       | "*_MTON"                                   | anat     | mt-on_MTR              |
-| 03       | "*_MTOFF"                                  | anat     | mt-off_MTR             |
-| 03       | "*_T1W"                                    | anat     | acq-T1w_MTR            |
+| ?        | "*func-semphon1_acq-mbep2d_ME_19mm"        | func     | task-semphon1_bold     |
+| ?        | "*func-semphon2_acq-mbep2d_ME_19mm"        | func     | task-semphon2_bold     |
+| ?        | "*func-audiobook1_acq-mbep2d_ME_19mm"      | func     | task-audiobook1_bold   |
+| ?        | "*func-audiobook2_acq-mbep2d_ME_19mm"      | func     | task-audiobook2_bold   |
+| ?        | "*func-sens1_acq-mbep2d_ME_19mm"           | func     | task-sens2_bold        |
+| ?        | "*func-sens2_acq-mbep2d_ME_19mm"           | func     | task-sens1_bold        |
+| ?        | "*func-slient1_acq-mbep2d_ME_19mm"         | func     | task-salient_bold      |
+
+## Diffusion weighted Imaging
+| Session  | Acquisition                              | BIDS dir | BIDS name                  |
+|----------|------------------------------------------|----------|----------------------------|
+| 01/02/a1 | "*dwi_acq_b0-dir_PA_SBRef"               | dwi      | acq-b0_dir-PA_sbref        |
+| 01/02/a1 | "*dwi_acq_b0-dir_PA"                     | dwi      | acq-b0_dir-PA_dwi          |
+| 01/02/a1 | "*dwi_acq_b0_PA_SBRef"                   | dwi      | acq-b0_dir-PA_sbref        |
+| 01/02/a1 | "*dwi_acq_b0_PA"                         | dwi      | acq-b0_dir-PA_dwi          |
+| ?        | "*dwi_acq_b0_PA_1p5iso_SBRef"            | dwi      | acq-b0_dir-PA_sbref        |
+| ?        | "*dwi_acq_b0_PA_1p5iso"                  | dwi      | acq-b0_dir-PA_dwi          |
+| 01/02    | "*dwi_acq_b2000_90d-dir_AP_SBRef"        | dwi      | acq-b2000_dir-AP_sbref     |
+| 01/02    | "*dwi_acq_b2000_90d-dir_AP"              | dwi      | acq-b2000_dir-AP_dwi       |
+| 01/02    | "*dwi_acq_b700_40d-dir_AP_SBRef"         | dwi      | acq-b700_dir-AP_sbref      |
+| 01/02    | "*dwi_acq_b700_40d-dir_AP"               | dwi      | acq-b700_dir-AP_dwi        |
+| 01/02    | "*dwi_acq_b300_10d-dir_AP_SBRef"         | dwi      | acq-b300_dir-AP_sbref      |
+| 01/02    | "*dwi_acq_b300_10d-dir_AP"               | dwi      | acq-b300_dir-AP_dwi        |
+| a1       | "*dwi_acq_multib_38dir_AP_acc9_SBRef"    | dwi      | acq-multib38_dir-AP_sbref  |
+| a1       | "*dwi_acq_multib_38dir_AP_acc9"          | dwi      | acq-multib38_dir-AP_dwi    |
+| a1       | "*dwi_acq_multib_38dir_AP_acc9_1p5iso_SBRef" | dwi   | acq-multib38_dir-AP_sbref |
+| a1       | "*dwi_acq_multib_38dir_AP_acc9_1p5iso"   | dwi      | acq-multib38_dir-AP_dwi    |
+| a1       | "*dwi_acq_multib_38dir_AP_acc9_test_SBRef" | dwi    | acq-multib38_dir-AP_sbref  |
+| a1       | "*dwi_acq_multib_38dir_AP_acc9_test"     | dwi      | acq-multib38_dir-AP_dwi    |
+| a1       | "*dwi_acq_multib_70dir_AP_acc9_SBRef"    | dwi      | acq-multib70_dir-AP_sbref  |
+| a1       | "*dwi_acq_multib_70dir_AP_acc9"          | dwi      | acq-multib70_dir-AP_dwi    |
+| a1       | "*dwi_acq_multib_70dir_AP_acc9_1p5iso_SBRef" | dwi   | acq-multib70_dir-AP_sbref |
+| a1       | "*dwi_acq_multib_70dir_AP_acc9_1p5iso"   | dwi      | acq-multib70_dir-AP_dwi    |

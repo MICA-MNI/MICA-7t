@@ -124,64 +124,77 @@ here=$(pwd)
 # New BIDS-naming, follow the BIDS specification:
 # https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html
 orig=(
+  "*anat-T1w_acq-mprage_07mm_UP"
+  "*fmap-b1_acq-tra_p2"
+  "*fmap-b1_acq-sag_p2"
+  "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP*"
+  "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA*"
+  "*func-rsfmri_acq-singleE_1*"
+  "*func-rsfmri_acq-mbep2d_ME_19mm"
+  "*func-epiencode_acq-mbep2d_ME_19mm*"
+  "*func-epiretrieve_acq-mbep2d_ME_19mm"
+  "*func-pattersep1_acq-mbep2d_ME_19mm"
+  "*func-patter*sep2_acq-mbep2d_ME_19mm"
+  "*func-semantic1_acq-mbep2d_ME_19mm"
+  "*func-semantic2_acq-mbep2d_ME_19mm"
+  "*func-spatial1_acq-mbep2d_ME_19mm"
+  "*func-spatial2_acq-mbep2d_ME_19mm"
+  "*func-movie*1_acq-mbep2d_ME_19mm"
+  "*func-movie*2_acq-mbep2d_ME_19mm"
+  "*func-movies3_acq-mbep2d_ME_19mm"
+  "*func-movies4_acq-mbep2d_ME_19mm"
+  "*func-semphon1_acq-mbep2d_ME_19mm"
+  "*func-semphon2_acq-mbep2d_ME_19mm"
+  "*func-audiobook1_acq-mbep2d_ME_19mm"
+  "*func-audiobook2_acq-mbep2d_ME_19mm"
+  "*func-sens1_acq-mbep2d_ME_19mm"
+  "*func-sens2_acq-mbep2d_ME_19mm"
+  "*func-slient1_acq-mbep2d_ME_19mm"
   "*anat-T1w_acq-mp2rage_07mm_CSptx_INV1"
   "*anat-T1w_acq-mp2rage_07mm_CSptx_INV2"
   "*anat-T1w_acq-mp2rage_07mm_CSptx_T1_Images"
   "*anat-T1w_acq-mp2rage_07mm_CSptx_UNI_Images"
   "*anat-T1w_acq-mp2rage_07mm_CSptx_UNI-DEN"
+  "*cstfl-mp2rage-05mm_INV1"
+  "*cstfl-mp2rage-05mm_INV2"
+  "*cstfl-mp2rage-05mm_T1_Images"
+  "*cstfl-mp2rage-05mm_UNI_Images"
+  "*cstfl-mp2rage-05mm_UNI-DEN"
+  "*anat-T1w_acq-mp2rage_05mm_UP*_INV1"
+  "*anat-T1w_acq-mp2rage_05mm_UP*_INV2"
+  "*anat-T1w_acq-mp2rage_05mm_UP*_T1_Images"
+  "*anat-T1w_acq-mp2rage_05mm_UP*_UNI_Images"
   "*anat-flair_acq-0p7mm_UPAdia"
-  "*anat-T1w_acq-mprage_07mm_UP"
-  "*anat-T1w_acq-mp2rage_05mm_UP_INV1"
-  "*anat-T1w_acq-mp2rage_05mm_UP_INV2"
-  "*anat-T1w_acq-mp2rage_05mm_UP_T1_Images"
-  "*anat-T1w_acq-mp2rage_05mm_UP_UNI_Images"
-  "*fmap-b1_acq-tra_p2"
-  "*fmap-b1_acq-sag_p2"
-  "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP"
-  "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA"
-  "*func-rsfmri_acq-mbep2d_ME_19mm"
-  "*func-epiencode_acq-mbep2d_ME_19mm"
-  "*func-epiretrieve_acq-mbep2d_ME_19mm"
-  "*func-pattersep1_acq-mbep2d_ME_19mm"
-  "*func-patternsep2_acq-mbep2d_ME_19mm"
-  "*func-semantic1_acq-mbep2d_ME_19mm"
-  "*func-semantic2_acq-mbep2d_ME_19mm"
-  "*func-spatial1_acq-mbep2d_ME_19mm"
-  "*func-spatial2_acq-mbep2d_ME_19mm"
-  "*anat-T2star_acq-me_gre_07mm"
+  "*anat-flair_acq-07iso_dev3_5SD_UP"
+  "*Romeo_Mask_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
+  "*Aspire_M_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
+  "*Aspire_P_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
+  "*EchoCombined_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
+  "*T2star_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
+  "*Romeo_P_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
+  "*Romeo_B0_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
+  "*sensitivity_corrected_mag_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
+  "*CLEAR-SWI_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
+  "*anat-T2star_acq-me_gre_07mm*"
   "*T2Star_Images"
-  "*func-movies1_acq-mbep2d_ME_19mm"
-  "*func-movies2_acq-mbep2d_ME_19mm"
-  "*func-movies3_acq-mbep2d_ME_19mm"
-  "*func-movies4_acq-mbep2d_ME_19mm"
+  "*_MTON"
+  "*_MTOFF"
+  "*_T1W"
+  "*anat-mtw_acq-MTON_07mm"
+  "*anat-mtw_acq-MTOFF_07mm"
+  "*anat-mtw_acq-T1w_07mm"
   "*anat-angio_acq-tof_03mm_inplane"
   "*anat-angio_acq-tof_03mm_inplane_MIP_SAG"
   "*anat-angio_acq-tof_03mm_inplane_MIP_COR"
   "*anat-angio_acq-tof_03mm_inplane_MIP_TRA"
-  "*_MTON"
-  "*_MTOFF"
-  "*_T1W"
-  "*func-semphon1_acq-mbep2d_ME_19mm"
-  "*func-semphon2_acq-mbep2d_ME_19mm"
-  "*func-audiobook1_acq-mbep2d_ME_19mm"
-  "*func-audiobook2_acq-mbep2d_ME_19mm"
 )
 bids=(
-  acq-07mm_inv-1_MP2RAGE
-  acq-07mm_inv-2_MP2RAGE
-  acq-07mm_T1map
-  acq-07mm_UNIT1
-  acq-07mm_chunk-denoised_UNIT1
-  FLAIR
-  acq-mprage_T1w
-  inv-1_MP2RAGE
-  inv-2_MP2RAGE
-  T1map
-  UNIT1
-  acq-anat_chunk-tra_TB1TFL
-  acq-anat_chunk-sag_TB1TFL
+  mprage_T1w
+  acq-anat_TB1TFL
+  acq-anat_TB1TFL
   acq-fmri_dir-AP_epi
   acq-fmri_dir-PA_epi
+  acq-singleE_task-rest_bold
   task-rest_bold
   task-epiencode_bold
   task-epiretrieve_bold
@@ -191,41 +204,86 @@ bids=(
   task-semantic2_bold
   task-spatial1_bold
   task-spatial2_bold
-  T2starw
-  T2starmap
   task-movies1_bold
   task-movies2_bold
   task-movies3_bold
   task-movies4_bold
-  angio
-  acq-sag_angio
-  acq-cor_angio
-  acq-tra_angio
-  mt-on_MTR
-  mt-off_MTR
-  acq-MTR_T1w
   task-semphon1_bold
   task-semphon2_bold
   task-audiobook1_bold
   task-audiobook2_bold
+  task-sens2_bold
+  task-sens1_bold
+  task-salient_bold
+  inv-1_MP2RAGE
+  inv-2_MP2RAGE
+  T1map
+  UNIT1
+  acq-denoised_UNIT1
+  acq-05mm_inv-1_MP2RAGE
+  acq-05mm_inv-2_MP2RAGE
+  acq-05mm_T1map
+  acq-05mm_UNIT1
+  acq-05mmDenoised_UNIT1
+  acq-05mm_inv-1_MP2RAGE
+  acq-05mm_inv-2_MP2RAGE
+  acq-05mm_T1map
+  acq-05mm_UNIT1
+  FLAIR
+  FLAIR
+  acq-mask_T2starw
+  acq-aspire_T2starw
+  acq-aspire_T2starw
+  acq-combined_part-echo_T2starw
+  T2starw
+  acq-romeo_T2starw
+  acq-romeoUnwrapped_T2starw
+  acq-SensitivityCorrected_part-mag_T2starw
+  acq-clearSWI_T2starmap
+  acq-me_T2starw
+  acq-me_T2starmap
+  mt-on_MTR
+  mt-off_MTR
+  acq-MTR_T1w
+  mt-on_MTR
+  mt-off_MTR
+  acq-MTR_T1w
+  angio
+  acq-sag_angio
+  acq-cor_angio
+  acq-tra_angio
 )
+
 origDWI=(
   "*dwi_acq_b0-dir_PA_SBRef"
   "*dwi_acq_b0-dir_PA"
+  "*dwi_acq_b0_PA_SBRef"
+  "*dwi_acq_b0_PA"
+  "*dwi_acq_b0_PA_1p5iso_SBRef"
+  "*dwi_acq_b0_PA_1p5iso"
   "*dwi_acq_b2000_90d-dir_AP_SBRef"
-  "*dwi_acq_b2000_90d-dir_AP"cc
+  "*dwi_acq_b2000_90d-dir_AP"
   "*dwi_acq_b700_40d-dir_AP_SBRef"
   "*dwi_acq_b700_40d-dir_AP"
   "*dwi_acq_b300_10d-dir_AP_SBRef"
   "*dwi_acq_b300_10d-dir_AP"
-  "*dwi_acq_b0_PA_SBRef"
-  "*dwi_acq_b0_PA"
   "*dwi_acq_multib_38dir_AP_acc9_SBRef"
   "*dwi_acq_multib_38dir_AP_acc9"
+  "*dwi_acq_multib_38dir_AP_acc9_1p5iso_SBRef"
+  "*dwi_acq_multib_38dir_AP_acc9_1p5iso"
+  "*dwi_acq_multib_38dir_AP_acc9_test_SBRef"
+  "*dwi_acq_multib_38dir_AP_acc9_test"
   "*dwi_acq_multib_70dir_AP_acc9_SBRef"
   "*dwi_acq_multib_70dir_AP_acc9"
+  "*dwi_acq_multib_70dir_AP_acc9_1p5iso_SBRef"
+  "*dwi_acq_multib_70dir_AP_acc9_1p5iso"
 )
+
 bidsDWI=(
+  acq-b0_dir-PA_sbref
+  acq-b0_dir-PA_dwi
+  acq-b0_dir-PA_sbref
+  acq-b0_dir-PA_dwi
   acq-b0_dir-PA_sbref
   acq-b0_dir-PA_dwi
   acq-b2000_dir-AP_sbref
@@ -234,10 +292,14 @@ bidsDWI=(
   acq-b700_dir-AP_dwi
   acq-b300_dir-AP_sbref
   acq-b300_dir-AP_dwi
-  acq-b0_dir-PA_sbref
-  acq-b0_dir-PA_dwi
   acq-multib38_dir-AP_sbref
   acq-multib38_dir-AP_dwi
+  acq-multib38_dir-AP_sbref
+  acq-multib38_dir-AP_dwi
+  acq-multib38_dir-AP_sbref
+  acq-multib38_dir-AP_dwi
+  acq-multib70_dir-AP_sbref
+  acq-multib70_dir-AP_dwi
   acq-multib70_dir-AP_sbref
   acq-multib70_dir-AP_dwi
 )
@@ -247,77 +309,154 @@ bidsDWI=(
 start_time=$(date +%s)
 
 # -----------------------------------------------------------------------------------------------
-# Create BIDS/subj_dir
-Do_cmd mkdir -p "$BIDS"/{anat,func,dwi,fmap}
+#Create BIDS/subj_dir
+cmd mkdir -p "$BIDS"/{anat,func,dwi,fmap}
 if [ ! -d "$BIDS" ]; then Error "Could not create subject BIDS directory, check permissions \n\t     ${BIDS}\t    "; exit 0; fi
 
 # dicomx to Nifti with BIDS Naming
-Do_cmd cd $SUBJ_DIR
-# Warninging lenght
+cmd cd $SUBJ_DIR
+# Warning lenght
 n=$((${#orig[@]} - 1))
 for ((k=0; k<=n; k++)); do
-  N=$(ls -d ${orig[k]} | wc -l)
+  N=$(ls -d ${orig[k]} 2>/dev/null | wc -l) # make it quiet
   if [ "$N" -eq 0 ]; then
     Warning "No directories were found with the following name: ${orig[k]}"
   elif [ "$N" -gt 1 ]; then
     Names=($(ls -d ${orig[k]}))
     for ((i = 1; i <= N; i++)); do
        nii=$(echo ${Names[((i-2))]} | awk -F '_' '{print $1 "_" $2}')
-       nom="${id}${bids[k]}"
-       dcm=$(echo ${nom##*_})
-       nom=$(echo "${nom/$dcm/}run-${i}_${dcm}")
-       Do_cmd dcm2niix -z y -b y -o "$BIDS" -f "$nom" ${nii}${orig[k]}
+       acq=$(echo ${bids[k]} | grep -oP '(?<=acq-)[^_]+')
+       # Check if acq_string is not empty
+       if [[ -n "$acq" ]]; then acq_string="acq-${acq}_"; else acq_string=""; fi
+       nom="${id}${acq_string}run-${i}_${bids[k]/${acq_string}/}"
+       cmd dcm2niix -z y -b y -o "$BIDS" -f "$nom" ${nii}${orig[k]}
     done
   elif [ "$N" -eq 1 ]; then
-     Do_cmd dcm2niix -z y -b y -o "$BIDS" -f ${id}${bids[k]} ${orig[k]}
+     cmd dcm2niix -z y -b y -o "$BIDS" -f ${id}${bids[k]} ${orig[k]}
   fi
 done
 
-# remove runs from MTR acquisitions
-Info "removing run string from MTR"
-for i in "${BIDS}/"*MTR*; do
-    Do_cmd mv "${i}" "${i/run-1_/}"
-    Do_cmd mv "${i}" "${i/run-2_/}"
-done
-
 # Moving files to their correct directory location
-if ls "$BIDS"/*MP2RAGE* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*MP2RAGE* "$BIDS"/anat; fi
-if ls "$BIDS"/*UNIT1* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*UNIT1* "$BIDS"/anat; fi
-if ls "$BIDS"/*bold* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*bold* "$BIDS"/func; fi
-if ls "$BIDS"/*T1* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*T1* "$BIDS"/anat; fi
-if ls "$BIDS"/*T2* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*T2* "$BIDS"/anat; fi
-if ls "$BIDS"/*fieldmap* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*fieldmap* "$BIDS"/fmap; fi
-if ls "$BIDS"/*TB1TFL* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*TB1TFL* "$BIDS"/fmap; fi
-if ls "$BIDS"/*FLAIR* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*TB1TFL* "$BIDS"/fmap; fi
+if ls "$BIDS"/*MP2RAGE* 1> /dev/null 2>&1; then mv "$BIDS"/*MP2RAGE* "$BIDS"/anat; fi
+if ls "$BIDS"/*UNIT1* 1> /dev/null 2>&1; then mv "$BIDS"/*UNIT1* "$BIDS"/anat; fi
+if ls "$BIDS"/*bold* 1> /dev/null 2>&1; then mv "$BIDS"/*bold* "$BIDS"/func; fi
+if ls "$BIDS"/*T1* 1> /dev/null 2>&1; then mv "$BIDS"/*T1* "$BIDS"/anat; fi
+if ls "$BIDS"/*T2* 1> /dev/null 2>&1; then mv "$BIDS"/*T2* "$BIDS"/anat; fi
+if ls "$BIDS"/*fieldmap* 1> /dev/null 2>&1; then mv "$BIDS"/*fieldmap* "$BIDS"/fmap; fi
+if ls "$BIDS"/*TB1TFL* 1> /dev/null 2>&1; then mv "$BIDS"/*TB1TFL* "$BIDS"/fmap; fi
+if ls "$BIDS"/*FLAIR* 1> /dev/null 2>&1; then mv "$BIDS"/*FLAIR* "$BIDS"/anat; fi
+if ls "$BIDS"/*angio* 1> /dev/null 2>&1; then mv "$BIDS"/*angio* "$BIDS"/anat; fi
+if ls "$BIDS"/*MTR* 1> /dev/null 2>&1; then mv "$BIDS"/*MTR* "$BIDS"/anat; fi
 
 # Rename echos: echo-1_bold.nii.gz
+if ls ${BIDS}/func/*bold_e* 1> /dev/null 2>&1; then
 for i in {1..3}; do
     str="bold_e${i}"
     for f in ${BIDS}/func/*${str}*; do
         mv $f ${f/${str}/echo-${i}_bold}
     done
 done
+fi
 
-# REPLACE "_sbref_ph" with "part-phase_bold"
-for func in $(ls "$BIDS"/func/*"bold_ph"*); do mv ${func} ${func/bold_ph/part-phase_bold}; done
-
-# REMOVE the run-?
-for func in $(ls "$BIDS"/func/*"_run-"*); do mv ${func} ${func/_run-?/}; done
-
-Info "Remove MP2RAGE bval and bvecs"
-rm "$BIDS"/anat/*MP2RAGE.bv*
-
-Info "Organize TB1TFL acquisitions"
-for b1 in $(ls "$BIDS"/fmap/*"run-2_TB1TFL"*); do mv ${b1} ${b1/run-2_/}; done
-for b1 in $(ls "$BIDS"/fmap/*"run-1_TB1TFL"*); do
-b1_famp=$(echo "$b1" | sed -e 's/run-1_//' -e 's/acq-anat/acq-famp/')
-mv ${b1} ${b1_famp}
+# Rename T2starw: echo-?_T2starw_.nii.gz
+if ls ${BIDS}/anat/*T2starw_e* 1> /dev/null 2>&1; then
+for i in {1..5}; do
+    str="T2starw_e${i}"
+    for f in ${BIDS}/anat/*${str}*; do
+        mv $f ${f/${str}/echo-${i}_part-mag_T2starw}
+    done
 done
+fi
+
+# REPLACE "_ph" with "part-phase"
+replace_phase_suffix() {
+    local pattern=$1
+    local replacement=$2
+    local dir=$3
+
+    if ls "$dir"/*"$pattern"* 1> /dev/null 2>&1; then
+        for file in "$dir"/*"$pattern"*; do
+            mv "$file" "${file/$pattern/$replacement}"
+        done
+    fi
+}
+
+# Apply replacements
+replace_phase_suffix "bold_ph" "part-phase_bold" "$BIDS/func"
+replace_phase_suffix "MTR_ph" "part-phase_MTR" "$BIDS/anat"
+replace_phase_suffix "part-mag_T2starw_ph" "part-phase_T2starw" "$BIDS/anat"
+replace_phase_suffix "Unwrapped_T2starw_ph" "Unwrapped_part-phase_T2starw" "$BIDS/anat"
+replace_phase_suffix "T1w_ph" "part-phase_T1w" "$BIDS/anat"
+
+# remove run-? from echo-?_bold
+if ls "$BIDS"/func/*"_run-"* 1> /dev/null 2>&1; then
+  Info "REMOVE the run-? from func files (echoes)"
+  for func in $(ls "$BIDS"/func/*"_run-"*); do
+    mv "$func" "${func/_run-?/}"
+  done
+fi
+
+# remove runs from MTR acquisitions
+if ls "$BIDS"/anat/*"_run-"*MTR* 1> /dev/null 2>&1; then
+  Info "REMOVE the run-? from MTR"
+  for mtr in $(ls "$BIDS"/anat/*"_run-"*MTR*); do
+    mv "$mtr" "${mtr/_run-?/}"
+  done
+fi
+
+# Remove bvals and bvecs from MP2RAGE
+if ls "$BIDS"/anat/*MP2RAGE.bv* 1> /dev/null 2>&1; then
+  Info "Remove MP2RAGE bval and bvecs"
+  rm "$BIDS"/anat/*MP2RAGE.bv*
+fi
+
+# -----------------------------------------------------------------------------------------------
+Info  "TB1TFL - B1 fieldmaps"
+# -----------------------------------------------------------------------------------------------
+# Find files containing "acq-anat_TB1TFL?" where ? could be {,a,b,c..,n}, sort them alphabetically, and process them
+if ls "${BIDS}/fmap/"*acq-anat_TB1TFL*gz 1> /dev/null 2>&1; then
+  TB1TFLa=($(ls "${BIDS}/fmap/"*acq-anat_TB1TFL*gz | sort -V ))
+  for i in "${!TB1TFLa[@]}"; do
+    run_num=$((i + 1))
+    mv -v "${TB1TFLa[${i}]}" "${BIDS}/fmap/${id}acq-anat_run-${run_num}_TB1TFL.nii.gz"
+    mv -v "${TB1TFLa[${i}]/nii.gz/json}" "${BIDS}/fmap/${id}acq-anat_run-${run_num}_TB1TFL.json"
+  done
+fi
+
+# Check if there are TB1TFL files
+if ls "${BIDS}/fmap/"*TB1TFL*gz 1> /dev/null 2>&1; then
+    TB1TFL=($(ls "${BIDS}/fmap/"*TB1TFL*gz))
+    Info "Organizing TB1TFL acquisitions"
+
+    # Process files in pairs
+    for ((i=0; i<${#TB1TFL[@]}; i+=2)); do
+        file1="${TB1TFL[$i]}"
+        file2="${TB1TFL[$i+1]}"
+        run_num=$((i / 2 + 1))
+
+        # Extract sequence types (anatSag or anatTra) for both files
+        seq_type1=$(basename "$file1" | grep -oP "acq-\K\w+(?=_run)")
+        seq_type2=$(basename "$file2" | grep -oP "acq-\K\w+(?=_run)")
+
+        # Rename both files and their JSON counterparts
+        mv -v "$file1" "${BIDS}/fmap/${id}acq-${seq_type1/anat/sfam}_run-${run_num}_TB1TFL.nii.gz"
+        mv -v "$file2" "${BIDS}/fmap/${id}acq-${seq_type2}_run-${run_num}_TB1TFL.nii.gz"
+        mv -v "${file1/nii.gz/json}" "${BIDS}/fmap/${id}acq-${seq_type1/anat/sfam}_run-${run_num}_TB1TFL.json"
+        mv -v "${file2/nii.gz/json}" "${BIDS}/fmap/${id}acq-${seq_type2}_run-${run_num}_TB1TFL.json"
+    done
+fi
+
+# -----------------------------------------------------------------------------------------------
+# Rename T2starmap
+if ls "$BIDS"/anat/${id}T2starw.* 1> /dev/null 2>&1; then 
+  for t2 in "$BIDS"/anat/${id}T2starw.*; do 
+    mv $t2 ${t2/T2starw/T2starmap} 
+  done
+fi
 
 # -----------------------------------------------------------------------------------------------
 Info "DWI acquisitions"
 # -----------------------------------------------------------------------------------------------
-
 # Loop through the directories of DWI acquisitions
 n=$((${#origDWI[@]} - 1))
 for ((k=0; k<=n; k++)); do
@@ -331,51 +470,60 @@ for ((k=0; k<=n; k++)); do
       nom=${id}${bidsDWI[k]}
       dcm=$(echo ${nom##*_})
       nom=$(echo ${nom/$dcm/}run-$((i+1))_${dcm})
-      Do_cmd dcm2niix -z y -b y -o "$BIDS" -f "$nom" "${nii}${origDWI[k]}"
+      cmd dcm2niix -z y -b y -o "$BIDS" -f "$nom" "${nii}${origDWI[k]}"
     done
   elif [ "$N" -eq 1 ]; then
-     Do_cmd dcm2niix -z y -b y -o "$BIDS" -f "${id}${bidsDWI[k]}" "${origDWI[k]}"
+     cmd dcm2niix -z y -b y -o "$BIDS" -f "${id}${bidsDWI[k]}" "${origDWI[k]}"
   fi
 done
 
-Do_cmd cd "$BIDS"
-for n in $(ls *bval); do Dir=0
-  for i in $(cat $n); do if [[ "$i" == 0.00 ]] || [[ "$i" == 0 ]]; then Dir=$((Dir+1)); else Dir=$((Dir+1)); fi; done
-  for j in ${n/bval/}*; do mv "$j" dwi/${j/NUM/$Dir}; done
-done
+# Change directory 
+cmd cd "$BIDS"
 
-# Moving files to their correct directory location
-if ls "$BIDS"/*b0* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*b0* "$BIDS"/dwi; fi
-if ls "$BIDS"/*dwi* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*dwi* "$BIDS"/dwi; fi
-if ls "$BIDS"/*sbref* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*sbref* "$BIDS"/dwi; fi
-if ls "$BIDS"/*epi* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*epi* "$BIDS"/fmap; fi
-if ls "$BIDS"/*FLAIR* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*FLAIR* "$BIDS"/anat; fi
-if ls "$BIDS"/*angio* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*angio* "$BIDS"/anat; fi
-if ls "$BIDS"/*MTR* 1> /dev/null 2>&1; then Do_cmd mv "$BIDS"/*MTR* "$BIDS"/anat; fi
-if ls "$BIDS"/anat/*ROI* 1> /dev/null 2>&1; then Do_cmd rm "$BIDS"/anat/*ROI*; fi
+Info "Moving files to their correct directory location"
+if ls "$BIDS"/*b0* 1> /dev/null 2>&1; then mv "$BIDS"/*b0* "$BIDS"/dwi; fi
+if ls "$BIDS"/*sbref* 1> /dev/null 2>&1; then mv "$BIDS"/*sbref* "$BIDS"/dwi; fi
+if ls "$BIDS"/*dwi.* 1> /dev/null 2>&1; then mv "$BIDS"/*dwi.* "$BIDS"/dwi; fi
+if ls "$BIDS"/*epi* 1> /dev/null 2>&1; then mv "$BIDS"/*epi* "$BIDS"/fmap; fi
+if ls "$BIDS"/anat/*ROI* 1> /dev/null 2>&1; then rm "$BIDS"/anat/*ROI*; fi
 
-Info "REMOVE run-1 string from new 7T DWI acquisition"
-for dwi in $(ls "$BIDS"/dwi/*"acq_multib_"*"d_dir-AP_run-1_dwi"*); do mv -v $dwi ${dwi/run-1_/}; done
+if ls "$BIDS"/dwi/*"acq-"*"_dir-"*"_run-1_dwi"* 1> /dev/null 2>&1; then
+  Info "REMOVE run-1 string from new 7T DWI acquisition"
+  for dwi in $(ls "$BIDS"/dwi/*"acq-"*"_dir-"*"_run-1_dwi"*); do mv "$dwi" "${dwi/run-1_/}"; done
+fi
 
-Info "REPLACE run-2 string to  from new 7T DWI acquisition"
-for dwi in $(ls "$BIDS"/dwi/*"acq_multib_"*"d_dir-AP_run-2_dwi"*); do mv -v $dwi ${dwi/run-2_/part-phase_}; done
+if ls "$BIDS"/dwi/*"acq-"*"_dir-"*"_run-2_dwi"* 1> /dev/null 2>&1; then
+  Info "REPLACE run-2 string to part-phase from new 7T DWI acquisition"
+  for dwi in $(ls "$BIDS"/dwi/*"acq-"*"_dir-"*"_run-2_dwi"*); do mv "$dwi" "${dwi/run-2_/part-phase_}"; done
+fi
 
-Info "REPLACE \"_sbref_ph\" with \"_part-phase_sbref\""
-for dwi in $(ls "$BIDS"/dwi/*"_sbref_ph"*); do mv $dwi ${dwi/_sbref_ph/_part-phase_sbref}; done
-for dwi in $(ls "$BIDS"/dwi/*"_dwi_ph"*); do mv $dwi ${dwi/_dwi_ph/_part-phase_dwi}; done
+if ls "$BIDS"/dwi/*"_sbref_ph"* 1> /dev/null 2>&1; then
+  Info "REPLACE \"_sbref_ph\" with \"_part-phase_sbref\""
+  for dwi in $(ls "$BIDS"/dwi/*"_sbref_ph"*); do mv "$dwi" "${dwi/_sbref_ph/_part-phase_sbref}"; done
+fi
 
-# QC, count the number of Niftis (json) per subject
-dat=$(stat ${BIDS} | awk 'NR==6 {print $2}')
-anat=$(ls -R ${BIDS}/anat | grep gz | wc -l)
-dwi=$(ls -R ${BIDS}/dwi | grep gz | wc -l)
-func=$(ls -R ${BIDS}/func | grep gz | wc -l)
-fmap=$(ls -R ${BIDS}/fmap | grep gz | wc -l)
+if ls "$BIDS"/dwi/*"_dwi_ph"* 1> /dev/null 2>&1; then
+  Info "REPLACE \"_dwi_ph\" with \"_part-phase_dwi\""
+  for dwi in $(ls "$BIDS"/dwi/*"_dwi_ph"*); do mv "$dwi" "${dwi/_dwi_ph/_part-phase_dwi}"; done
+fi
 
 # -----------------------------------------------------------------------------------------------
-# Add Units to the phase files
+Info "Add Units to the phase files"
 for file in "$BIDS"/*/*phase*json; do
   # Add the key "Units": "arbitrary" to the JSON file
-  jq '. + {"Units": "arbitrary"}' "$file" > tmp.$$.json && mv tmp.$$.json "$file"
+  jq '. + {"Units": "rad"}' "$file" > tmp.$$.json && mv tmp.$$.json "$file"
+done
+
+# -----------------------------------------------------------------------------------------------
+Info "Add MTState to the mt scans"
+# Add MTState to the mt-off scans
+for file in "$BIDS"/*/*mt-off*json; do
+  # Add the key "MTState": "False" to the JSON file
+  jq '. + {"MTState": false}' "$file" > tmp.$$.json && mv tmp.$$.json "$file"
+done
+for file in "$BIDS"/*/*mt-on*json; do
+  # Add the key "MTState": "False" to the JSON file
+  jq '. + {"MTState": true}' "$file" > tmp.$$.json && mv tmp.$$.json "$file"
 done
 
 # -----------------------------------------------------------------------------------------------
@@ -403,10 +551,19 @@ if [ ! -f "$bidsignore" ]; then echo -e "participants_7t2bids.tsv\nbids_validato
 # Add the new subject to the participants.tsv file
 participants_tsv="$BIDS_DIR"/participants.tsv
 # Check if file exist
-if [ ! -f "$participants_tsv" ]; then echo -e "participant_id\tsession_id\tsite\tgroup" > "$participants_tsv"; fi
+if [ ! -f "$participants_tsv" ]; then echo -e "participant_id\tsite\tgroup" > "$participants_tsv"; fi
+# Remove existing entry if it exists
+grep -v -P "^sub-${Subj}" "$participants_tsv" > "${participants_tsv}.tmp" && mv "${participants_tsv}.tmp" "$participants_tsv"
 # Add information about subject
-group=${Subj:0:3}
-echo -e "sub-${Subj}\t${SES/ses-/}\tSiemmensTerra7T\t${group}" >> "$participants_tsv"
+echo -e "sub-${Subj}\tMontreal_SiemmensTerra7T\tHealthy" >> "$participants_tsv"
+
+# create a sessions tsv
+sessions_tsv="${BIDS_DIR}/sub-${Subj}/sub-${Subj}_sessions.tsv"
+if [ ! -f "$sessions_tsv" ]; then echo -e "session_id" > "$sessions_tsv"; fi
+# Remove existing entry if it exists
+grep -v -P "^${SES}" "$sessions_tsv" > "${sessions_tsv}.tmp" && mv "${sessions_tsv}.tmp" "$sessions_tsv"
+# Add information about subject
+echo -e "${SES}" >> "$sessions_tsv"
 
 # -----------------------------------------------------------------------------------------------
 # Get the repository path
@@ -437,14 +594,19 @@ if [ ! -f "$BIDS_DIR"/dataset_description.json ]; then cp -v "$gitrepo"/files/da
 if [ ! -f "$BIDS_DIR"/CITATION.cff ]; then cp -v "$gitrepo"/files/CITATION.cff "$BIDS_DIR"/CITATION.cff; fi
 
 # Create README
-echo -e "This dataset was provided by the Montreal Paris Neurobanque initiative.\n\nIf you reference this dataset in your publications, please acknowledge its authors." > "$BIDS_DIR"/README
+echo -e "The Presicion NeuroImaging (PNI) dataset was provided by the Multimodal Imaging and Connectome Analysis Lab, Montreal Neurological Institute and Hospital, The Neuro.\n\nIf you reference this dataset in your publications, please acknowledge its authors." > "$BIDS_DIR"/README
 
 # -----------------------------------------------------------------------------------------------
 # Go back to initial directory
 cd "$here"
 
+# -----------------------------------------------------------------------------------------------
+# Run BIDS validator
+deno run --allow-write -ERN jsr:@bids/validator "$BIDS_DIR" --ignoreWarnings --outfile "$BIDS_DIR"/bids_validator_output.txt
+cat "$BIDS_DIR"/bids_validator_output.txt
+
 # -----------------------------------------------------------------------------------------------#
-#			 Total Running Time
+#	Total Running Time
 end_time=$(date +%s)
 time_difference=$(echo "$end_time - $start_time" | bc)
 time_difference=$(echo print $time_difference/60 | perl)
