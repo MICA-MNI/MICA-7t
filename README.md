@@ -111,7 +111,7 @@ singularity run --writable-tmpfs --containall \
 	-B ${fs_lic}:/opt/licence.txt \
 	${micapipe_img} \
 	-bids /bids -out /out -fs_licence /opt/licence.txt -threads 6 -sub ${sub} -ses ${ses} \
-	-proc_structural -uni -T1wStr acq-uni_0p5-T1map,acq-inv1_0p5-T1map,acq-inv2_0p5-T1map
+	-proc_structural -uni -T1wStr acq-05mm_UNIT1,acq-05mm_inv-1_MP2RAGE,acq-05mm_inv-2_MP2RAGE
 
 ```
 
