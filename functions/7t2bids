@@ -571,15 +571,13 @@ gitrepo=$(dirname $(dirname $(realpath "$0")))
 if [ ! -f "$BIDS_DIR"/participants.json ]; then cp -v "$gitrepo"/files/participants.json "$BIDS_DIR"/participants.json; fi
 
 # Add the task jsons
-tasks_protocols=(func-rsfmri_acq-mbep2d_ME_19mm func-epiencode_acq-mbep2d_ME_19mm func-epiretrieve_acq-mbep2d_ME_19mm func-pattersep1_acq-mbep2d_ME_19mm func-patternsep2_acq-mbep2d_ME_19mm func-semantic1_acq-mbep2d_ME_19mm func-semantic2_acq-mbep2d_ME_19mm func-spatial1_acq-mbep2d_ME_19mm func-spatial2_acq-mbep2d_ME_19mm func-movies1_acq-mbep2d_ME_19mm func-movies2_acq-mbep2d_ME_19mm func-movies3_acq-mbep2d_ME_19mm func-movies4_acq-mbep2d_ME_19mm func-semphon1_acq-mbep2d_ME_19mm func-semphon2_acq-mbep2d_ME_19mm func-audiobook1_acq-mbep2d_ME_19mm func-audiobook2_acq-mbep2d_ME_19mm)
-tasks=(rest epiencode epiretrieve patternsep1 patternsep2 semantic1 semantic2 spatial1 spatial2 movies1 movies2 movies3 movies4 semphon1 semphon2 audiobook1 audiobook2)
+tasks=($(ls ${BIDS}/func | grep -oP '(?<=task-)[^_]*' | sort -u))
 for i in ${!tasks[@]}; do
-
+    if [ ! -f "$BIDS_DIR"/task-${tasks[$i]}.json ]; then 
     if [ ! -f "$BIDS_DIR"/task-${tasks[$i]}.json ]; then 
     # Create task json files
     cp "$gitrepo"/files/task-template_bold.json "$BIDS_DIR"/task-${tasks[$i]}_bold.json
     # Replace strings
-    sed -i "s/PROTOCOL_NAME/${tasks_protocols[$i]}/g" "$BIDS_DIR"/task-${tasks[$i]}_bold.json
     sed -i "s/TASK_NAME/${tasks[$i]}/g" "$BIDS_DIR"/task-${tasks[$i]}_bold.json
     fi
   
@@ -603,7 +601,7 @@ if ls "${BIDS}"/tmp* 1> /dev/null 2>&1; then cmd rm "$BIDS"/tmp*; fi
 
 # -----------------------------------------------------------------------------------------------
 # Run BIDS validator
-deno run --allow-write -ERN jsr:@bids/validator "$BIDS_DIR" --ignoreWarnings --outfile "$BIDS_DIR"/bids_validator_output.txt
+cmd deno run --allow-write -ERN jsr:@bids/validator "$BIDS_DIR" --ignoreWarnings --outfile "$BIDS_DIR"/bids_validator_output.txt
 cat "$BIDS_DIR"/bids_validator_output.txt
 
 # -----------------------------------------------------------------------------------------------#
