@@ -189,7 +189,7 @@ orig=(
   "*anat-angio_acq-tof_03mm_inplane_MIP_TRA"
 )
 bids=(
-  mprage_T1w
+  T1w
   acq-anat_TB1TFL
   acq-anat_TB1TFL
   acq-fmri_dir-AP_epi
@@ -537,9 +537,7 @@ fmap=$(ls -R ${BIDS}/fmap | grep gz | wc -l)
 # check mandatory inputs: -in Is $SUBJ_DIR found?
 tsv_file="$BIDS_DIR"/participants_7t2bids.tsv
 # Check if file exist
-if [ ! -f "$tsv_file" ]; then echo -e "sub\tses\tdate\tN.anat\tN.dwi\tN.func\tN.fmap\tdicoms\tuser" > "$tsv_file"; fi
-# Add information about subject
-echo -e "${Subj}\t${SES/ses-/}\t${dat}\t${anat}\t${dwi}\t${func}\t${fmap}\t${SUBJ_DIR}\t${USER}" >> "$tsv_file"
+if [ ! -f "$tsv_file" ]; then echo -e "sub\tses\tdate\tN.anat\tN.dwi\tN.func\tN.fmap\tdicoms\tuser\tprocessing.time" > "$tsv_file"; fi
 
 # -----------------------------------------------------------------------------------------------
 # Gitignore file
@@ -600,6 +598,9 @@ echo -e "The Presicion NeuroImaging (PNI) dataset was provided by the Multimodal
 # Go back to initial directory
 cd "$here"
 
+# Remove any tmp files if any
+if ls "${BIDS}"/tmp* 1> /dev/null 2>&1; then cmd rm "$BIDS"/tmp*; fi
+
 # -----------------------------------------------------------------------------------------------
 # Run BIDS validator
 deno run --allow-write -ERN jsr:@bids/validator "$BIDS_DIR" --ignoreWarnings --outfile "$BIDS_DIR"/bids_validator_output.txt
@@ -610,4 +611,8 @@ cat "$BIDS_DIR"/bids_validator_output.txt
 end_time=$(date +%s)
 time_difference=$(echo "$end_time - $start_time" | bc)
 time_difference=$(echo print $time_difference/60 | perl)
-Info "GLOBAL micapipe running time with $PROC processing:\033[38;5;220m $(printf "%0.3f\n" ${time_difference}) minutes \033[38;5;141m"
+time_difference=$(printf "%0.3f\n" ${time_difference})
+Info "GLOBAL micapipe running time with $PROC processing:\033[38;5;220m ${time_difference} minutes \033[38;5;141m"
+
+# Add information about subject
+echo -e "${Subj}\t${SES/ses-/}\t${dat}\t${anat}\t${dwi}\t${func}\t${fmap}\t${SUBJ_DIR}\t${USER}\t${time_difference}" >> "$tsv_file"
