@@ -194,7 +194,7 @@ bids=(
   acq-anat_TB1TFL
   acq-fmri_dir-AP_epi
   acq-fmri_dir-PA_epi
-  acq-singleE_task-rest_bold
+  task-rest_acq-singleE_bold
   task-rest_bold
   task-epiencode_bold
   task-epiretrieve_bold
