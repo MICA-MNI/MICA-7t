@@ -3,27 +3,6 @@
     "BIDSVersion": "2.0.0",
     "DatasetType": "raw",
     "License": "CC0 1.0 Universal",
-    "Authors": [
-  "Donna Gift Cabalo*",
-  "Meaghan Smith",
-  "Yougeun Hwang",
-  "Yezhou Wang",
-  "Ilana Leppert",
-  "Risa Thevakumaran",
-  "Jordan DeKraker",
-  "Jessica Royer",
-  "Valeria Kebets",
-  "Shahin Tavakol",
-  "Oualid Benkarim",
-  "Nicole Eichert",
-  "Casey Paquola",
-  "Jonathan Smallwood",
-  "Christine Tardif",
-  "David Rudko",
-  "Raul Rodriguez-Cruces**",
-  "Boris C. Bernhardt**"
-    ],
-  
     "Acknowledgements": "The authors thank all participants who took part in this study. We also thank David Costa, Ronald Lopez and Soheil M. Quchani for their assistance in data collection, as well as Michael Ferreira for their guidance in designing the scanning protocol.",
     "HowToAcknowledge": "Please cite the dataset: Cabalo, Donna Gift, et al. Multimodal Precision Neuroimaging of the Individual Human Brain at Ultra-high fields. bioRxiv (2024): 2024-06.",
     "Funding": [
