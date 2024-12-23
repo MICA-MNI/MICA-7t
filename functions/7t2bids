@@ -574,13 +574,11 @@ if [ ! -f "$BIDS_DIR"/participants.json ]; then cp -v "$gitrepo"/files/participa
 tasks=($(ls ${BIDS}/func | grep -oP '(?<=task-)[^_]*' | sort -u))
 for i in ${!tasks[@]}; do
     if [ ! -f "$BIDS_DIR"/task-${tasks[$i]}.json ]; then 
-    if [ ! -f "$BIDS_DIR"/task-${tasks[$i]}.json ]; then 
     # Create task json files
     cp "$gitrepo"/files/task-template_bold.json "$BIDS_DIR"/task-${tasks[$i]}_bold.json
     # Replace strings
     sed -i "s/TASK_NAME/${tasks[$i]}/g" "$BIDS_DIR"/task-${tasks[$i]}_bold.json
     fi
-  
 done
 
 # Copy the data_set_description.json file to the BIDS directory
