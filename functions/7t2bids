@@ -360,7 +360,7 @@ fi
 
 # Rename T2starw: echo-?_T2starw_.nii.gz
 if ls ${BIDS}/anat/*T2starw_e* 1> /dev/null 2>&1; then
-for i in {1..5}; do
+for i in {1..6}; do
     str="T2starw_e${i}"
     for f in ${BIDS}/anat/*${str}*; do
         mv $f ${f/${str}/echo-${i}_part-mag_T2starw}
