@@ -255,10 +255,8 @@ bids=(
 )
 
 origDWI=(
-  "*dwi_acq_b0-dir_PA_SBRef"
-  "*dwi_acq_b0-dir_PA"
-  "*dwi_acq_b0_PA_SBRef"
-  "*dwi_acq_b0_PA"
+  "*dwi_acq_b0*_PA_SBRef"
+  "*dwi_acq_b0*_PA"
   "*dwi_acq_b0_PA_1p5iso_SBRef"
   "*dwi_acq_b0_PA_1p5iso"
   "*dwi_acq_b2000_90d-dir_AP_SBRef"
@@ -282,10 +280,8 @@ origDWI=(
 bidsDWI=(
   acq-b0_dir-PA_sbref
   acq-b0_dir-PA_dwi
-  acq-b0_dir-PA_sbref
-  acq-b0_dir-PA_dwi
-  acq-b0_dir-PA_sbref
-  acq-b0_dir-PA_dwi
+  acq-b01p5_dir-PA_sbref
+  acq-b01p5_dir-PA_dwi
   acq-b2000_dir-AP_sbref
   acq-b2000_dir-AP_dwi
   acq-b700_dir-AP_sbref
@@ -294,14 +290,14 @@ bidsDWI=(
   acq-b300_dir-AP_dwi
   acq-multib38_dir-AP_sbref
   acq-multib38_dir-AP_dwi
-  acq-multib38_dir-AP_sbref
-  acq-multib38_dir-AP_dwi
-  acq-multib38_dir-AP_sbref
-  acq-multib38_dir-AP_dwi
+  acq-multib381p5_dir-AP_sbref
+  acq-multib381p5_dir-AP_dwi
+  acq-multib38Test_dir-AP_sbref
+  acq-multib38Test_dir-AP_dwi
   acq-multib70_dir-AP_sbref
   acq-multib70_dir-AP_dwi
-  acq-multib70_dir-AP_sbref
-  acq-multib70_dir-AP_dwi
+  acq-multib701p5_dir-AP_sbref
+  acq-multib701p5_dir-AP_dwi
 )
 
 # -----------------------------------------------------------------------------------------------
@@ -316,23 +312,22 @@ if [ ! -d "$BIDS" ]; then Error "Could not create subject BIDS directory, check 
 # dicomx to Nifti with BIDS Naming
 cmd cd $SUBJ_DIR
 # Warning lenght
-n=$((${#orig[@]} - 1))
-for ((k=0; k<=n; k++)); do
-  N=$(ls -d ${orig[k]} 2>/dev/null | wc -l) # make it quiet
-  if [ "$N" -eq 0 ]; then
-    Warning "No directories were found with the following name: ${orig[k]}"
-  elif [ "$N" -gt 1 ]; then
+for k in "${!orig[@]}"; do
+  bids_name=${bids[k]}
+  mri="${bids_name##*_}"                                                                                                                                                      
+  acq="${bids_name%_*}"
+  # Check if acq_string is not empty
+  if [[ ${acq} == ${mri} ]]; then acq=""; else acq="${acq}_"; fi
+  # Find the number of dicoms_sorted with the sequence name (quiet)
+  N=$(ls -d ${orig[k]} 2>/dev/null | wc -l)
+  if [ "$N" -gt 1 ]; then
     Names=($(ls -d ${orig[k]}))
-    for ((i = 1; i <= N; i++)); do
-       nii=$(echo ${Names[((i-2))]} | awk -F '_' '{print $1 "_" $2}')
-       acq=$(echo ${bids[k]} | grep -oP '(?<=acq-)[^_]+')
-       # Check if acq_string is not empty
-       if [[ -n "$acq" ]]; then acq_string="acq-${acq}_"; else acq_string=""; fi
-       nom="${id}${acq_string}run-${i}_${bids[k]/${acq_string}/}"
-       cmd dcm2niix -z y -b y -o "$BIDS" -f "$nom" ${nii}${orig[k]}
+    for i in "${!Names[@]}"; do
+       out_name="${id}${acq}run-$((i+1))_${mri}"
+       echo $N dcm2niix -z y -b y -o "$BIDS" -f "$out_name" ${Names[i]}
     done
   elif [ "$N" -eq 1 ]; then
-     cmd dcm2niix -z y -b y -o "$BIDS" -f ${id}${bids[k]} ${orig[k]}
+     echo $N dcm2niix -z y -b y -o "$BIDS" -f ${id}${bids_name} ${orig[k]}
   fi
 done
 
@@ -388,21 +383,21 @@ replace_phase_suffix "part-mag_T2starw_ph" "part-phase_T2starw" "$BIDS/anat"
 replace_phase_suffix "Unwrapped_T2starw_ph" "Unwrapped_part-phase_T2starw" "$BIDS/anat"
 replace_phase_suffix "T1w_ph" "part-phase_T1w" "$BIDS/anat"
 
-# remove run-? from echo-?_bold
-if ls "$BIDS"/func/*"_run-"* 1> /dev/null 2>&1; then
-  Info "REMOVE the run-? from func files (echoes)"
-  for func in $(ls "$BIDS"/func/*"_run-"*); do
-    mv "$func" "${func/_run-?/}"
-  done
-fi
+# # remove run-? from echo-?_bold
+# if ls "$BIDS"/func/*"_run-"* 1> /dev/null 2>&1; then
+#   Info "REMOVE the run-? from func files (echoes)"
+#   for func in $(ls "$BIDS"/func/*"_run-"*); do
+#     mv "$func" "${func/_run-?/}"
+#   done
+# fi
 
-# remove runs from MTR acquisitions
-if ls "$BIDS"/anat/*"_run-"*MTR* 1> /dev/null 2>&1; then
-  Info "REMOVE the run-? from MTR"
-  for mtr in $(ls "$BIDS"/anat/*"_run-"*MTR*); do
-    mv "$mtr" "${mtr/_run-?/}"
-  done
-fi
+# # remove runs from MTR acquisitions
+# if ls "$BIDS"/anat/*"_run-"*MTR* 1> /dev/null 2>&1; then
+#   Info "REMOVE the run-? from MTR"
+#   for mtr in $(ls "$BIDS"/anat/*"_run-"*MTR*); do
+#     mv "$mtr" "${mtr/_run-?/}"
+#   done
+# fi
 
 # Remove bvals and bvecs from MP2RAGE
 if ls "$BIDS"/anat/*MP2RAGE.bv* 1> /dev/null 2>&1; then
@@ -418,8 +413,8 @@ if ls "${BIDS}/fmap/"*acq-anat_TB1TFL*gz 1> /dev/null 2>&1; then
   TB1TFLa=($(ls "${BIDS}/fmap/"*acq-anat_TB1TFL*gz | sort -V ))
   for i in "${!TB1TFLa[@]}"; do
     run_num=$((i + 1))
-    mv -v "${TB1TFLa[${i}]}" "${BIDS}/fmap/${id}acq-anat_run-${run_num}_TB1TFL.nii.gz"
-    mv -v "${TB1TFLa[${i}]/nii.gz/json}" "${BIDS}/fmap/${id}acq-anat_run-${run_num}_TB1TFL.json"
+    mv "${TB1TFLa[${i}]}" "${BIDS}/fmap/${id}acq-anat_run-${run_num}_TB1TFL.nii.gz"
+    mv "${TB1TFLa[${i}]/nii.gz/json}" "${BIDS}/fmap/${id}acq-anat_run-${run_num}_TB1TFL.json"
   done
 fi
 
@@ -439,10 +434,10 @@ if ls "${BIDS}/fmap/"*TB1TFL*gz 1> /dev/null 2>&1; then
         seq_type2=$(basename "$file2" | grep -oP "acq-\K\w+(?=_run)")
 
         # Rename both files and their JSON counterparts
-        mv -v "$file1" "${BIDS}/fmap/${id}acq-${seq_type1/anat/sfam}_run-${run_num}_TB1TFL.nii.gz"
-        mv -v "$file2" "${BIDS}/fmap/${id}acq-${seq_type2}_run-${run_num}_TB1TFL.nii.gz"
-        mv -v "${file1/nii.gz/json}" "${BIDS}/fmap/${id}acq-${seq_type1/anat/sfam}_run-${run_num}_TB1TFL.json"
-        mv -v "${file2/nii.gz/json}" "${BIDS}/fmap/${id}acq-${seq_type2}_run-${run_num}_TB1TFL.json"
+        mv "$file1" "${BIDS}/fmap/${id}acq-${seq_type1/anat/sfam}_run-${run_num}_TB1TFL.nii.gz"
+        mv "$file2" "${BIDS}/fmap/${id}acq-${seq_type2}_run-${run_num}_TB1TFL.nii.gz"
+        mv "${file1/nii.gz/json}" "${BIDS}/fmap/${id}acq-${seq_type1/anat/sfam}_run-${run_num}_TB1TFL.json"
+        mv "${file2/nii.gz/json}" "${BIDS}/fmap/${id}acq-${seq_type2}_run-${run_num}_TB1TFL.json"
     done
 fi
 
@@ -454,26 +449,34 @@ if ls "$BIDS"/anat/${id}T2starw.* 1> /dev/null 2>&1; then
   done
 fi
 
+# # FILENAME_MISMATCH: acq-xxx_run-n_dir-xx_epi MUST be acq-xxx_dir-xx_run-n_epi
+# for i in ${BIDS}/fmap/*_acq-*_run-?_dir-*_epi.*; do 
+#   run=$(basename "$i" | grep -o 'run-[0-9]*')
+#   j=${i/_run-?/}; 
+#   mv ${i} ${j/epi/${run}_epi}
+# done
+
 # -----------------------------------------------------------------------------------------------
 Info "DWI acquisitions"
 # -----------------------------------------------------------------------------------------------
 # Loop through the directories of DWI acquisitions
-n=$((${#origDWI[@]} - 1))
-for ((k=0; k<=n; k++)); do
-  N=$(ls -d ${origDWI[k]} 2>/dev/null | wc -l) # make it quiet
-  if [ "$N" -eq 0 ]; then
-    Warning "No directories were found with the following name: ${origDWI[k]}"
-  elif [ "$N" -gt 1 ]; then
-    Names=($(ls -d ${origDWI[k]} 2>/dev/null))
-    for ((i = 0; i < N; i++)); do
-      nii=$(echo ${Names[i]} | awk -F '_' '{print $1 "_" $2}')
-      nom=${id}${bidsDWI[k]}
-      dcm=$(echo ${nom##*_})
-      nom=$(echo ${nom/$dcm/}run-$((i+1))_${dcm})
-      cmd dcm2niix -z y -b y -o "$BIDS" -f "$nom" "${nii}${origDWI[k]}"
+# Warning lenght
+for k in "${!origDWI[@]}"; do
+  bids_name=${bidsDWI[k]}
+  mri="${bids_name##*_}"                                                                                                                                                      
+  acq="${bids_name%_*}"
+  # Check if acq_string is not empty
+  if [[ ${acq} == ${mri} ]]; then acq=""; else acq="${acq}_"; fi
+  # Find the number of dicoms_sorted with the sequence name (quiet)
+  N=$(ls -d ${origDWI[k]} 2>/dev/null | wc -l)
+  if [ "$N" -gt 1 ]; then
+    Names=($(ls -d ${origDWI[k]}))
+    for i in "${!Names[@]}"; do
+       out_name="${id}${acq}run-$((i+1))_${mri}"
+       echo $N dcm2niix -z y -b y -o "$BIDS" -f "$out_name" ${Names[i]}
     done
   elif [ "$N" -eq 1 ]; then
-     cmd dcm2niix -z y -b y -o "$BIDS" -f "${id}${bidsDWI[k]}" "${origDWI[k]}"
+     echo $N dcm2niix -z y -b y -o "$BIDS" -f ${id}${bids_name} ${origDWI[k]}
   fi
 done
 
@@ -487,25 +490,18 @@ if ls "$BIDS"/*dwi.* 1> /dev/null 2>&1; then mv "$BIDS"/*dwi.* "$BIDS"/dwi; fi
 if ls "$BIDS"/*epi* 1> /dev/null 2>&1; then mv "$BIDS"/*epi* "$BIDS"/fmap; fi
 if ls "$BIDS"/anat/*ROI* 1> /dev/null 2>&1; then rm "$BIDS"/anat/*ROI*; fi
 
-if ls "$BIDS"/dwi/*"acq-"*"_dir-"*"_run-1_dwi"* 1> /dev/null 2>&1; then
-  Info "REMOVE run-1 string from new 7T DWI acquisition"
-  for dwi in $(ls "$BIDS"/dwi/*"acq-"*"_dir-"*"_run-1_dwi"*); do mv "$dwi" "${dwi/run-1_/}"; done
-fi
+# if ls "$BIDS"/dwi/*"acq-"*"_dir-"*"_run-1_dwi"* 1> /dev/null 2>&1; then
+#   Info "REMOVE run-1 string from new 7T DWI acquisition"
+#   for dwi in $(ls "$BIDS"/dwi/*"acq-"*"_dir-"*"_run-1_dwi"*); do mv "$dwi" "${dwi/run-1_/}"; done
+# fi
 
-if ls "$BIDS"/dwi/*"acq-"*"_dir-"*"_run-2_dwi"* 1> /dev/null 2>&1; then
-  Info "REPLACE run-2 string to part-phase from new 7T DWI acquisition"
-  for dwi in $(ls "$BIDS"/dwi/*"acq-"*"_dir-"*"_run-2_dwi"*); do mv "$dwi" "${dwi/run-2_/part-phase_}"; done
-fi
+# if ls "$BIDS"/dwi/*"acq-"*"_dir-"*"_run-2_dwi"* 1> /dev/null 2>&1; then
+#   Info "REPLACE run-2 string to part-phase from new 7T DWI acquisition"
+#   for dwi in $(ls "$BIDS"/dwi/*"acq-"*"_dir-"*"_run-2_dwi"*); do mv "$dwi" "${dwi/run-2_/part-phase_}"; done
+# fi
 
-if ls "$BIDS"/dwi/*"_sbref_ph"* 1> /dev/null 2>&1; then
-  Info "REPLACE \"_sbref_ph\" with \"_part-phase_sbref\""
-  for dwi in $(ls "$BIDS"/dwi/*"_sbref_ph"*); do mv "$dwi" "${dwi/_sbref_ph/_part-phase_sbref}"; done
-fi
-
-if ls "$BIDS"/dwi/*"_dwi_ph"* 1> /dev/null 2>&1; then
-  Info "REPLACE \"_dwi_ph\" with \"_part-phase_dwi\""
-  for dwi in $(ls "$BIDS"/dwi/*"_dwi_ph"*); do mv "$dwi" "${dwi/_dwi_ph/_part-phase_dwi}"; done
-fi
+replace_phase_suffix "sbref_ph" "part-phase_sbref" "$BIDS/dwi"
+replace_phase_suffix "dwi_ph" "part-phase_dwi" "$BIDS/dwi"
 
 # -----------------------------------------------------------------------------------------------
 Info "Add Units to the phase files"
