@@ -324,10 +324,10 @@ for k in "${!orig[@]}"; do
     Names=($(ls -d ${orig[k]}))
     for i in "${!Names[@]}"; do
        out_name="${id}${acq}run-$((i+1))_${mri}"
-       echo $N dcm2niix -z y -b y -o "$BIDS" -f "$out_name" ${Names[i]}
+       dcm2niix -z y -b y -o "$BIDS" -f "$out_name" ${Names[i]}
     done
   elif [ "$N" -eq 1 ]; then
-     echo $N dcm2niix -z y -b y -o "$BIDS" -f ${id}${bids_name} ${orig[k]}
+     dcm2niix -z y -b y -o "$BIDS" -f ${id}${bids_name} ${orig[k]}
   fi
 done
 
@@ -465,10 +465,10 @@ for k in "${!origDWI[@]}"; do
     Names=($(ls -d ${origDWI[k]}))
     for i in "${!Names[@]}"; do
        out_name="${id}${acq}run-$((i+1))_${mri}"
-       echo $N dcm2niix -z y -b y -o "$BIDS" -f "$out_name" ${Names[i]}
+       dcm2niix -z y -b y -o "$BIDS" -f "$out_name" ${Names[i]}
     done
   elif [ "$N" -eq 1 ]; then
-     echo $N dcm2niix -z y -b y -o "$BIDS" -f ${id}${bids_name} ${origDWI[k]}
+     dcm2niix -z y -b y -o "$BIDS" -f ${id}${bids_name} ${origDWI[k]}
   fi
 done
 
