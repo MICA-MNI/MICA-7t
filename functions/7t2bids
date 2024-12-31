@@ -364,7 +364,7 @@ done
 fi
 
 # REPLACE "_ph" with "part-phase"
-replace_phase_suffix() {
+replace_suffix() {
     local pattern=$1
     local replacement=$2
     local dir=$3
@@ -377,19 +377,18 @@ replace_phase_suffix() {
 }
 
 # Apply replacements
-replace_phase_suffix "bold_ph" "part-phase_bold" "$BIDS/func"
-replace_phase_suffix "MTR_ph" "part-phase_MTR" "$BIDS/anat"
-replace_phase_suffix "part-mag_T2starw_ph" "part-phase_T2starw" "$BIDS/anat"
-replace_phase_suffix "Unwrapped_T2starw_ph" "Unwrapped_part-phase_T2starw" "$BIDS/anat"
-replace_phase_suffix "T1w_ph" "part-phase_T1w" "$BIDS/anat"
+replace_suffix "bold_ph" "part-phase_bold" "$BIDS/func"
+replace_suffix "MTR_ph" "part-phase_MTR" "$BIDS/anat"
+replace_suffix "part-mag_T2starw_ph" "part-phase_T2starw" "$BIDS/anat"
+replace_suffix "Unwrapped_T2starw_ph" "Unwrapped_part-phase_T2starw" "$BIDS/anat"
+replace_suffix "T1w_ph" "part-phase_T1w" "$BIDS/anat"
 
-# # remove run-? from echo-?_bold
-# if ls "$BIDS"/func/*"_run-"* 1> /dev/null 2>&1; then
-#   Info "REMOVE the run-? from func files (echoes)"
-#   for func in $(ls "$BIDS"/func/*"_run-"*); do
-#     mv "$func" "${func/_run-?/}"
-#   done
-# fi
+# remove run-? from echo-?_bold if there are 6 files (ONLY 1 run)
+if [ $(ls "$BIDS"/func/*"task-rest_run-?_echo-"?_bold* 2>/dev/null | wc -l) -eq 6 ]; then
+  # "REMOVE the run-? from func files (echoes)"
+  for func in $(ls "$BIDS"/func/*"task-rest_run-1_echo-"?_bold*); do mv "$func" "${func/_run-1/}"; done
+  for func in $(ls "$BIDS"/func/*"task-rest_run-2_echo-"?_part-phase_bold*); do mv "$func" "${func/_run-2/}"; done
+fi
 
 # # remove runs from MTR acquisitions
 # if ls "$BIDS"/anat/*"_run-"*MTR* 1> /dev/null 2>&1; then
@@ -449,13 +448,6 @@ if ls "$BIDS"/anat/${id}T2starw.* 1> /dev/null 2>&1; then
   done
 fi
 
-# # FILENAME_MISMATCH: acq-xxx_run-n_dir-xx_epi MUST be acq-xxx_dir-xx_run-n_epi
-# for i in ${BIDS}/fmap/*_acq-*_run-?_dir-*_epi.*; do 
-#   run=$(basename "$i" | grep -o 'run-[0-9]*')
-#   j=${i/_run-?/}; 
-#   mv ${i} ${j/epi/${run}_epi}
-# done
-
 # -----------------------------------------------------------------------------------------------
 Info "DWI acquisitions"
 # -----------------------------------------------------------------------------------------------
@@ -490,18 +482,43 @@ if ls "$BIDS"/*dwi.* 1> /dev/null 2>&1; then mv "$BIDS"/*dwi.* "$BIDS"/dwi; fi
 if ls "$BIDS"/*epi* 1> /dev/null 2>&1; then mv "$BIDS"/*epi* "$BIDS"/fmap; fi
 if ls "$BIDS"/anat/*ROI* 1> /dev/null 2>&1; then rm "$BIDS"/anat/*ROI*; fi
 
-# if ls "$BIDS"/dwi/*"acq-"*"_dir-"*"_run-1_dwi"* 1> /dev/null 2>&1; then
-#   Info "REMOVE run-1 string from new 7T DWI acquisition"
-#   for dwi in $(ls "$BIDS"/dwi/*"acq-"*"_dir-"*"_run-1_dwi"*); do mv "$dwi" "${dwi/run-1_/}"; done
-# fi
+dwi_rename() {
+    local dwi_acq=$1
+    local dwi_dir=$2
+    # If there is two files, remove the run-? and and the second file will be the phase
+    dwis=("$BIDS"/dwi/*"acq-${dwi_acq}_dir-${dwi_dir}_"*_dwi.nii.gz)
+    if [[ ${#dwis[@]} -eq 2 ]]; then
+      # Info "REMOVE run-1 string from new 7T DWI acquisition"
+      replace_suffix "acq-${dwi_acq}_dir-${dwi_dir}_run-1_dwi" "acq-${dwi_acq}_dir-${dwi_dir}_dwi" "$BIDS/dwi"
+      # Info "Make the run-2 the phase file"
+      replace_suffix "acq-${dwi_acq}_dir-${dwi_dir}_run-2_dwi" "acq-${dwi_acq}_dir-${dwi_dir}_part-phase_dwi" "$BIDS/dwi"
+    elif [[ ${#dwis[@]} -gt 2 ]]; then
+      # Process the file naming in pairs
+      for ((i=0; i<${#dwis[@]}; i+=2)); do
+          file1="${dwis[$i]}"
+          file2="${dwis[$i+1]}"
+          run_num=$((i / 2 + 1))
+          # Rename both files and their JSON counterparts
+          mv "$file1" "${BIDS}/dwi/${id}acq-${dwi_acq}_dir-${dwi_dir}_run-${run_num}_dwi.nii.gz"
+          mv "$file2" "${BIDS}/dwi/${id}acq-${dwi_acq}_dir-${dwi_dir}_run-${run_num}_part-phase_dwi.nii.gz"
+          mv "${file1/nii.gz/json}" "${BIDS}/dwi/${id}acq-${dwi_acq}_dir-${dwi_dir}_run-${run_num}_dwi.json"
+          mv "${file2/nii.gz/json}" "${BIDS}/dwi/${id}acq-${dwi_acq}_dir-${dwi_dir}_run-${run_num}_part-phase_dwi.json"
+      done
+    fi
+}
 
-# if ls "$BIDS"/dwi/*"acq-"*"_dir-"*"_run-2_dwi"* 1> /dev/null 2>&1; then
-#   Info "REPLACE run-2 string to part-phase from new 7T DWI acquisition"
-#   for dwi in $(ls "$BIDS"/dwi/*"acq-"*"_dir-"*"_run-2_dwi"*); do mv "$dwi" "${dwi/run-2_/part-phase_}"; done
-# fi
+# Run special case for a? 7T DWI acquisitions
+if [[ ${SES} == "a?" ]]; then
+  # Rename the phase files (run-2 or mulples of 2)
+  dwi_rename multib38 AP
+  dwi_rename multib70 AP
+  dwi_rename b0 AP
+  dwi_rename b0 PA
+fi
 
-replace_phase_suffix "sbref_ph" "part-phase_sbref" "$BIDS/dwi"
-replace_phase_suffix "dwi_ph" "part-phase_dwi" "$BIDS/dwi"
+# Replace file names with the correct suffix
+replace_suffix "sbref_ph" "part-phase_sbref" "$BIDS/dwi"
+replace_suffix "dwi_ph" "part-phase_dwi" "$BIDS/dwi"
 
 # -----------------------------------------------------------------------------------------------
 Info "Add Units to the phase files"
