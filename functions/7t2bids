@@ -115,7 +115,7 @@ if [ ! -d "${SUBJ_DIR}" ]; then Error "Subject DICOMS directory doesn't exist: \
 
 # overwrite BIDS-SUBJECT
 if [[ "${force}" == TRUE ]]; then rm -rf "${BIDS}"; fi
-# if [ -d ${BIDS} ]; then Error "Output directory already exist, use -force to overwrite it. \n\t    ${BIDS}\t    "; exit 0; fi
+if [ -d ${BIDS} ]; then Error "Output directory already exist, use -force to overwrite it. \n\t    ${BIDS}\t    "; exit 0; fi
 
 # Save actual path
 here=$(pwd)
@@ -391,17 +391,27 @@ if [ $(ls "$BIDS"/func/*"task-rest_run-?_echo-"?_bold* 2>/dev/null | wc -l) -eq 
 fi
 
 # # remove runs from MTR acquisitions
-# if ls "$BIDS"/anat/*"_run-"*MTR* 1> /dev/null 2>&1; then
-#   Info "REMOVE the run-? from MTR"
-#   for mtr in $(ls "$BIDS"/anat/*"_run-"*MTR*); do
-#     mv "$mtr" "${mtr/_run-?/}"
-#   done
-# fi
+if ls "$BIDS"/anat/*"_run-"*MTR* 1> /dev/null 2>&1; then
+  # Info "REMOVE the run-? from MTR"
+  for mtr in $(ls "$BIDS"/anat/*"_run-"*MTR*); do
+    mv "$mtr" "${mtr/_run-?/}"
+  done
+fi
 
 # Remove bvals and bvecs from MP2RAGE
 if ls "$BIDS"/anat/*MP2RAGE.bv* 1> /dev/null 2>&1; then
   Info "Remove MP2RAGE bval and bvecs"
   rm "$BIDS"/anat/*MP2RAGE.bv*
+fi
+
+# Reorder strings if inv-?_run-* exists
+if ls "$BIDS"/anat/*inv-*_run-* 1> /dev/null 2>&1; then
+  for inv in $(ls "$BIDS"/anat/*inv-*_run-*); do
+    # Perform the renaming operation
+    inv_bids=$(echo "$inv" | sed -E 's/(.*)_inv-([0-9]+)_run-([0-9]+)_(.*)/\1_run-\3_inv-\2_\4/')
+    # Rename the file
+    mv "$inv" "$inv_bids"
+  done
 fi
 
 # -----------------------------------------------------------------------------------------------
