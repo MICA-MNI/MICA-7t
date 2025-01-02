@@ -25,8 +25,8 @@ NOTE: you need to modify lines 132 and 133 to
 
 
 RRC
-McGill University, MNI, MICA-lab, June 2021
-raul.rodriguezcrcues@mcgill.ca
+McGill University, MNI, MICA-lab, June 2021. Updated: December 2024
+raul.rodriguezcruces@mcgill.ca
 "
 }
 
@@ -125,8 +125,7 @@ here=$(pwd)
 # https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html
 orig=(
   "*anat-T1w_acq-mprage_07mm_UP"
-  "*fmap-b1_acq-tra_p2"
-  "*fmap-b1_acq-sag_p2"
+  "*fmap-b1_acq-*_p2"
   "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP*"
   "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA*"
   "*func-rsfmri_acq-singleE_1*"
@@ -155,15 +154,15 @@ orig=(
   "*anat-T1w_acq-mp2rage_07mm_CSptx_T1_Images"
   "*anat-T1w_acq-mp2rage_07mm_CSptx_UNI_Images"
   "*anat-T1w_acq-mp2rage_07mm_CSptx_UNI-DEN"
+  "*anat-T1w_acq-mp2rage_05mm_UP*_INV1"
+  "*anat-T1w_acq-mp2rage_05mm_UP*_INV2"
+  "*anat-T1w_acq-mp2rage_05mm_UP*_T1_Images"
+  "*anat-T1w_acq-mp2rage_05mm_UP*_UNI_Images"
   "*cstfl-mp2rage-05mm_INV1"
   "*cstfl-mp2rage-05mm_INV2"
   "*cstfl-mp2rage-05mm_T1_Images"
   "*cstfl-mp2rage-05mm_UNI_Images"
   "*cstfl-mp2rage-05mm_UNI-DEN"
-  "*anat-T1w_acq-mp2rage_05mm_UP*_INV1"
-  "*anat-T1w_acq-mp2rage_05mm_UP*_INV2"
-  "*anat-T1w_acq-mp2rage_05mm_UP*_T1_Images"
-  "*anat-T1w_acq-mp2rage_05mm_UP*_UNI_Images"
   "*anat-flair_acq-0p7mm_UPAdia"
   "*anat-flair_acq-07iso_dev3_5SD_UP"
   "*Romeo_Mask_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
@@ -190,8 +189,8 @@ orig=(
 )
 bids=(
   T1w
-  acq-anat_TB1TFL
-  acq-anat_TB1TFL
+  acq-anatTRA_TB1TFL
+  acq-anatSAG_TB1TFL
   acq-fmri_dir-AP_epi
   acq-fmri_dir-PA_epi
   task-rest_acq-singleE_bold
@@ -224,11 +223,11 @@ bids=(
   acq-05mm_inv-2_MP2RAGE
   acq-05mm_T1map
   acq-05mm_UNIT1
-  acq-05mmDenoised_UNIT1
-  acq-05mm_inv-1_MP2RAGE
-  acq-05mm_inv-2_MP2RAGE
-  acq-05mm_T1map
-  acq-05mm_UNIT1
+  acq-cstfl_inv-1_MP2RAGE
+  acq-cstfl_inv-2_MP2RAGE
+  acq-cstfl_T1map
+  acq-cstfl_UNIT1
+  acq-cstflDenoised_UNIT1
   FLAIR
   FLAIR
   acq-mask_T2starw
@@ -417,38 +416,33 @@ fi
 # -----------------------------------------------------------------------------------------------
 Info  "TB1TFL - B1 fieldmaps"
 # -----------------------------------------------------------------------------------------------
-# Find files containing "acq-anat_TB1TFL?" where ? could be {,a,b,c..,n}, sort them alphabetically, and process them
-if ls "${BIDS}/fmap/"*acq-anat_TB1TFL*gz 1> /dev/null 2>&1; then
-  TB1TFLa=($(ls "${BIDS}/fmap/"*acq-anat_TB1TFL*gz | sort -V ))
-  for i in "${!TB1TFLa[@]}"; do
-    run_num=$((i + 1))
-    mv "${TB1TFLa[${i}]}" "${BIDS}/fmap/${id}acq-anat_run-${run_num}_TB1TFL.nii.gz"
-    mv "${TB1TFLa[${i}]/nii.gz/json}" "${BIDS}/fmap/${id}acq-anat_run-${run_num}_TB1TFL.json"
-  done
-fi
 
-# Check if there are TB1TFL files
-if ls "${BIDS}/fmap/"*TB1TFL*gz 1> /dev/null 2>&1; then
-    TB1TFL=($(ls "${BIDS}/fmap/"*TB1TFL*gz))
-    Info "Organizing TB1TFL acquisitions"
+tb1tfl_rename() {
+    # If there is two files, remove the run-? and and the second file will be the scaled flip angle map (sfam) 
+    b1s=("${BIDS}/fmap/"*acq-anat_*TB1TFL*gz)
+    if [[ ${#b1s[@]} -eq 2 ]]; then
+      # Info "REMOVE run-1 string from new 7T DWI acquisition"
+      replace_suffix "acq-anat_run-1_TB1TFL" "acq-anat_TB1TFL" "$BIDS/fmap"
+      # Info "Make the run-2 the sfam"
+      replace_suffix "acq-anat_run-2_TB1TFL" "acq-sfam_TB1TFL" "$BIDS/fmap"
+    elif [[ ${#b1s[@]} -gt 2 ]]; then
+      # Process the file naming in pairs
+      for ((i=0; i<${#b1s[@]}; i+=2)); do
+          file1="${b1s[$i]}"
+          file2="${b1s[$i+1]}"
+          run_num=$((i / 2 + 1))
+          # Rename both files and their JSON counterparts
+          acq-anat_run-1_TB1TFL
+          mv "$file1" "${BIDS}/fmap/${id}acq-anat_run-${run_num}_TB1TFL.nii.gz"
+          mv "$file2" "${BIDS}/fmap/${id}acq-sfam_run-${run_num}_TB1TFL.nii.gz"
+          mv "${file1/nii.gz/json}" "${BIDS}/fmap/${id}acq-anat_run-${run_num}_TB1TFL.json"
+          mv "${file2/nii.gz/json}" "${BIDS}/fmap/${id}acq-sfam_run-${run_num}_TB1TFL.json"
+      done
+    fi
+}
 
-    # Process files in pairs
-    for ((i=0; i<${#TB1TFL[@]}; i+=2)); do
-        file1="${TB1TFL[$i]}"
-        file2="${TB1TFL[$i+1]}"
-        run_num=$((i / 2 + 1))
-
-        # Extract sequence types (anatSag or anatTra) for both files
-        seq_type1=$(basename "$file1" | grep -oP "acq-\K\w+(?=_run)")
-        seq_type2=$(basename "$file2" | grep -oP "acq-\K\w+(?=_run)")
-
-        # Rename both files and their JSON counterparts
-        mv "$file1" "${BIDS}/fmap/${id}acq-${seq_type1/anat/sfam}_run-${run_num}_TB1TFL.nii.gz"
-        mv "$file2" "${BIDS}/fmap/${id}acq-${seq_type2}_run-${run_num}_TB1TFL.nii.gz"
-        mv "${file1/nii.gz/json}" "${BIDS}/fmap/${id}acq-${seq_type1/anat/sfam}_run-${run_num}_TB1TFL.json"
-        mv "${file2/nii.gz/json}" "${BIDS}/fmap/${id}acq-${seq_type2}_run-${run_num}_TB1TFL.json"
-    done
-fi
+# FRename TB1TFL files
+if ls "${BIDS}/fmap/"*acq-anat_TB1TFL*gz 1> /dev/null 2>&1; then tb1tfl_rename; fi
 
 # -----------------------------------------------------------------------------------------------
 # Rename T2starmap
@@ -494,14 +488,13 @@ if ls "$BIDS"/anat/*ROI* 1> /dev/null 2>&1; then rm "$BIDS"/anat/*ROI*; fi
 
 dwi_rename() {
     local dwi_acq=$1
-    local dwi_dir=$2
     # If there is two files, remove the run-? and and the second file will be the phase
-    dwis=("$BIDS"/dwi/*"acq-${dwi_acq}_dir-${dwi_dir}_"*_dwi.nii.gz)
+    dwis=("$BIDS"/dwi/*"${dwi_acq}"*_dwi.nii.gz)
     if [[ ${#dwis[@]} -eq 2 ]]; then
       # Info "REMOVE run-1 string from new 7T DWI acquisition"
-      replace_suffix "acq-${dwi_acq}_dir-${dwi_dir}_run-1_dwi" "acq-${dwi_acq}_dir-${dwi_dir}_dwi" "$BIDS/dwi"
+      replace_suffix "${dwi_acq}_run-1_dwi" "${dwi_acq}_dwi" "$BIDS/dwi"
       # Info "Make the run-2 the phase file"
-      replace_suffix "acq-${dwi_acq}_dir-${dwi_dir}_run-2_dwi" "acq-${dwi_acq}_dir-${dwi_dir}_part-phase_dwi" "$BIDS/dwi"
+      replace_suffix "${dwi_acq}_run-2_dwi" "${dwi_acq}_part-phase_dwi" "$BIDS/dwi"
     elif [[ ${#dwis[@]} -gt 2 ]]; then
       # Process the file naming in pairs
       for ((i=0; i<${#dwis[@]}; i+=2)); do
@@ -509,21 +502,21 @@ dwi_rename() {
           file2="${dwis[$i+1]}"
           run_num=$((i / 2 + 1))
           # Rename both files and their JSON counterparts
-          mv "$file1" "${BIDS}/dwi/${id}acq-${dwi_acq}_dir-${dwi_dir}_run-${run_num}_dwi.nii.gz"
-          mv "$file2" "${BIDS}/dwi/${id}acq-${dwi_acq}_dir-${dwi_dir}_run-${run_num}_part-phase_dwi.nii.gz"
-          mv "${file1/nii.gz/json}" "${BIDS}/dwi/${id}acq-${dwi_acq}_dir-${dwi_dir}_run-${run_num}_dwi.json"
-          mv "${file2/nii.gz/json}" "${BIDS}/dwi/${id}acq-${dwi_acq}_dir-${dwi_dir}_run-${run_num}_part-phase_dwi.json"
+          mv "$file1" "${BIDS}/dwi/${id}${dwi_acq}_run-${run_num}_dwi.nii.gz"
+          mv "$file2" "${BIDS}/dwi/${id}${dwi_acq}_run-${run_num}_part-phase_dwi.nii.gz"
+          mv "${file1/nii.gz/json}" "${BIDS}/dwi/${id}${dwi_acq}_run-${run_num}_dwi.json"
+          mv "${file2/nii.gz/json}" "${BIDS}/dwi/${id}${dwi_acq}_run-${run_num}_part-phase_dwi.json"
       done
     fi
 }
 
 # Run special case for a? 7T DWI acquisitions
-if [[ ${SES} == "a?" ]]; then
+if [[ ${SES} == a? ]]; then
   # Rename the phase files (run-2 or mulples of 2)
-  dwi_rename multib38 AP
-  dwi_rename multib70 AP
-  dwi_rename b0 AP
-  dwi_rename b0 PA
+  dwi_rename acq-multib38_dir-AP
+  dwi_rename acq-multib70_dir-AP
+  dwi_rename acq-b0_dir-PA
+  dwi_rename acq-b0_dir-AP
 fi
 
 # Replace file names with the correct suffix
