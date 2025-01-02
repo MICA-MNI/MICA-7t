@@ -441,8 +441,8 @@ tb1tfl_rename() {
     fi
 }
 
-# FRename TB1TFL files
-if ls "${BIDS}/fmap/"*acq-anat_TB1TFL*gz 1> /dev/null 2>&1; then tb1tfl_rename; fi
+# Rename TB1TFL files
+if ls "${BIDS}/fmap/"*acq-anat_*TB1TFL*gz 1> /dev/null 2>&1; then tb1tfl_rename; fi
 
 # -----------------------------------------------------------------------------------------------
 # Rename T2starmap
