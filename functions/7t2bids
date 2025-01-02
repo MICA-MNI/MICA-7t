@@ -189,8 +189,7 @@ orig=(
 )
 bids=(
   T1w
-  acq-anatTRA_TB1TFL
-  acq-anatSAG_TB1TFL
+  acq-anat_TB1TFL
   acq-fmri_dir-AP_epi
   acq-fmri_dir-PA_epi
   task-rest_acq-singleE_bold
