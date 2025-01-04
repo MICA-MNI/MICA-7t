@@ -418,14 +418,13 @@ Info  "TB1TFL - B1 fieldmaps"
 
 tb1tfl_rename() {
     # If there is two files, remove the run-? and and the second file will be the scaled flip angle map (sfam) 
-    b1s=("${BIDS}/fmap/"*acq-anat_*TB1TFL*gz)
+    b1s=($(ls "${BIDS}/fmap/"*acq-anat_*TB1TFL*gz))
     if [[ ${#b1s[@]} -eq 2 ]]; then
-      # Info "REMOVE run-1 string from new 7T DWI acquisition"
+      Info "Make run-1 anat and run-2 the sfam"
       replace_suffix "acq-anat_run-1_TB1TFL" "acq-anat_TB1TFL" "$BIDS/fmap"
-      # Info "Make the run-2 the sfam"
       replace_suffix "acq-anat_run-2_TB1TFL" "acq-sfam_TB1TFL" "$BIDS/fmap"
     elif [[ ${#b1s[@]} -gt 2 ]]; then
-      # Process the file naming in pairs
+      Info "Process the naming of multiple TB1TFL runs in corresponding pairs"
       for ((i=0; i<${#b1s[@]}; i+=2)); do
           file1="${b1s[$i]}"
           file2="${b1s[$i+1]}"
@@ -488,14 +487,14 @@ if ls "$BIDS"/anat/*ROI* 1> /dev/null 2>&1; then rm "$BIDS"/anat/*ROI*; fi
 dwi_rename() {
     local dwi_acq=$1
     # If there is two files, remove the run-? and and the second file will be the phase
-    dwis=("$BIDS"/dwi/*"${dwi_acq}"*_dwi.nii.gz)
+    dwis=($(ls ${BIDS}/dwi/*${dwi_acq}*_dwi.nii.gz))
+    Info "DWIS ${dwi_acq}: ${#dwis[@]}"
     if [[ ${#dwis[@]} -eq 2 ]]; then
-      # Info "REMOVE run-1 string from new 7T DWI acquisition"
+      Info "REMOVE run-1 string from new 7T DWI acquisition & Make the run-2 the phase file"
       replace_suffix "${dwi_acq}_run-1_dwi" "${dwi_acq}_dwi" "$BIDS/dwi"
-      # Info "Make the run-2 the phase file"
       replace_suffix "${dwi_acq}_run-2_dwi" "${dwi_acq}_part-phase_dwi" "$BIDS/dwi"
     elif [[ ${#dwis[@]} -gt 2 ]]; then
-      # Process the file naming in pairs
+      Info "Process the naming of multiple DWI runs in corresponding pairs"
       for ((i=0; i<${#dwis[@]}; i+=2)); do
           file1="${dwis[$i]}"
           file2="${dwis[$i+1]}"
