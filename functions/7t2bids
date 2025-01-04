@@ -509,7 +509,7 @@ dwi_rename() {
 }
 
 # Run special case for a? 7T DWI acquisitions
-if [[ ${SES} == a? ]]; then
+if [[ ${SES/ses-/} == a? ]]; then
   # Rename the phase files (run-2 or mulples of 2)
   dwi_rename acq-multib38_dir-AP
   dwi_rename acq-multib70_dir-AP
