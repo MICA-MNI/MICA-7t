@@ -307,9 +307,10 @@ start_time=$(date +%s)
 cmd mkdir -p "$BIDS"/{anat,func,dwi,fmap}
 if [ ! -d "$BIDS" ]; then Error "Could not create subject BIDS directory, check permissions \n\t     ${BIDS}\t    "; exit 0; fi
 
-# dicomx to Nifti with BIDS Naming
+# Change working directory
 cmd cd $SUBJ_DIR
-# Warning lenght
+
+# dicomx to Nifti with BIDS Naming
 for k in "${!orig[@]}"; do
   bids_name=${bids[k]}
   mri="${bids_name##*_}"                                                                                                                                                      
@@ -415,7 +416,6 @@ fi
 # -----------------------------------------------------------------------------------------------
 Info  "TB1TFL - B1 fieldmaps"
 # -----------------------------------------------------------------------------------------------
-
 tb1tfl_rename() {
     # If there is two files, remove the run-? and and the second file will be the scaled flip angle map (sfam) 
     b1s=($(ls "${BIDS}/fmap/"*acq-anat_*TB1TFL*gz))
@@ -454,7 +454,6 @@ fi
 Info "DWI acquisitions"
 # -----------------------------------------------------------------------------------------------
 # Loop through the directories of DWI acquisitions
-# Warning lenght
 for k in "${!origDWI[@]}"; do
   bids_name=${bidsDWI[k]}
   mri="${bids_name##*_}"                                                                                                                                                      
