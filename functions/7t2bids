@@ -199,7 +199,7 @@ bids=(
   acq-fmriQ1K_dir-PA_epi
   task-rest_acq-singleE_bold
   task-rest_bold
-  acq-Q1K_task-rest_bold
+  task-rest_acq-Q1K_bold
   task-epiencode_bold
   task-epiretrieve_bold
   task-patternsep1_bold
