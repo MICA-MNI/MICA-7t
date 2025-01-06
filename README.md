@@ -32,7 +32,7 @@ python test_vlc.py
 # Running GUI with mica laptop
 source /home/mica/Desktop/conda/etc/profile.d/conda.sh
 conda activate py39env
-cd 7T
+cd 7T_cp
 python run_tasks.py
 
 ```
@@ -169,8 +169,8 @@ To apply the mask:
 ```bash
 # 1. Generate the new binary mask from the CNN inference
 
-mask_inference=/host/percy/local_raid/donna/7T_NNunet/new/nnUNet_results/Dataset500_Segmentation/nnUNetTrainer__nnUNetPlans__3d_fullres/inference/PNC_122.nii.gz
-fsdir=/data/mica3/BIDS_PNI/derivatives/fastsurfer/sub-PNC022_ses-01
+mask_inference=/host/percy/local_raid/donna/7T_NNunet/new/nnUNet_results/Dataset500_Segmentation/nnUNetTrainer__nnUNetPlans__3d_fullres/inference/PNC_118.nii.gz
+fsdir=/data/mica3/BIDS_PNI/derivatives/fastsurfer/sub-PNC018_ses-01
 
 #2. Erase the mask and the norm
 rm ${fsdir}/mri/mask.mgz ${fsdir}/mri/norm.mgz
@@ -189,7 +189,7 @@ mrconvert ${fsdir}/mri/norm.nii.gz ${fsdir}/mri/norm.mgz
 rm ${fsdir}/mri/wm.mgz ${fsdir}/mri/aparc.DKTatlas+aseg.orig.mgz ${fsdir}/mri/orig_nu.nii.gz
 
 #7. re-run fastsurfer
-sub=PNC022
+sub=PNC018
 ses=01
 /data/mica1/01_programs/MICA-7t/functions/post-qc_fastsurfer.sh -sub ${sub} -ses ${ses} \
          -out /data_/mica3/BIDS_PNI/derivatives/fastsurfer
@@ -202,10 +202,10 @@ Warning!! Please make sure your eraser and brush values when editing are set to 
 
 1. The edits should be perfom on the `mask.mgz` file. However, maybe it's easier to correct over the file called `norm.mgz`. Once the edits are perform you can replace `mask.mgz` with the binarized version of the corrected `norm.mgz`.
 
-2. Run the next script after you are done with the edits. It will create new surfaces based on on the edits and generate a file named `qc_done.txt` under the subject's directory e.g. `fastsurfer/sub-PNA002_ses-01`.
+2. Run the next script after you are done with the edits. It will create new surfaces based on on the edits and generate a file named `qc_done.txt` under the subject's directory e.g. `fastsurfer/sub-PNC018_ses-01`.
 
 ```bash
-sub=PNA002
+sub=PNC018
 ses=01
 /data/mica1/01_programs/MICA-7t/functions/post-qc_fastsurfer.sh -sub ${sub} -ses ${ses} \
          -out /data_/mica3/BIDS_PNI/derivatives/fastsurfer
@@ -293,6 +293,10 @@ fsdir=/data/mica3/BIDS_PNI/derivatives/fastsurfer/${sub}_${ses}
 # run this container
 micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.3.sif
 
+#define subject and session 
+sub=sub-PNC018
+ses=ses-01
+
 # call singularity
 singularity run --writable-tmpfs --containall \
 	-B ${bids}:/bids \
@@ -305,11 +309,11 @@ singularity run --writable-tmpfs --containall \
         -post_structural \
 	-proc_dwi -dwi_rpe /bids/${sub}/${ses}/dwi/${sub}_${ses}_acq-b0_dir-PA_run-1_epi.nii.gz -regSynth \
 	-GD -proc_func \
-	-mainScanStr task-rest_run-2_echo-1_bold,task-rest_run-2_echo-2_bold,task-rest_run-2_echo-3_bold \
+	-mainScanStr task-rest_echo-1_bold,task-rest_echo-2_bold,task-rest_echo-3_bold \
 	-func_pe /bids/${sub}/${ses}/fmap/${sub}_${ses}_acq-fmri_dir-AP_epi.nii.gz \
 	-func_rpe /bids/${sub}/${ses}/fmap/${sub}_${ses}_acq-fmri_dir-PA_epi.nii.gz \
 	-MPC -mpc_acq T1map -regSynth \
-	-microstructural_img /bids/${sub}/${ses}/anat/${sub}_${ses}_acq-T1_0p5-T1map.nii.gz \
+	-microstructural_img /bids/${sub}/${ses}/anat/${sub}_${ses}_acq-05mm_T1map.nii.gz \
 	-microstructural_reg FALSE \
 	-SC -tracts 40M
 
