@@ -88,9 +88,9 @@ sub=PNC001
 ses=01
 
 # Variables
-bids=/data/mica3/BIDS_PNI/rawdata
+bids=/data/mica3/BIDS_PNI/rawdata_v2.0.0/
 out=/data/mica3/BIDS_PNI/derivatives
-tmp=/data/mica2/temporaryNetworkProcessing
+tmp=/host/percy/local_raid/donna/useful/7T_processing/tmp_dir
 fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
 
 # run this container
@@ -122,8 +122,8 @@ Surface processing
 
 ```bash
 # cd to micapipe subject directory
-id1=sub-PNC022/ses-01/
-id=sub-PNC022_ses-01
+id1=sub-PNC018/ses-01/
+id=sub-PNC018_ses-01
 
 Nifti=${id1}/anat/${id/\//_}_space-nativepro_T1w.nii.gz
 outStr=${id/\//_}_space-nativepro_T1w_nlm
@@ -136,9 +136,9 @@ bash /host/yeatman/local_raid/rcruces/git_here/MRI_analytic_tools/Freesurfer_pre
 ```bash
 
 # Variables
-bids=/data/mica3/BIDS_PNI/rawdata
+bids=/data/mica3/BIDS_PNI/rawdata_v2.0.0/
 out=/data/mica3/BIDS_PNI/derivatives
-tmp=/data/mica2/temporaryNetworkProcessing
+tmp=/host/percy/local_raid/donna/useful/7T_processing/tmp_dir
 fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
 
 # run this container
@@ -243,7 +243,7 @@ rm wm.mgz aparc.DKTatlas+aseg.orig.mgz
 Run the command `recon-surf.sh` using a singularity container to generate the new surfaces:
 ```
 # Subject id
-sub=sub-PNA002
+sub=sub-PNC018
 ses=ses-01
 
 # output directory
@@ -284,9 +284,9 @@ touch ${SUBJECTS_DIR}/${sub}_${ses}/qc_done.txt
 # One shot processing after reconsurf
 ```
 
-bids=/data/mica3/BIDS_PNI/rawdata
+bids=/data/mica3/BIDS_PNI/rawdata_v2.0.0/
 out=/data/mica3/BIDS_PNI/derivatives
-tmp=/data/mica2/temporaryNetworkProcessing
+tmp=/host/percy/local_raid/donna/useful/7T_processing/tmp_dir
 fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
 fsdir=/data/mica3/BIDS_PNI/derivatives/fastsurfer/${sub}_${ses}
 
@@ -323,12 +323,12 @@ cleanup - Change the module name and subject name accordingly
 
 ```
 micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.3.sif
-bids=/data/mica3/BIDS_PNI/rawdata/
+bids=/data/mica3/BIDS_PNI/rawdata_v2.0.0/
 out=/data/mica3/BIDS_PNI/derivatives
 fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
 tmp=/data/mica2/temporaryNetworkProcessing
-sub=sub-PNC009
-ses=ses-04
+sub=sub-PNC018
+ses=ses-01
 echo "cleaning ${idBIDS} directory"
 micapipe_cleanup -sub "${sub}" \
         -ses "${ses}" \
