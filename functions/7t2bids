@@ -126,10 +126,13 @@ here=$(pwd)
 orig=(
   "*anat-T1w_acq-mprage_07mm_UP"
   "*fmap-b1_acq-*_p2"
-  "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP*"
-  "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA*"
+  "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP"
+  "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA"
+  "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP_Q1K"
+  "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA_Q1K"
   "*func-rsfmri_acq-singleE_1*"
   "*func-rsfmri_acq-mbep2d_ME_19mm"
+  "*func-rsfmri_acq-mbep2d_ME_19mm_Q1K"
   "*func-epiencode_acq-mbep2d_ME_19mm*"
   "*func-epiretrieve_acq-mbep2d_ME_19mm"
   "*func-pattersep1_acq-mbep2d_ME_19mm"
@@ -192,8 +195,11 @@ bids=(
   acq-anat_TB1TFL
   acq-fmri_dir-AP_epi
   acq-fmri_dir-PA_epi
+  acq-fmriQ1K_dir-AP_epi
+  acq-fmriQ1K_dir-PA_epi
   task-rest_acq-singleE_bold
   task-rest_bold
+  acq-Q1K_task-rest_bold
   task-epiencode_bold
   task-epiretrieve_bold
   task-patternsep1_bold
