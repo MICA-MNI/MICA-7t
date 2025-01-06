@@ -59,4 +59,4 @@ COPY . /app
 ENV PATH="/app/functions:$PATH"
 
 # Run the application
-CMD ["functions/7t2bids"]
+CMD ["bash", "-c", "7t2bids"]
