@@ -59,4 +59,4 @@ COPY . /app
 ENV PATH="/app/functions:$PATH"
 
 # Run the application
-CMD ["bash", "-c", "7t2bids"]
+ENTRYPOINT ["7t2bids"]
