@@ -388,12 +388,18 @@ replace_suffix "part-mag_T2starw_ph" "part-phase_T2starw" "$BIDS/anat"
 replace_suffix "Unwrapped_T2starw_ph" "Unwrapped_part-phase_T2starw" "$BIDS/anat"
 replace_suffix "T1w_ph" "part-phase_T1w" "$BIDS/anat"
 
-# remove run-? from echo-?_bold if there are 6 files (ONLY 1 run)
-if [ $(ls "$BIDS"/func/*"task-rest_run-?_echo-"?_bold* 2>/dev/null | wc -l) -eq 6 ]; then
-  # "REMOVE the run-? from func files (echoes)"
-  for func in $(ls "$BIDS"/func/*"task-rest_run-1_echo-"?_bold*); do mv "$func" "${func/_run-1/}"; done
-  for func in $(ls "$BIDS"/func/*"task-rest_run-2_echo-"?_part-phase_bold*); do mv "$func" "${func/_run-2/}"; done
-fi
+# Remove the run-? from the task-rest when there is only 1 run
+func_rename() {
+  func_acq=$1
+  # remove run-? from echo-?_bold if there are 6 files (ONLY 1 run)
+  if [ $(ls "$BIDS"/func/*${func_acq}_run-?_echo-?_bold* 2>/dev/null | wc -l) -eq 6 ]; then
+    # run-1 is the fMRI and run-2 is the phase
+    for func in $(ls "$BIDS"/func/*"${func_acq}_run-1_echo-"?_bold*); do mv "$func" "${func/_run-1/}"; done
+    for func in $(ls "$BIDS"/func/*"${func_acq}_run-2_echo-"?_part-phase_bold*); do mv "$func" "${func/_run-2/}"; done
+  fi
+}
+func_rename "task-rest"
+func_rename "task-rest_acq-Q1K"
 
 # # remove runs from MTR acquisitions
 if ls "$BIDS"/anat/*"_run-"*MTR* 1> /dev/null 2>&1; then
