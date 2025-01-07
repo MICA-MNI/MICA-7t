@@ -243,7 +243,7 @@ bids=(
   acq-romeo_T2starw
   acq-romeoUnwrapped_T2starw
   acq-SensitivityCorrected_part-mag_T2starw
-  acq-clearSWI_T2starmap
+  acq-SWI_T2starw
   acq-me_T2starw
   acq-me_T2starmap
   mt-on_MTR
