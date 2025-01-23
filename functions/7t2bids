@@ -243,7 +243,7 @@ bids=(
   acq-romeo_T2starw
   acq-romeoUnwrapped_T2starw
   acq-SensitivityCorrected_part-mag_T2starw
-  acq-SWI_T2starw
+  acq-SWI_GRE
   acq-me_T2starw
   acq-me_T2starmap
   mt-on_MTR
@@ -309,7 +309,7 @@ bidsDWI=(
 start_time=$(date +%s)
 
 # -----------------------------------------------------------------------------------------------
-#Create BIDS/subj_dir
+# Create BIDS/subj_dir
 cmd mkdir -p "$BIDS"/{anat,func,dwi,fmap}
 if [ ! -d "$BIDS" ]; then Error "Could not create subject BIDS directory, check permissions \n\t     ${BIDS}\t    "; exit 0; fi
 
@@ -347,6 +347,8 @@ if ls "$BIDS"/*TB1TFL* 1> /dev/null 2>&1; then mv "$BIDS"/*TB1TFL* "$BIDS"/fmap;
 if ls "$BIDS"/*FLAIR* 1> /dev/null 2>&1; then mv "$BIDS"/*FLAIR* "$BIDS"/anat; fi
 if ls "$BIDS"/*angio* 1> /dev/null 2>&1; then mv "$BIDS"/*angio* "$BIDS"/anat; fi
 if ls "$BIDS"/*MTR* 1> /dev/null 2>&1; then mv "$BIDS"/*MTR* "$BIDS"/anat; fi
+# SWI | GRE https://docs.google.com/document/d/1kyw9mGgacNqeMbp4xZet3RnDhcMmf4_BmRgKaOkO2Sc/edit?tab=t.0#heading=h.kc8slmd5olof
+if ls "$BIDS"/*GRE* 1> /dev/null 2>&1; then mv "$BIDS"/*GRE* "$BIDS"/anat; fi
 
 # Rename echos: echo-1_bold.nii.gz
 if ls ${BIDS}/func/*bold_e* 1> /dev/null 2>&1; then
@@ -401,7 +403,7 @@ func_rename() {
 func_rename "task-rest"
 func_rename "task-rest_acq-Q1K"
 
-# # remove runs from MTR acquisitions
+# Remove runs from MTR acquisitions
 if ls "$BIDS"/anat/*"_run-"*MTR* 1> /dev/null 2>&1; then
   # Info "REMOVE the run-? from MTR"
   for mtr in $(ls "$BIDS"/anat/*"_run-"*MTR*); do
