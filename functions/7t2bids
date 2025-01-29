@@ -168,15 +168,15 @@ orig=(
   "*cstfl-mp2rage-05mm_UNI-DEN"
   "*anat-flair_acq-0p7mm_UPAdia"
   "*anat-flair_acq-07iso_dev3_5SD_UP"
+  "*CLEAR-SWI_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
+  "*Romeo_P_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
   "*Romeo_Mask_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
+  "*Romeo_B0_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
   "*Aspire_M_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
   "*Aspire_P_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
   "*EchoCombined_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
-  "*T2star_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
-  "*Romeo_P_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
-  "*Romeo_B0_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
   "*sensitivity_corrected_mag_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
-  "*CLEAR-SWI_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
+  "*T2star_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
   "*anat-T2star_acq-me_gre_07mm*"
   "*T2Star_Images"
   "*_MTON"
@@ -235,23 +235,23 @@ bids=(
   acq-cstflDenoised_UNIT1
   FLAIR
   FLAIR
-  acq-mask_T2starw
-  acq-aspire_T2starw
-  acq-aspire_T2starw
-  acq-combined_part-echo_T2starw
-  T2starw
+  acq-SWI_T2starw
   acq-romeo_T2starw
-  acq-romeoUnwrapped_T2starw
-  acq-SensitivityCorrected_part-mag_T2starw
-  acq-SWI_GRE
+  acq-romeo_desc-mask_T2starw
+  acq-romeo_desc-unwrapped_T2starw
+  acq-aspire_T2starw
+  acq-aspire_T2starw
+  acq-aspire_desc-echoCombined_T2starw
+  acq-aspire_desc-echoCombinedSensitivityCorrected_T2starw
+  acq-aspire_T2starw
   acq-me_T2starw
   acq-me_T2starmap
   mt-on_MTR
   mt-off_MTR
   acq-MTR_T1w
-  mt-on_MTR
-  mt-off_MTR
-  acq-MTR_T1w
+  acq-mtw_mt-on_MTR
+  acq-mtw_mt-off_MTR
+  acq-mtw_acq-MTR_T1w
   angio
   acq-sag_angio
   acq-cor_angio
@@ -387,7 +387,7 @@ replace_suffix() {
 replace_suffix "bold_ph" "part-phase_bold" "$BIDS/func"
 replace_suffix "MTR_ph" "part-phase_MTR" "$BIDS/anat"
 replace_suffix "part-mag_T2starw_ph" "part-phase_T2starw" "$BIDS/anat"
-replace_suffix "Unwrapped_T2starw_ph" "Unwrapped_part-phase_T2starw" "$BIDS/anat"
+replace_suffix "unwrapped_T2starw_ph" "Unwrapped_part-phase_T2starw" "$BIDS/anat"
 replace_suffix "T1w_ph" "part-phase_T1w" "$BIDS/anat"
 
 # Remove the run-? from the task-rest when there is only 1 run
@@ -402,6 +402,14 @@ func_rename() {
 }
 func_rename "task-rest"
 func_rename "task-rest_acq-Q1K"
+
+# Remove runs from MTR acquisitions
+if ls "$BIDS"/anat/*acq-mtw_mt-off_run-?_MTR.json 1> /dev/null 2>&1; then
+  # Info "REMOVE the run-? from MTR"
+  for mtr in $(ls "$BIDS"/anat/*acq-mtw*); do
+    mv "$mtr" "${mtr/_run-?/}"
+  done
+fi
 
 # Remove runs from MTR acquisitions
 if ls "$BIDS"/anat/*"_run-"*MTR* 1> /dev/null 2>&1; then
@@ -459,6 +467,12 @@ if ls "${BIDS}/fmap/"*acq-anat_*TB1TFL*gz 1> /dev/null 2>&1; then tb1tfl_rename;
 # Rename T2starmap
 if ls "$BIDS"/anat/${id}T2starw.* 1> /dev/null 2>&1; then 
   for t2 in "$BIDS"/anat/${id}T2starw.*; do 
+    mv $t2 ${t2/T2starw/T2starmap} 
+  done
+fi
+# Rename acq-aspire_T2starmap
+if ls "$BIDS"/anat/${id}acq-aspire_T2starw.* 1> /dev/null 2>&1; then 
+  for t2 in "$BIDS"/anat/${id}acq-aspire_T2starw.*; do 
     mv $t2 ${t2/T2starw/T2starmap} 
   done
 fi
@@ -569,7 +583,7 @@ if [ ! -f "$tsv_file" ]; then echo -e "sub\tses\tdate\tN.anat\tN.dwi\tN.func\tN.
 # Gitignore file
 bidsignore="$BIDS_DIR"/.bidsignore
 # Check if file exist
-if [ ! -f "$bidsignore" ]; then echo -e "participants_7t2bids.tsv\nbids_validator_output.txt\nbeh_taskscores.csv" > "$bidsignore"; fi
+if [ ! -f "$bidsignore" ]; then echo -e "participants_7t2bids.tsv\nbids_validator_output.txt\nbeh_taskscores.csv\nsub*/ses*/anat/*desc-*" > "$bidsignore"; fi
 
 # -----------------------------------------------------------------------------------------------
 # Add the new subject to the participants.tsv file
