@@ -20,15 +20,15 @@ http://bids-standard.github.io/bids-validator/
 
 NOTE: This script REQUIRES dcm2niix to work:
       https://github.com/rordenlab/dcm2niix
-NOTE: you need to modify lines 132 and 133 to
-      match your DICOM directories
-
 
 RRC
-McGill University, MNI, MICA-lab, June 2021. Updated: December 2024
+McGill University, MNI, MICA-lab, June 2021. Updated: 2024-December v.2.0, 2025-January v2.1
 raul.rodriguezcruces@mcgill.ca
 "
 }
+
+# File permissions: Files will be created with rw-rw-r-- & Directories will be created with rwxrwxr-x 
+umask 002
 
 # Source print functions
 dir_functions=$(dirname $(realpath "$0"))
@@ -145,6 +145,10 @@ orig=(
   "*func-movie*2_acq-mbep2d_ME_19mm"
   "*func-movies3_acq-mbep2d_ME_19mm"
   "*func-movies4_acq-mbep2d_ME_19mm"
+  "*func-movie1action_acq-mbep2d_ME_19mm"
+  "*func-movie2control_acq-mbep2d_ME_19mm"
+  "*func-movie3control_acq-mbep2d_ME_19mm"
+  "*func-movie4action_acq-mbep2d_ME_19mm"
   "*func-semphon1_acq-mbep2d_ME_19mm"
   "*func-semphon2_acq-mbep2d_ME_19mm"
   "*func-audiobook1_acq-mbep2d_ME_19mm"
@@ -212,6 +216,10 @@ bids=(
   task-movies2_bold
   task-movies3_bold
   task-movies4_bold
+  task-caddy_bold
+  task-harsh_bold
+  task-pines_bold
+  task-bathroom_bold
   task-semphon1_bold
   task-semphon2_bold
   task-audiobook1_bold
@@ -223,7 +231,7 @@ bids=(
   inv-2_MP2RAGE
   T1map
   UNIT1
-  acq-denoised_UNIT1
+  desc-denoised_UNIT1
   acq-05mm_inv-1_MP2RAGE
   acq-05mm_inv-2_MP2RAGE
   acq-05mm_T1map
@@ -391,6 +399,7 @@ replace_suffix "unwrapped_T2starw_ph" "Unwrapped_part-phase_T2starw" "$BIDS/anat
 replace_suffix "T1w_ph" "part-phase_T1w" "$BIDS/anat"
 
 # Remove the run-? from the task-rest when there is only 1 run
+# This only affects the acquisitions that contain the phase encoded inside the same acquisition: e.g rest and rest_Q1k
 func_rename() {
   func_acq=$1
   # remove run-? from echo-?_bold if there are 6 files (ONLY 1 run)
