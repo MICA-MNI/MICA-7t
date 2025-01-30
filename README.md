@@ -400,8 +400,8 @@ micapipe_cleanup -sub "${sub}" \
 | ?        | "*anat-T1w_acq-mp2rage_07mm_CSptx_INV1"    | anat     | inv-1_MP2RAGE          |
 | ?        | "*anat-T1w_acq-mp2rage_07mm_CSptx_INV2"    | anat     | inv-2_MP2RAGE          |
 | ?        | "*anat-T1w_acq-mp2rage_07mm_CSptx_T1_Images" | anat   | T1map                  |
-| ?        | "*anat-T1w_acq-mp2rage_07mm_CSptx_UNI_Images" | anat   | UNIT1                  |
-| ?        | "*anat-T1w_acq-mp2rage_07mm_CSptx_UNI-DEN" | anat     | acq-denoised_UNIT1     |
+| ?        | "*anat-T1w_acq-mp2rage_07mm_CSptx_UNI_Images" | anat  | UNIT1                  |
+| ?        | "*anat-T1w_acq-mp2rage_07mm_CSptx_UNI-DEN" | anat     | desc-denoised_UNIT1    |
 | ?        | "*cstfl-mp2rage-05mm_INV1"                 | anat     | acq-05mm_inv-1_MP2RAGE |
 | ?        | "*cstfl-mp2rage-05mm_INV2"                 | anat     | acq-05mm_inv-2_MP2RAGE |
 | ?        | "*cstfl-mp2rage-05mm_T1_Images"            | anat     | acq-05mm_T1map         |
@@ -411,35 +411,37 @@ micapipe_cleanup -sub "${sub}" \
 | 01/02/03 | "*anat-T1w_acq-mp2rage_05mm_UP*_INV2"       | anat     | acq-inv2_T1map         |
 | 01/02/03 | "*anat-T1w_acq-mp2rage_05mm_UP*_T1_Images"  | anat     | acq-T1_T1map           |
 | 01/02/03 | "*anat-T1w_acq-mp2rage_05mm_UP*_UNI_Images" | anat     | acq-uni_T1map          |
-| a1       | "*anat-flair_acq-0p7mm_UPAdia"             | anat     | FLAIR                  |
-| ?        | "*anat-flair_acq-07iso_dev3_5SD_UP"        | anat     | FLAIR                  |
-| a1       | "*Romeo_Mask_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-mask_T2starw      |
-| a1       | "*Aspire_M_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-aspire_T2starw    |
-| a1       | "*Aspire_P_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-aspire_T2starw    |
-| a1       | "*EchoCombined_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-combined_part-echo_T2starw |
-| a1       | "*T2star_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | T2starw               |
-| a1       | "*Romeo_P_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-romeo_T2starw     |
-| a1       | "*Romeo_B0_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-romeoUnwrapped_T2starw |
-| a1       | "*sensitivity_corrected_mag_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-SensitivityCorrected_part-mag_T2starw |
-| a1       | "*CLEAR-SWI_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-clearSWI_T2starmap |
-| 02/03    | "*anat-T2star_acq-me_gre_07mm"             | anat     | T2starw                |
-| 02/03    | "*T2Star_Images"                           | anat     | T2starmap              |
+| a1       | "*anat-flair_acq-0p7mm_UPAdia"              | anat     | FLAIR                  |
+| ?        | "*anat-flair_acq-07iso_dev3_5SD_UP"         | anat     | FLAIR                  |
+| a1       | "*CLEAR-SWI_anat-T2star_acq-me_gre_0*7iso_ASPIRE"    | anat | acq-SWI_T2starw   |
+| a1       | "*Romeo_P_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-romeo_T2starw      |
+| a1       | "*Romeo_Mask_anat-T2star_acq-me_gre_0*7iso_ASPIRE"   | anat | acq-romeo_desc-mask_T2starw   |
+| a1       | "*Romeo_B0_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-romeo_desc-unwrapped_T2starw  |
+| a1       | "*Aspire_M_anat-T2star_acq-me_gre_0*7iso_ASPIRE"     | anat | acq-aspire_part-mag_T2starw   |
+| a1       | "*Aspire_P_anat-T2star_acq-me_gre_0*7iso_ASPIRE"     | anat | acq-aspire_part-phase_T2starw |
+| a1       | "*EchoCombined_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-aspire_desc-echoCombined_T2starw |
+| a1       | "*sensitivity_corrected_mag_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-aspire_desc-echoCombinedSensitivityCorrected_T2starw |
+| a1       | "*T2star_anat-T2star_acq-me_gre_0*7iso_ASPIRE" | anat | acq-aspire_[T2starw,T2starmap] |
+| 02/03    | "*anat-T2star_acq-me_gre_07mm"             | anat     | acq-me_T2starw         |
+| 02/03    | "*T2Star_Images"                           | anat     | acq-me_T2starmap       |
 | 03       | "*_MTON"                                   | anat     | mt-on_MTR              |
 | 03       | "*_MTOFF"                                  | anat     | mt-off_MTR             |
 | 03       | "*_T1W"                                    | anat     | acq-MTR_T1w            |
-| ?        | "*anat-mtw_acq-MTON_07mm"                  | anat     | mt-on_MTR              |
-| ?        | "*anat-mtw_acq-MTOFF_07mm"                 | anat     | mt-off_MTR             |
-| ?        | "*anat-mtw_acq-T1w_07mm"                   | anat     | acq-MTR_T1w            |
+| ?        | "*anat-mtw_acq-MTON_07mm"                  | anat     | acq-mtw_mt-on_MTR      |
+| ?        | "*anat-mtw_acq-MTOFF_07mm"                 | anat     | acq-mtw_mt-off_MTR     |
+| ?        | "*anat-mtw_acq-T1w_07mm"                   | anat     | acq-mtw_acq-MTR_T1w    |
 | 03       | "*anat-angio_acq-tof_03mm_inplane"         | anat     | angio                  |
 | 03       | "*anat-angio_acq-tof_03mm_inplane_MIP_SAG" | anat     | acq-sag_angio          |
 | 03       | "*anat-angio_acq-tof_03mm_inplane_MIP_COR" | anat     | acq-cor_angio          |
 | 03       | "*anat-angio_acq-tof_03mm_inplane_MIP_TRA" | anat     | acq-tra_angio          |
 
+> The acquisitions `acq-romeo_part-phase_T2starw`, `acq-aspire_part-mag_T2starw`, and `acq-aspire_part-phase_T2starw` each have five echoes. The final string will include the identifier `echo-` followed by the echo number. For example: `acq-aspire_echo-1_part-mag_T2starw`.
+
 ## Field maps
 | Session     | Acquisition                                | BIDS dir | BIDS name              |
 |-------------|--------------------------------------------|----------|------------------------|
-| 01/02/03/a1 | "*fmap-b1_acq-tra_p2"                      | fmap     | acq-anat_TB1TFL        |
-| 01/02/03/a1 | "*fmap-b1_acq-sag_p2"                      | fmap     | acq-anat_TB1TFL        |
+| 01/02/03/a1 | "*fmap-b1_acq-tra_p2"                      | fmap     | acq-[anat,sfam]_TB1TFL |
+| 01/02/03/a1 | "*fmap-b1_acq-sag_p2"                      | fmap     | acq-[anat,sfam]_TB1TFL |
 | 01/02/03    | "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP*"    | fmap     | acq-fmri_dir-AP_epi    |
 | 01/02/03    | "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA*"    | fmap     | acq-fmri_dir-PA_epi    |
 
@@ -468,6 +470,8 @@ micapipe_cleanup -sub "${sub}" \
 | ?        | "*func-sens2_acq-mbep2d_ME_19mm"           | func     | task-sens1_bold        |
 | ?        | "*func-slient1_acq-mbep2d_ME_19mm"         | func     | task-salient_bold      |
 
+> Each functional MRI acquisition includes three echoes and a phase. The final string will contain the identifier `echo-` followed by the echo number (e.g., `task-rest_echo-1_bold`). Additionally, the string `part-phase` will be included to identify the phase (e.g., `task-rest_echo-1_part-phase_bold`).
+
 ## Diffusion weighted Imaging
 | Session  | Acquisition                              | BIDS dir | BIDS name                  |
 |----------|------------------------------------------|----------|----------------------------|
@@ -493,3 +497,25 @@ micapipe_cleanup -sub "${sub}" \
 | a1       | "*dwi_acq_multib_70dir_AP_acc9"          | dwi      | acq-multib70_dir-AP_dwi    |
 | a1       | "*dwi_acq_multib_70dir_AP_acc9_1p5iso_SBRef" | dwi   | acq-multib70_dir-AP_sbref |
 | a1       | "*dwi_acq_multib_70dir_AP_acc9_1p5iso"   | dwi      | acq-multib70_dir-AP_dwi    |
+
+### Abbreviation Glossary
+
+| **Abbreviation** | **Description**                                               |
+|-------------------|---------------------------------------------------------------|
+| **AP**           | Anterio-Posterior                                             |
+| **PA**           | Postero-anterior                                              |
+| **mtw**          | Magnetic transfer weighted                                    |
+| **sfmap**         | Scaled flip angle map                                        |
+| **tof**          | Time of flight                                                |
+| **multib**       | Multi shell N directions                                      |
+| **semphon**      | Semantic-phonetic                                             |
+| **romeo**        | Rapid opensource minimum spanning tree algorithm              |
+| **aspire**       | Combination of multi-channel phase data from multi-echo acquisitions |
+
+# References
+
+1. Eckstein K, Dymerska B, Bachrata B, Bogner W, Poljanc K, Trattnig S, Robinson SD. Computationally efficient combination of multi‐channel phase data from multi‐echo acquisitions (ASPIRE). Magnetic resonance in medicine. 2018 Jun;79(6):2996-3006. https://doi.org/10.1002/mrm.26963
+
+2. Dymerska B, Eckstein K, Bachrata B, Siow B, Trattnig S, Shmueli K, Robinson SD. Phase unwrapping with a rapid opensource minimum spanning tree algorithm (ROMEO). Magnetic resonance in medicine. 2021 Apr;85(4):2294-308. https://doi.org/10.1002/mrm.28563
+
+3. Sasaki M, Shibata E, Tohyama K, Takahashi J, Otsuka K, Tsuchiya K, Takahashi S, Ehara S, Terayama Y, Sakai A. Neuromelanin magnetic resonance imaging of locus ceruleus and substantia nigra in Parkinson's disease. Neuroreport. 2006 Jul 31;17(11):1215-8. https://doi.org/10.1097/01.wnr.0000227984.84927.a7 
