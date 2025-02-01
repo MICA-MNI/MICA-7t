@@ -406,18 +406,18 @@ func_rename() {
   # Extract unique run numbers from the filenames
   unique_runs=($(ls "$BIDS"/func/*${func_acq}_run* 2>/dev/null | grep -oP 'run-\d+' | sort -u))
   # Check if there is only one run
-  if [ ${#unique_runs[@]} -eq 1 ]; then
+  if [ ${#unique_runs[@]} -eq 2 ]; then
       Info "${func_acq}: run-1 is the fMRI and run-2 is the phase"
       replace_suffix "${func_acq}_run-1" "${func_acq}" "$BIDS/func"
       replace_suffix "${func_acq}_run-2" "${func_acq}" "$BIDS/func"
-  elif [[ ${#unique_runs[@]} -gt 1 ]]; then
+  elif [[ ${#unique_runs[@]} -gt 2 ]]; then
       Info "${func_acq}: process the naming of multiple runs in corresponding pairs"
       # Rename number of runs in pairs when there is more than one run 
       for ((i=0; i<${#unique_runs[@]}; i+=2)); do
           run_A="${unique_runs[$i]}"
           run_B="${unique_runs[$i+1]}"
           run_num=$((i / 2 + 1))
-          echo "Run A: $run_A, Run B: $run_B, Run Num: $run_num"
+          #echo "Run A: $run_A, Run B: $run_B, Run Num: $run_num"
           replace_suffix "${func_acq}_${run_A}" "${func_acq}_run-${run_num}" "$BIDS/func"
           replace_suffix "${func_acq}_${run_B}" "${func_acq}_run-${run_num}" "$BIDS/func"
       done
