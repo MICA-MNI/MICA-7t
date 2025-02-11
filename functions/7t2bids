@@ -259,7 +259,7 @@ bids=(
   acq-MTR_T1w
   acq-mtw_mt-on_MTR
   acq-mtw_mt-off_MTR
-  acq-mtw_acq-MTR_T1w
+  acq-mtw_T1w
   angio
   acq-sag_angio
   acq-cor_angio
@@ -425,6 +425,10 @@ func_rename() {
 }
 func_rename "task-rest"
 func_rename "task-rest_acq-Q1K"
+func_rename "caddy"
+func_rename "harsh"
+func_rename "pines"
+func_rename "bathroom"
 
 # Remove runs from MTR acquisitions
 if ls "$BIDS"/anat/*acq-mtw_mt-off_run-?_MTR.json 1> /dev/null 2>&1; then
