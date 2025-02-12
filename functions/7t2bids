@@ -410,7 +410,7 @@ func_rename() {
       Info "${func_acq}: run-1 is the fMRI and run-2 is the phase"
       replace_suffix "${func_acq}_run-1" "${func_acq}" "$BIDS/func"
       replace_suffix "${func_acq}_run-2" "${func_acq}" "$BIDS/func"
-  elif [[ ${#unique_runs[@]} -gt 2 ]]; then
+  elif [[ ${#unique_runs[@]} -gt 3 ]]; then
       Info "${func_acq}: process the naming of multiple runs in corresponding pairs"
       # Rename number of runs in pairs when there is more than one run 
       for ((i=0; i<${#unique_runs[@]}; i+=2)); do
