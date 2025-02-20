@@ -153,6 +153,8 @@ orig=(
   "*func-semphon2_acq-mbep2d_ME_19mm"
   "*func-audiobook1_acq-mbep2d_ME_19mm"
   "*func-audiobook2_acq-mbep2d_ME_19mm"
+  "*func-oceans11_acq-mbep2d_ME_19mm"
+  "*func-social_acq-mbep2d_ME_19mm"
   "*func-sens1_acq-mbep2d_ME_19mm"
   "*func-sens2_acq-mbep2d_ME_19mm"
   "*func-slient1_acq-mbep2d_ME_19mm"
@@ -224,6 +226,8 @@ bids=(
   task-semphon2_bold
   task-audiobook1_bold
   task-audiobook2_bold
+  task-oceans11_bold
+  task-social_bold
   task-sens2_bold
   task-sens1_bold
   task-salient_bold
@@ -429,7 +433,16 @@ func_rename "caddy"
 func_rename "harsh"
 func_rename "pines"
 func_rename "bathroom"
-
+func_rename "sens1"
+func_rename "sens2"
+func_rename "oceans11"
+func_rename "social"
+func_rename "epiencode"
+func_rename "epiretrieve"
+func_rename "movies1"
+func_rename "movies2"
+func_rename "semphon1"
+func_rename "semphon2"
 # Remove runs from MTR acquisitions
 if ls "$BIDS"/anat/*acq-mtw_mt-off_run-?_MTR.json 1> /dev/null 2>&1; then
   # Info "REMOVE the run-? from MTR"
