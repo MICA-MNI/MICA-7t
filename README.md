@@ -88,7 +88,7 @@ sub=PNC001
 ses=01
 
 # Variables
-bids=/data/mica3/BIDS_PNI/rawdata_v2.0.0/
+bids=/data/mica3/BIDS_PNI/rawdata/
 out=/data/mica3/BIDS_PNI/derivatives
 tmp=/host/percy/local_raid/donna/useful/7T_processing/tmp_dir
 fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
@@ -136,7 +136,7 @@ bash /host/yeatman/local_raid/rcruces/git_here/MRI_analytic_tools/Freesurfer_pre
 ```bash
 
 # Variables
-bids=/data/mica3/BIDS_PNI/rawdata_v2.0.0/
+bids=/data/mica3/BIDS_PNI/rawdata/
 out=/data/mica3/BIDS_PNI/derivatives
 tmp=/host/percy/local_raid/donna/useful/7T_processing/tmp_dir
 fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
@@ -284,7 +284,7 @@ touch ${SUBJECTS_DIR}/${sub}_${ses}/qc_done.txt
 # One shot processing after reconsurf
 ```
 
-bids=/data/mica3/BIDS_PNI/rawdata_v2.0.0/
+bids=/data/mica3/BIDS_PNI/rawdata/
 out=/data/mica3/BIDS_PNI/derivatives
 tmp=/host/percy/local_raid/donna/useful/7T_processing/tmp_dir
 fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
@@ -305,9 +305,9 @@ singularity run --writable-tmpfs --containall \
 	-B ${fsdir}:${fsdir} \
 	-B ${fs_lic}:/opt/licence.txt \
 	 ${micapipe_img} -bids /bids -out /out \
-	-sub ${sub} -ses ${ses} -proc_surf -surf_dir ${fsdir} -fs_licence /opt/licence.txt -threads 10 \
+	-sub ${sub} -ses ${ses} -fs_licence /opt/licence.txt -threads 10 \
         -post_structural \
-	-proc_dwi -dwi_rpe /bids/${sub}/${ses}/dwi/${sub}_${ses}_acq-b0_dir-PA_run-1_epi.nii.gz -regSynth \
+	-proc_dwi -dwi_rpe /bids/${sub}/${ses}/dwi/${sub}_${ses}_acq-b0_dir-PA_dwi.nii.gz -regSynth \
 	-GD -proc_func \
 	-mainScanStr task-rest_echo-1_bold,task-rest_echo-2_bold,task-rest_echo-3_bold \
 	-func_pe /bids/${sub}/${ses}/fmap/${sub}_${ses}_acq-fmri_dir-AP_epi.nii.gz \
