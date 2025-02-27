@@ -153,6 +153,10 @@ orig=(
   "*func-semphon2_acq-mbep2d_ME_19mm"
   "*func-audiobook1_acq-mbep2d_ME_19mm"
   "*func-audiobook2_acq-mbep2d_ME_19mm"
+  "*func-caddy_acq-mbep2d_ME_19mm"
+  "*func-harsh_acq-mbep2d_ME_19mm"
+  "*func-pines_acq-mbep2d_ME_19mm"
+  "*func-bathroom_acq-mbep2d_ME_19mm"
   "*func-oceans11_acq-mbep2d_ME_19mm"
   "*func-social_acq-mbep2d_ME_19mm"
   "*func-sens1_acq-mbep2d_ME_19mm"
@@ -226,6 +230,10 @@ bids=(
   task-semphon2_bold
   task-audiobook1_bold
   task-audiobook2_bold
+  task-caddy_bold
+  task-harsh_bold
+  task-pines_bold
+  task-bathroom_bold
   task-oceans11_bold
   task-social_bold
   task-sens2_bold
