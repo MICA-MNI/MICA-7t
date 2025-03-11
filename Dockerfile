@@ -41,14 +41,14 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -
 ENV PATH="/opt/conda/bin:$PATH"
 
 # Install jq v1.6
-RUN apt-get update && apt-get install -y jq
+RUN apt-get update && apt-get install -y jq:1.6
 
-# Install deno v2.0.6
+# Install deno v2.2.3
 RUN curl -fsSL https://deno.land/install.sh | sh
 ENV PATH="/root/.deno/bin:$PATH"
 
-# Compile bids-validator v2.0.0
-RUN deno compile -ERN -o bids-validator jsr:@bids/validator
+# Compile bids-validator v2.0.3
+RUN deno compile -ERN -o bids-validator jsr:@bids/validator@2.0.3
 
 # Set the working directory
 WORKDIR /app
