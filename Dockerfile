@@ -36,9 +36,13 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -
     rm /miniconda.sh && \
     /opt/conda/bin/conda init && \
     /opt/conda/bin/conda clean -afy
+    # add pydicom here
 
 # Update PATH to include conda
 ENV PATH="/opt/conda/bin:$PATH"
+
+# Install pydicom using Conda
+RUN conda install -y pydicom && conda clean -afy
 
 # Install jq v1.6
 RUN apt-get update && apt-get install -y jq:1.6
@@ -59,4 +63,4 @@ COPY . /app
 ENV PATH="/app/functions:$PATH"
 
 # Run the application
-ENTRYPOINT ["7t2bids"]
+ENTRYPOINT ["/app/functions/dcm2bids.py"]
