@@ -35,7 +35,7 @@ dicoms_dir="${data_dir}/sorted/sub-${sub}_ses-${ses}/dicoms"
 sorted_dir="${data_dir}/sorted/sub-${sub}_ses-${ses}/dicoms_sorted"
 
 # Path to singularity image
-dcm2bids_img=/data/mica1/01_programs/MICA-7t/dcm2bids_v2.1.sif
+dcm2bids_img=/data/mica1/01_programs/MICA-7t/7t2bids_v2.1.sif
 
 # Run dcm2bids.py with singularity container
 singularity run --containall \
