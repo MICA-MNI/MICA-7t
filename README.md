@@ -60,7 +60,7 @@ This workflow is composed of three modular steps: the first sorts the DICOMs to 
 ### Singularity command:
 ```bash
 sub=PNE018
-ses=18
+ses=a1
 
 # Variables
 data_dir="/data_/mica3/BIDS_PNI"
@@ -68,8 +68,8 @@ bids_dir="${data_dir}/rawdata"
 dicoms_dir="${data_dir}/sorted/sub-${sub}_ses-${ses}/dicoms"
 sorted_dir="${data_dir}/sorted/sub-${sub}_ses-${ses}/dicoms_sorted"
 
-# Path to singularity image
-dcm2bids_img=/data/mica1/01_programs/MICA-7t/7t2bids_v2.1.sif
+# Path to singularity image v2.2
+dcm2bids_img=/data/mica1/01_programs/MICA-7t/7t2bids_v2.2.sif
 
 # Run dcm2bids.py with singularity container
 singularity run --containall \
