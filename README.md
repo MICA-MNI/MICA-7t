@@ -1,6 +1,7 @@
 # Precision NeuroImaging 7T
 
 [![version](https://img.shields.io/github/v/tag/MICA-MNI/MICA-7t)](https://github.com/MICA-MNI/MICA-7t)
+[![Docker Image Version](https://img.shields.io/docker/v/micalab/7t2bids?color=blue&label=docker%20version)](https://hub.docker.com/r/micalab/7t2bids)
 [![License: GPL v3](https://img.shields.io/github/license/MICA-MNI/MICA-7t?color=blue)](https://www.gnu.org/licenses/gpl-3.0)
 [![GitHub issues](https://img.shields.io/github/issues/MICA-MNI/MICA-7t)](https://github.com/MICA-MNI/MICA-7t/issues)
 [![GitHub stars](https://img.shields.io/github/stars/MICA-MNI/MICA-7t.svg?style=flat&label=⭐%EF%B8%8F%20stars&color=brightgreen)](https://github.com/rcruces/7T_pipeline/stargazers)
