@@ -82,7 +82,7 @@ def sorted2bids():
 
 def validate_bids():
     print("\n[ info ] ... Running BIDS validator ...\n")
-    command = f'deno run --allow-write -ERN jsr:@bids/validator {bids_dir} --ignoreWarnings --outfile {bids_dir}/bids_validator_output.txt'
+    command = f'deno run --allow-write -ERN jsr:@bids/validator {bids_dir} --ignoreWarnings --config {bids_dir}/bids_validator_config.json --outfile {bids_dir}/bids_validator_output.txt'
     run_command(command)
 
 def main():
