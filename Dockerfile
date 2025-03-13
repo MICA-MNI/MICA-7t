@@ -7,6 +7,7 @@ ENV PATH="/opt/dcm2niix-v1.0.20240202/bin:$PATH"
 # Install dependencies and dcm2niix
 RUN apt-get update -qq \
     && apt-get install -y -q --no-install-recommends \
+           bc \
            cmake \
            curl \
            g++ \
@@ -52,11 +53,13 @@ RUN apt-get update && apt-get install -y curl && \
     jq --version
 
 # Install deno v2.2.3
+ENV DENO_DIR=/opt/deno_cache
+ENV DENO_INSTALL="/opt/.deno"
 RUN curl -fsSL https://deno.land/install.sh | sh
-ENV PATH="/root/.deno/bin:$PATH"
+ENV PATH="$DENO_INSTALL/bin:$PATH"
 
 # Compile bids-validator v2.0.3
-RUN deno compile -ERN -o bids-validator jsr:@bids/validator@2.0.3
+RUN deno compile -ERN -o bids-validator jsr:@bids/validator
 
 # Set the working directory
 WORKDIR /app
