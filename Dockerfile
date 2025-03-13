@@ -42,10 +42,14 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -
 ENV PATH="/opt/conda/bin:$PATH"
 
 # Install pydicom using Conda
-RUN conda install -y pydicom && conda clean -afy
+RUN /opt/conda/bin/conda install -y -c conda-forge pydicom && \
+    /opt/conda/bin/conda clean -afy
 
 # Install jq v1.6
-RUN apt-get update && apt-get install -y jq:1.6
+RUN apt-get update && apt-get install -y curl && \
+    curl -L -o /usr/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && \
+    chmod +x /usr/bin/jq && \
+    jq --version
 
 # Install deno v2.2.3
 RUN curl -fsSL https://deno.land/install.sh | sh
