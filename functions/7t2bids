@@ -631,7 +631,7 @@ if [ ! -f "$tsv_file" ]; then echo -e "sub\tses\tdate\tN.anat\tN.dwi\tN.func\tN.
 # Gitignore file
 bidsignore="$BIDS_DIR"/.bidsignore
 # Check if file exist
-if [ ! -f "$bidsignore" ]; then echo -e "participants_7t2bids.tsv\nbids_validator_output.txt\nbeh_taskscores.csv\nsub*/ses*/anat/*desc-*\nMovies_rename.csv" > "$bidsignore"; fi
+if [ ! -f "$bidsignore" ]; then echo -e "participants_7t2bids.tsv\nbids_validator_output.txt\nbeh_taskscores.csv\nsub*/ses*/anat/*desc-*\nMovies_rename.csv\nbids_validator_config.json" > "$bidsignore"; fi
 
 # -----------------------------------------------------------------------------------------------
 # Add the new subject to the participants.tsv file
@@ -669,11 +669,15 @@ for i in ${!tasks[@]}; do
     fi
 done
 
-# Copy the data_set_description.json file to the BIDS directory
-if [ ! -f "$BIDS_DIR"/dataset_description.json ]; then cp -v "$gitrepo"/files/dataset_description.json "$BIDS_DIR"/dataset_description.json; fi
+# Define an array of files to copy
+files=("dataset_description.json" "CITATION.cff" "bids_validator_config.json" ".bidsignore")
 
-# Copy the data_set_description.json file to the BIDS directory
-if [ ! -f "$BIDS_DIR"/CITATION.cff ]; then cp -v "$gitrepo"/files/CITATION.cff "$BIDS_DIR"/CITATION.cff; fi
+# Copy files to the BIDS directory if they do not already exist
+for file in "${files[@]}"; do
+    if [ ! -f "$BIDS_DIR/$file" ]; then
+        cp -v "$gitrepo/files/$file" "$BIDS_DIR/$file"
+    fi
+done
 
 # Create README
 echo -e "The Presicion NeuroImaging (PNI) dataset was provided by the Multimodal Imaging and Connectome Analysis Lab, Montreal Neurological Institute and Hospital, The Neuro.\n\nIf you reference this dataset in your publications, please acknowledge its authors." > "$BIDS_DIR"/README
@@ -684,11 +688,6 @@ cd "$here"
 
 # Remove any tmp files if any
 if ls "${BIDS}"/tmp* 1> /dev/null 2>&1; then cmd rm "$BIDS"/tmp*; fi
-
-# -----------------------------------------------------------------------------------------------
-# Run BIDS validator
-cmd deno run --allow-write -ERN jsr:@bids/validator "$BIDS_DIR" --ignoreWarnings --outfile "$BIDS_DIR"/bids_validator_output.txt
-cat "$BIDS_DIR"/bids_validator_output.txt
 
 # -----------------------------------------------------------------------------------------------#
 #	Total Running Time

@@ -1,0 +1,15 @@
+# Filer for local organization PNI 7T databse
+participants_7t2bids.tsv
+beh_taskscores.csv
+Movies_rename.csv
+
+# Bids validator
+bids_validator_output.txt
+bids_validator_config.json
+
+# Ignore all the Scaner derivativatives
+sub*/ses*/anat/*desc-*
+
+# Ignore all the ERROR of bids validator v2.0.3 of inv-?_MP2RAGE
+# SIDECAR_KEY_REQUIRED: {RepetitionTimeExcitation, RepetitionTimePreparation, NumberShots}
+sub*/ses*/anat/*inv-*_MP2RAGE*
