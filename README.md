@@ -44,25 +44,45 @@ ses1=01
 ses=ses-${ses1}
 find_mri ${SUBID}
 find_mri -claim ${dicoms_directory}
-mkdir /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}
-mkdir /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/beh
-mkdir /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms
-mkdir /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms_sorted
+
+# Create the directories
+mkdir -p /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/{beh, dicoms, dicoms_sorted}
+
+# Copy the DICOMS
 cp -r ${dicoms_directory_returned_from_previous_command} /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms
 ```
 
-## 2. Sorting the dicoms
-This step is to sort the dicoms to `/data_/mica3/BIDS_PNI/sorted` using the `dcmSort` script.
+## 2. Integrated workflow from DICOMS to BIDS
+This workflow is composed of three modular steps: the first sorts the DICOMs to `/data_/mica3/BIDS_PNI/sorted/sub-XXX000_ses-xx`, then it converts the sorted DICOMs into BIDS, and finally, it runs a BIDS validation.
+
+> **Note**: this workflow replaces the previous Bash scripts `dcmSort` and `7t2bids`. `dcmSort` was updated and rewritten in Python using `pydicom`. `7t2bids` is still integrated in the workflow.
+
+### Singularity command:
 ```bash
-dcmSort /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms_sorted
+sub=PNE018
+ses=18
+
+# Variables
+data_dir="/data_/mica3/BIDS_PNI"
+bids_dir="${data_dir}/rawdata"
+dicoms_dir="${data_dir}/sorted/sub-${sub}_ses-${ses}/dicoms"
+sorted_dir="${data_dir}/sorted/sub-${sub}_ses-${ses}/dicoms_sorted"
+
+# Path to singularity image
+dcm2bids_img=/data/mica1/01_programs/MICA-7t/7t2bids_v2.1.sif
+
+# Run dcm2bids.py with singularity container
+singularity run --containall \
+	-B "${bids_dir}":"${bids_dir}" \
+	-B "${dicoms_dir}":"${dicoms_dir}" \
+	-B "${sorted_dir}":"${sorted_dir}" \
+    "${dcm2bids_img}" --sub "${sub}" --ses "${ses}" \
+        --dicoms_dir "${dicoms_dir}" \
+        --sorted_dir "${sorted_dir}" \
+        --bids_dir "${bids_dir}"
 ```
 
-## 3. From sorted dicoms to BIDS
-Once the dicoms are sorted we can run the `7t2bids` to transform all the dicoms into NIFTIS and rename and organize the files  accoding to BIDS. 
-```bash
-7t2bids -in /data_/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms_sorted -id ${SUBID} -bids /data_/mica3/BIDS_PNI/rawdata -ses ${ses1}
-```
-## 4. Copy behavior data
+## 3. Copy behavior data
 This step is to copy the behavior data from cognitive tasks.
 ```bash
 cp -r /data/mica3/7T_task_fMRI/7T_task_fMRI/logs/sub-${SUBID}/$ses/beh/* /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/beh/

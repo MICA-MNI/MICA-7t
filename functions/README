@@ -20,34 +20,6 @@
 dcm2bids.py --sub SUB --ses SES --dicoms_dir DICOMS_DIR --sorted_dir SORTED_DIR --bids_dir BIDS_DIR
 ```
 
-
-```bash
-#!/bin/bash
-# dcm2bids PNI 7t v2.1
-
-sub=PNE018
-ses=18
-
-# Variables
-data_dir="/data_/mica3/BIDS_PNI"
-bids_dir="${data_dir}/rawdata"
-dicoms_dir="${data_dir}/sorted/sub-${sub}_ses-${ses}/dicoms"
-sorted_dir="${data_dir}/sorted/sub-${sub}_ses-${ses}/dicoms_sorted"
-
-# Path to singularity image
-dcm2bids_img=/data/mica1/01_programs/MICA-7t/7t2bids_v2.1.sif
-
-# Run dcm2bids.py with singularity container
-singularity run --containall \
-	-B "${bids_dir}":"${bids_dir}" \
-	-B "${dicoms_dir}":"${dicoms_dir}" \
-	-B "${sorted_dir}":"${sorted_dir}" \
-    "${dcm2bids_img}" --sub "${sub}" --ses "${ses}" \
-        --dicoms_dir "${dicoms_dir}" \
-        --sorted_dir "${sorted_dir}" \
-        --bids_dir "${bids_dir}"
-```
-
 ### Modular workflow from DICOMS to BIDS
 ```bash
 # Fisrt sort the dicoms
