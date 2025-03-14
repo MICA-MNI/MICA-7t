@@ -665,7 +665,7 @@ done
 
 # Sync files to the BIDS directory
 files=("dataset_description.json" "CITATION.cff" "bids_validator_config.json" ".bidsignore")
-for file in "${files[@]}"; do rsync -av --remove-source-files "$gitrepo/files/$file" "$BIDS_DIR/$file"; done
+for file in "${files[@]}"; do cp -fv "${gitrepo}/files/${file}" "${BIDS_DIR}/${file}"; done
 
 # Create README
 echo -e "The Presicion NeuroImaging (PNI) dataset was provided by the Multimodal Imaging and Connectome Analysis Lab, Montreal Neurological Institute and Hospital, The Neuro.\n\nIf you reference this dataset in your publications, please acknowledge its authors." > "$BIDS_DIR"/README
