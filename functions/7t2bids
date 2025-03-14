@@ -673,11 +673,7 @@ done
 files=("dataset_description.json" "CITATION.cff" "bids_validator_config.json" ".bidsignore")
 
 # Copy files to the BIDS directory if they do not already exist
-for file in "${files[@]}"; do
-    if [ ! -f "$BIDS_DIR/$file" ]; then
-        cp -v "$gitrepo/files/$file" "$BIDS_DIR/$file"
-    fi
-done
+for file in "${files[@]}"; do cp -v "$gitrepo/files/$file" "$BIDS_DIR/$file"; done
 
 # Create README
 echo -e "The Presicion NeuroImaging (PNI) dataset was provided by the Multimodal Imaging and Connectome Analysis Lab, Montreal Neurological Institute and Hospital, The Neuro.\n\nIf you reference this dataset in your publications, please acknowledge its authors." > "$BIDS_DIR"/README
