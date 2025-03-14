@@ -628,12 +628,6 @@ tsv_file="$BIDS_DIR"/participants_7t2bids.tsv
 if [ ! -f "$tsv_file" ]; then echo -e "sub\tses\tdate\tN.anat\tN.dwi\tN.func\tN.fmap\tdicoms\tuser\tprocessing.time" > "$tsv_file"; fi
 
 # -----------------------------------------------------------------------------------------------
-# Gitignore file
-bidsignore="$BIDS_DIR"/.bidsignore
-# Check if file exist
-if [ ! -f "$bidsignore" ]; then echo -e "participants_7t2bids.tsv\nbids_validator_output.txt\nbeh_taskscores.csv\nsub*/ses*/anat/*desc-*\nMovies_rename.csv\nbids_validator_config.json" > "$bidsignore"; fi
-
-# -----------------------------------------------------------------------------------------------
 # Add the new subject to the participants.tsv file
 participants_tsv="$BIDS_DIR"/participants.tsv
 # Check if file exist
@@ -669,11 +663,9 @@ for i in ${!tasks[@]}; do
     fi
 done
 
-# Define an array of files to copy
+# Sync files to the BIDS directory
 files=("dataset_description.json" "CITATION.cff" "bids_validator_config.json" ".bidsignore")
-
-# Copy files to the BIDS directory if they do not already exist
-for file in "${files[@]}"; do cp -v "$gitrepo/files/$file" "$BIDS_DIR/$file"; done
+for file in "${files[@]}"; do rsync -av --remove-source-files "$gitrepo/files/$file" "$BIDS_DIR/$file"; done
 
 # Create README
 echo -e "The Presicion NeuroImaging (PNI) dataset was provided by the Multimodal Imaging and Connectome Analysis Lab, Montreal Neurological Institute and Hospital, The Neuro.\n\nIf you reference this dataset in your publications, please acknowledge its authors." > "$BIDS_DIR"/README
