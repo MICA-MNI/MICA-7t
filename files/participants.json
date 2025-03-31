@@ -3,10 +3,6 @@
       "LongName": "Participant identification label sub-",
       "Description": "Assigned identification number for a subject. No ‘sub-’"
     },
-   "session_id": {
-      "LongName": "Session ses-",
-      "Description": "Data acquisition session, string. If not available, specify n/a. No -ses"
-    },
    "site": {
       "LongName": "Site and scanner information",
       "Description": "Specify name of site and scanner, e.g. Montreal_SiemmensTerra7T"
