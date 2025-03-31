@@ -1,6 +1,8 @@
 {
   "ignore": [
-    { "code": "SIDECAR_KEY_REQUIRED", "location": "/acq-05mm_inv-*_MP2RAGE.json" }
+    { "code": "SIDECAR_KEY_REQUIRED", "subcode": "RepetitionTimeExcitation" },
+    { "code": "SIDECAR_KEY_REQUIRED", "subcode": "RepetitionTimePreparation" },
+    { "code": "SIDECAR_KEY_REQUIRED", "subcode": "RepetitionTimeNumberShots" }
   ],
   "warning": [],
   "error": []
