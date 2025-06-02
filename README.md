@@ -309,7 +309,6 @@ bids=/data/mica3/BIDS_PNI/rawdata/
 out=/data/mica3/BIDS_PNI/derivatives
 tmp=/host/percy/local_raid/donna/useful/7T_processing/tmp_dir
 fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
-fsdir=/data/mica3/BIDS_PNI/derivatives/fastsurfer/${sub}_${ses}
 
 # run this container
 micapipe_img=/data_/mica1/01_programs/micapipe-v0.2.0/micapipe_v0.2.3.sif
@@ -323,12 +322,11 @@ singularity run --writable-tmpfs --containall \
 	-B ${bids}:/bids \
 	-B ${out}:/out \
 	-B ${tmp}:/tmp \
-	-B ${fsdir}:${fsdir} \
 	-B ${fs_lic}:/opt/licence.txt \
 	 ${micapipe_img} -bids /bids -out /out \
 	-sub ${sub} -ses ${ses} -fs_licence /opt/licence.txt -threads 10 \
         -post_structural \
-	-proc_dwi -dwi_rpe /bids/${sub}/${ses}/dwi/${sub}_${ses}_acq-b0_dir-PA_dwi.nii.gz -regSynth \
+	-proc_dwi -dwi_main /bids/${sub}/${ses}/dwi/${sub}_${ses}_acq-multib38_dir-AP_dwi.nii.gz,/bids/${sub}/${ses}/dwi/${sub}_${ses}_acq-multib70_dir-AP_dwi.nii.gz -dwi_rpe /bids/${sub}/${ses}/dwi/${sub}_${ses}_acq-b0_dir-PA_dwi.nii.gz \
 	-GD -proc_func \
 	-mainScanStr task-rest_echo-1_bold,task-rest_echo-2_bold,task-rest_echo-3_bold \
 	-func_pe /bids/${sub}/${ses}/fmap/${sub}_${ses}_acq-fmri_dir-AP_epi.nii.gz \
