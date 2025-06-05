@@ -64,7 +64,7 @@ sub=PNE018
 ses=a1
 
 # Variables
-data_dir="/data_dir="/host/verges/tank/data/BIDS_PNI"
+data_dir="/host/verges/tank/data/BIDS_PNI"
 bids_dir="/data_/mica3/BIDS_PNI/rawdata"
 dicoms_dir="${data_dir}/sorted/sub-${sub}_ses-${ses}/dicoms"
 sorted_dir="${data_dir}/sorted/sub-${sub}_ses-${ses}/dicoms_sorted"
