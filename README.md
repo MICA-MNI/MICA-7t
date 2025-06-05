@@ -47,10 +47,10 @@ find_mri ${SUBID}
 find_mri -claim ${dicoms_directory}
 
 # Create the directories
-mkdir -p /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/{beh, dicoms, dicoms_sorted}
+mkdir -p /host/verges/tank/data/BIDS_PNI/sorted/sub-${SUBID}_${ses}/{beh,dicoms,dicoms_sorted}
 
 # Copy the DICOMS
-cp -r ${dicoms_directory_returned_from_previous_command} /data/mica3/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms
+cp -r ${dicoms_directory_returned_from_previous_command}/*  /host/verges/tank/data/BIDS_PNI/sorted/sub-${SUBID}_${ses}/dicoms
 ```
 
 ## 2. Integrated workflow from DICOMS to BIDS
