@@ -138,6 +138,8 @@ singularity run --writable-tmpfs --containall \
 
 Surface processing
 -------
+> Note: this version of `micapipe v0.2.3` was run with `fastsurfer v2.0.0`
+
 2.  Here we run a denoising algorithm on the `t1nativepro` to enhance contrast in grey/white matter to facilitate the surface generation.
 > This step might be incorporated into the pipeline in the future but is still work on progress...
 
