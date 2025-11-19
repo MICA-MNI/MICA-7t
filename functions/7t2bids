@@ -162,6 +162,8 @@ orig=(
   "*func-sens1_acq-mbep2d_ME_19mm"
   "*func-sens2_acq-mbep2d_ME_19mm"
   "*func-slient1_acq-mbep2d_ME_19mm"
+  "*func-silent1_acq-mbep2d_ME_19mm"
+  "*func-silent2_acq-mbep2d_ME_19mm"
   "*anat-T1w_acq-mp2rage_07mm_CSptx_INV1"
   "*anat-T1w_acq-mp2rage_07mm_CSptx_INV2"
   "*anat-T1w_acq-mp2rage_07mm_CSptx_T1_Images"
@@ -238,7 +240,9 @@ bids=(
   task-social_bold
   task-sens2_bold
   task-sens1_bold
-  task-salient_bold
+  task-silent1_bold
+  task-silent1_bold
+  task-silent2_bold
   inv-1_MP2RAGE
   inv-2_MP2RAGE
   T1map
