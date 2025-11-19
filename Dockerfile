@@ -35,16 +35,19 @@ RUN apt-get update -qq \
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /miniconda.sh && \
     bash /miniconda.sh -b -p /opt/conda && \
     rm /miniconda.sh && \
-    /opt/conda/bin/conda init && \
     /opt/conda/bin/conda clean -afy
-    # add pydicom here
 
-# Update PATH to include conda
-ENV PATH="/opt/conda/bin:$PATH"
+# Configure conda: remove default channels, use conda-forge only
+RUN /opt/conda/bin/conda config --system --remove-key channels && \
+    /opt/conda/bin/conda config --system --add channels conda-forge && \
+    /opt/conda/bin/conda config --system --set channel_priority strict
 
-# Install pydicom using Conda
-RUN /opt/conda/bin/conda install -y -c conda-forge pydicom && \
-    /opt/conda/bin/conda clean -afy
+# Set PATH so we can run conda directly
+ENV PATH /opt/conda/bin:$PATH
+
+# Install pydicom
+RUN conda install -y pydicom && \
+    conda clean -afy
 
 # Install jq v1.6
 RUN apt-get update && apt-get install -y curl && \
