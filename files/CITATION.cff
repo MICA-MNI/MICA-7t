@@ -39,9 +39,6 @@ authors:
   - family-names: Royer
     given-names: Jessica
     orcid: https://orcid.org/0000-0002-4448-8998
-  - family-names: DeKraker
-    given-names: Jordan
-    orcid: https://orcid.org/0000-0002-4093-0582
   - family-names: Wang
     given-names: Yezhou
     orcid: https://orcid.org/0000-0003-3650-5476
@@ -67,7 +64,7 @@ authors:
   - family-names: Rodriguez-Cruces
     given-names: Raul
     email: raul.rodriguezcruces@mcgill.ca
-    orcid: https://orcid.org/0000-0001-8002-0877
+    orcid: https://orcid.org/0000-0002-2917-1212
   - family-names: Bernhardt
     given-names: Boris C.
     email: boris.bernhardt@mcgill.ca
