@@ -247,7 +247,7 @@ bids=(
   inv-2_MP2RAGE
   T1map
   UNIT1
-  desc-denoised_UNIT1
+  rec-denoised_UNIT1
   acq-05mm_inv-1_MP2RAGE
   acq-05mm_inv-2_MP2RAGE
   acq-05mm_T1map
@@ -261,12 +261,12 @@ bids=(
   FLAIR
   acq-SWI_T2starw
   acq-romeo_T2starw
-  acq-romeo_desc-mask_T2starw
-  acq-romeo_desc-unwrapped_T2starw
+  acq-romeo_rec-mask_T2starw
+  acq-romeo_rec-unwrapped_T2starw
   acq-aspire_T2starw
   acq-aspire_T2starw
-  acq-aspire_desc-echoCombined_T2starw
-  acq-aspire_desc-echoCombinedSensitivityCorrected_T2starw
+  acq-aspire_rec-echoCombined_T2starw
+  acq-aspire_rec-echoCombinedSensitivityCorrected_T2starw
   acq-aspire_T2starw
   acq-me_T2starw
   acq-me_T2starmap
@@ -634,12 +634,20 @@ if [ ! -f "$tsv_file" ]; then echo -e "sub\tses\tdate\tN.anat\tN.dwi\tN.func\tN.
 # -----------------------------------------------------------------------------------------------
 # Add the new subject to the participants.tsv file
 participants_tsv="$BIDS_DIR"/participants.tsv
+
 # Check if file exist
 if [ ! -f "$participants_tsv" ]; then echo -e "participant_id\tsite\tgroup" > "$participants_tsv"; fi
+
 # Remove existing entry if it exists
 grep -v -P "^sub-${Subj}" "$participants_tsv" > "${participants_tsv}.tmp" && mv "${participants_tsv}.tmp" "$participants_tsv"
+
 # Add information about subject
-echo -e "sub-${Subj}\tMontreal_SiemmensTerra7T\tHealthy" >> "$participants_tsv"
+[[ "$Subj" == *PNC* ]] && group="Healthy" ||
+[[ "$Subj" == *PNA* ]] && group="Autism" ||
+[[ "$Subj" == *PNE* ]] && group="Epilepsy" ||
+[[ "$Subj" == *PNF* ]] && group="Family" ||
+[[ "$Subj" == *Pilot* ]] && group="Pilot"
+echo -e "sub-${Subj}\tMontreal_SiemmensTerra7T\t${group}" >> "$participants_tsv"
 
 # create a sessions tsv
 sessions_tsv="${BIDS_DIR}/sub-${Subj}/sub-${Subj}_sessions.tsv"
