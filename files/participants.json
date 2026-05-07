@@ -10,10 +10,11 @@
     "group": {
       "LongName": "Group",
       "Levels": {
-        "PNC": "Healthy control",
-        "PNE": "Epilepsy patient",
-        "PNA": "Autism patient",
-        "Pil": "Pilot"
+        "PNC": "Healthy",
+        "PNE": "Epilepsy",
+        "PNA": "Autism",
+        "PNF": "Family",
+        "Pilot": "Pilot"
       }
   }
 }
