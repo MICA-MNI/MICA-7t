@@ -58,9 +58,10 @@ denoise_mp2rage_sequences() {
         bids_uni="${anat_dir_singularity}/sub-${sub}_ses-${ses}${suffix}_UNIT1.nii.gz"
         bids_inv1="${anat_dir_singularity}/sub-${sub}_ses-${ses}${suffix}_inv-1_MP2RAGE.nii.gz"
         bids_inv2="${anat_dir_singularity}/sub-${sub}_ses-${ses}${suffix}_inv-2_MP2RAGE.nii.gz"
-        bids_uni_dns="${anat_dir_singularity}/sub-${sub}_ses-${ses}_desc-denoised${suffix}_UNIT1.nii.gz"
+        bids_uni_dns="${anat_dir_singularity}/sub-${sub}_ses-${ses}_rec-denoised${suffix}_UNIT1.nii.gz"
 
-        # Denoising UNI image
+        # Denoising UNI image add rec-denoise, based on:
+        # https://github.com/bids-standard/bids-specification/issues/1890
         # Only run if the denoised file doesn't already exist
         if [[ ! -f "$bids_uni_dns" ]]; then
             echo -e "----------------------------------------------------------\n\tRunning MP2RAGE denoising on ${seq}\n----------------------------------------------------------"
@@ -71,16 +72,40 @@ denoise_mp2rage_sequences() {
             bids_uni_dns="${anat_dir}/sub-${sub}_ses-${ses}_desc-denoised${suffix}_UNIT1.nii.gz"
             cp "${bids_uni%.nii.gz}.json" "${bids_uni_dns%.nii.gz}.json"
 
-            sed -i $'/^{/a\\\t"ImageComments": "Denoised Uniform Image (multiplying factor = '"$MF"')",' "${bids_uni_dns%.nii.gz}.json"
+            # Add fields to the new json
+            jq --arg src "${bids_uni}" --arg mf "${MF}" \
+            '. + {
+                "SkullStripped": false,
+                "Description": "UNIT1 image denoised by mp2rage_denoise (micapipe v0.2.3)",
+                "Sources": [$src],
+                "ImageComments": ("Denoised Uniform Image (multiplying factor = " + $mf + ")")
+            }' "${bids_uni_dns%.nii.gz}.json" > tmp.json && mv tmp.json "${bids_uni_dns%.nii.gz}.json"
         else
             echo -e "\ntDenoised UNI image already exists for ${seq}, skipping MP2RAGE denoising\n"
         fi
     done
 }
 
+function add_mp2rage_metadata() {
+    local json_file="$1"
+
+    jq '. + {
+        "RepetitionTimePreparation": .RepetitionTime,
+        "RepetitionTimeExcitation": (.EchoTime * 2),
+        "NumberShots": [
+            (.ReconMatrixPE * (.PartialFourier - 0.5)),
+            (.ReconMatrixPE / 2)
+        ]
+    }' "${json_file}" > tmp.json && mv tmp.json "${json_file}"
+}
+
 # ----------------------------------------------------------
 # Timer
 aloita=$(date +%s)
+
+# ----------------------------------------------------------
+# Add MP2RAGE keys: RepetitionTimePreparation, RepetitionTimeExcitation, NumberShots
+for i in sub-${sub}/ses-${ses}/anat/*MP2RAGE.json; do add_mp2rage_metadata $i; done
 
 # ----------------------------------------------------------
 # Denoise UNI images
@@ -109,11 +134,6 @@ ${command} /opt/micapipe/functions/micapipe_anonymize \
   -bids /bids -out /out -threads "${threads}" -sub "${sub}" -ses "${ses}" \
   -deface -reface -regSynth -robust \
   -T1 "$uni_dns"
-
-# JSON keys to remove: InstitutionAddress, ProcedureStepDescription, AcquisitionTime
-# Maybe: ProtocolName, SeriesDescription, ReceiveCoilName, 
-# CBIG specific kys to remove: ??
-# MICA specific keys to remove: ?? for REB compliance
 
 # Processing time
 lopuu=$(date +%s)

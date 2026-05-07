@@ -91,6 +91,12 @@ def copy_if_exists(src, dst):
     if os.path.exists(src):
         shutil.copy2(src, dst)
 
+def create_bidsignore(out_dir):
+    bidsignore_path = f"{out_dir}/.bidsignore"
+    content = "bids_validator_output.txt\nsub*/ses*/anat/*desc*\n"
+    with open(bidsignore_path, 'w') as f:
+        f.write(content)
+
 def run_bids_validator(bids_dir):
     """
     Run the BIDS validator using deno and save output to file.
@@ -338,6 +344,9 @@ if __name__ == "__main__":
     # Run main process
     process_cbig_xls(args.cbig_xls, args.out, args.pni)
 
+    # Create bidsignore file
+    create_bidsignore(args.out)
+
     # Run BIDS validator
     run_bids_validator(args.out)
 
@@ -353,6 +362,10 @@ if __name__ == "__main__":
     # Format the time difference to 3 decimal places
     formatted_time = f"{time_difference_minutes:.3f}"
     print(f"PROCESSING TIME: {formatted_time} minutes")
+
+    # Create RepetitionTimePreparation = {RepetitionTime key value} keep RepetitionTime
+    # Create a key RepetitionTimeExcitation = 2 X EchoTime
+    # Create a NumberShots = try this with your best guess
     
 
 
