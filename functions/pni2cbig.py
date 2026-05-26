@@ -108,7 +108,7 @@ def run_bids_validator(bids_dir):
             subprocess.run(command_list, check=True)
         except subprocess.CalledProcessError as e:
             print(f"Error occurred while running command: {e}")
-
+    print(f"\n-------------------------------------------")
     print("Running BIDS validator ...")
 
     command = [
@@ -126,25 +126,7 @@ def run_bids_validator(bids_dir):
     run_command(command)
 
 
-def copy_and_rename_file(src_file, src_sub, dst_sub, out_dir, pni_dir):
-    """
-    Copy file preserving structure but replacing subject ID in:
-    - directory path
-    - filename
-    """
-    rel_path = os.path.relpath(src_file, pni_dir)
-
-    # Replace subject in path + filename
-    rel_path_new = rel_path.replace(src_sub, dst_sub)
-
-    dst_file = os.path.join(out_dir, rel_path_new)
-
-    os.makedirs(os.path.dirname(dst_file), exist_ok=True)
-
-    shutil.copy2(src_file, dst_file)
-
-
-def process_cbig_xls(cbig_xls_path, out_dir, pni_dir=None):
+def process_cbig_xls(cbig_xls_path, out_dir, pni_dir=None, sessions=None):
     # Resolve file
     files = glob.glob(cbig_xls_path)
     if len(files) == 0:
@@ -159,68 +141,39 @@ def process_cbig_xls(cbig_xls_path, out_dir, pni_dir=None):
 
     # Rename columns
     df = df.rename(columns={
-        "External Study Identifiers": "participant_id",
+        "External Study Identifiers": "MICSID",
+        "PSCID": "participant_id",
         "Entity Type": "entity",
         "Participant Status": "status",
-        "Date of registration": "registration"
+        "Date of registration": "registration",
+        "Sex": "sex", 
+        "Age": "age", 
+        "Site": "site", 
+        "Diagnosis": "diagnosis"
     })
 
     # Add sub-
     df["participant_id"] = df["participant_id"].astype(str).apply(lambda x: f"sub-{x}")
 
-    # Select columns
-    df = df[
-        [
-            "participant_id",
-            "PSCID",
-            "DCCID",
-            "Sex",
-            "Age",
-            "registration",
-            "Site",
-            "entity",
-            "status",
-            "Diagnosis"
-        ]
-    ]
-
-    # Rename to lowercase where needed
-    df = df.rename(columns={
-        "Sex": "sex",
-        "Age": "age",
-        "Site": "site",
-        "Diagnosis": "diagnosis"
-    })
-
     # Reorder
-    df = df[
-        [
-            "participant_id",
-            "PSCID",
-            "DCCID",
-            "sex",
-            "age",
-            "registration",
-            "site",
-            "entity",
-            "status",
-            "diagnosis"
-        ]
-    ]
+    df = df[["participant_id", "DCCID", "MICSID",
+             "sex", "age", "registration", 
+             "site", "entity", "status", "diagnosis"]]
 
     os.makedirs(out_dir, exist_ok=True)
-
+    
+    # ------------------------------------------
     # Save TSV
     df.to_csv(os.path.join(out_dir, "participants.tsv"), sep="\t", index=False)
 
     # Save JSON
     participants_json = {
         "participant_id": {
-            "LongName": "Participant identification label",
-            "Description": "Assigned identification number for a subject (without 'sub-' prefix in source data)."
+            "LongName": "Participant Study Code Identifier (PSCI)",
+            "Description": "Assigned identification number for a subject (with 'sub-' as prefix)."
         },
-        "PSCID": {"LongName": "PSCID", "Description": "Participant Study Code Identifier."},
         "DCCID": {"LongName": "DCCID", "Description": "Data Coordinating Center Identifier."},
+        "MICSID": {"LongName": "MICSID", "Description": "MICA lab Code Identifier."},
         "sex": {"LongName": "Sex", "Description": "Biological sex."},
         "age": {"LongName": "Age", "Description": "Age at registration."},
         "registration": {"LongName": "Date of registration", "Description": "Registration date."},
@@ -233,11 +186,10 @@ def process_cbig_xls(cbig_xls_path, out_dir, pni_dir=None):
     with open(os.path.join(out_dir, "participants.json"), "w") as f:
         json.dump(participants_json, f, indent=4)
 
-    # =========================
-    # PNI COPY LOGIC
-    # =========================
+    # ------------------------------------------
+    # PNI symlink + cp
+    # ------------------------------------------
     if pni_dir:
-
         print("1. Copying PNI dataset...")
         for fname in [
             "dataset_description.json",
@@ -248,80 +200,157 @@ def process_cbig_xls(cbig_xls_path, out_dir, pni_dir=None):
         ]:
             copy_if_exists(os.path.join(pni_dir, fname), os.path.join(out_dir, fname))
 
+        print(f"-------------------------------------------")
         print("2. Mapping individual files...")
         sub_map = {
-            row["participant_id"]: f"sub-{row['PSCID']}"
+            f"sub-{row['MICSID']}": row["participant_id"]
             for _, row in df.iterrows()
         }
 
-        selected_files: list[str] = []
-        files_per_sub: dict[str, list[str]] = {sub: [] for sub in sub_map}
+        anat_files: list[tuple[str, str]] = []
+        rsync_files: list[str] = []
 
-        for root, _, files in os.walk(pni_dir):
-            for f in files:
-                rel_path  = os.path.relpath(os.path.join(root, f), pni_dir)
-                first_part = rel_path.split(os.sep, 1)[0]
-                if first_part not in sub_map:
+        # Collect all files first so we have a len() for the progress bar
+        all_files = [
+            (root, f)
+            for root, _, files in os.walk(pni_dir)
+            for f in files
+        ]
+
+        for root, f in progress_bar(all_files, prefix="  Scanning files"):
+            full_path = os.path.join(root, f)
+            rel_path  = os.path.relpath(full_path, pni_dir)
+            parts     = rel_path.split(os.sep)
+            if sessions and (len(parts) < 2 or parts[1].replace("ses-", "") not in sessions):
+                continue
+            first_part = parts[0]
+            if first_part not in sub_map:
+                continue
+            is_anat      = len(parts) >= 3 and parts[2] == "anat"
+            is_func_fmap = len(parts) >= 3 and parts[2] in ("func", "fmap")
+            matched = (
+                "MP2RAGE"          in f or
+                "T1map"            in f or
+                "UNIT1"            in f or
+                ("acq-fmri_dir-"  in f and "_epi"  in f) or
+                ("task-rest_echo-" in f and "_bold" in f)
+            )
+            if not matched:
+                continue
+            dst_sub = sub_map[first_part]
+            dst_rel_parts = [dst_sub] + parts[1:]
+            if is_anat:
+                dst_fname = parts[-1].replace(first_part, dst_sub)
+                dst_rel_parts[-1] = dst_fname
+                anat_files.append((rel_path, os.path.join(*dst_rel_parts)))
+            elif is_func_fmap:
+                rsync_files.append(rel_path)
+
+        print(f"  - {len(anat_files)} anat files (symlink) | {len(rsync_files)} func/fmap files (rsync)")
+
+        # A: anat = symlinks
+        print(f"-------------------------------------------")
+        print("3. Creating anat symlinks...")
+        symlink_count = 0
+        for src_rel, dst_rel in progress_bar(anat_files, prefix="  Symlinking"):
+            src_abs = os.path.join(pni_dir, src_rel)
+            dst_abs = os.path.join(out_dir,  dst_rel)
+            if os.path.islink(dst_abs):
+                continue
+            os.makedirs(os.path.dirname(dst_abs), exist_ok=True)
+            os.symlink(src_abs, dst_abs)
+            symlink_count += 1
+
+        print(f"  → Created {symlink_count} symlinks ({len(anat_files) - symlink_count} skipped)")
+
+        # ------------------------------------------
+        # B: func & fmap = rsync (skip existing)
+        print(f"-------------------------------------------")
+        print("4. Rsyncing func/fmap files...")
+
+        # ------------------------------------------
+        # Build a renamed file list: rsync from pni_dir but we need the dst sub name.
+        # Strategy: rsync each sub separately so we can set the destination path.
+        sub_rsync: dict[str, list[str]] = {}
+        for rel in rsync_files:
+            src_sub = rel.split(os.sep)[0]
+            sub_rsync.setdefault(src_sub, []).append(rel)
+
+        rsync_count = 0
+        skipped_count = 0
+        for src_sub, rels in sub_rsync.items():
+            dst_sub = sub_map[src_sub]
+
+            # Filter out files that already exist in the destination (c)
+            to_sync: list[str] = []
+            for rel in rels:
+                parts   = rel.split(os.sep)
+                dst_rel = os.path.join(dst_sub, *parts[1:])
+                # Rename sub string in filename
+                dst_rel_parts        = dst_rel.split(os.sep)
+                dst_rel_parts[-1]    = dst_rel_parts[-1].replace(src_sub, dst_sub)
+                dst_abs              = os.path.join(out_dir, *dst_rel_parts)
+
+                if os.path.exists(dst_abs):      # (c) skip existing
+                    skipped_count += 1
                     continue
-                if (
-                    "MP2RAGE"          in f or
-                    "T1map"            in f or
-                    "UNIT1"            in f or
-                    ("acq-fmri_dir-"  in f and "_epi"   in f) or
-                    ("task-rest_echo-" in f and "_bold"  in f)
-                ):
-                    selected_files.append(rel_path)
-                    files_per_sub[first_part].append(rel_path)
+                to_sync.append(rel)
 
-        print(f"  → Selected {len(selected_files)} files across {len(files_per_sub)} subjects")
+            if not to_sync:
+                continue
 
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as tmp:
-            tmp.write("\n".join(selected_files) + "\n")
-            file_list_path = tmp.name
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as tmp:
+                tmp.write("\n".join(to_sync) + "\n")
+                file_list_path = tmp.name
 
-        subprocess.run(
-            [
-                "rsync",
-                "-av",
-                "--progress",
-                "--files-from", file_list_path,
-                pni_dir + "/",
-                out_dir + "/",
-            ],
-            check=True,
-        )
-        os.unlink(file_list_path)
+            # rsync into a temp sub-named folder, then rename sub token in filenames
+            tmp_sub_dir = os.path.join(out_dir, src_sub)
+            subprocess.run(
+                [
+                    "rsync", "-av", "--progress",
+                    "--files-from", file_list_path,
+                    pni_dir + "/",
+                    out_dir + "/",
+                ],
+                check=True,
+            )
+            os.unlink(file_list_path)
 
-        print("3. Renaming subjects...")
+            # Rename sub string in path and filenames after rsync
+            src_sub_path = os.path.join(out_dir, src_sub)
 
-        def _rename_subject(src_sub: str, dst_sub: str) -> int:
-            src_path = os.path.join(out_dir, src_sub)
-            if not os.path.exists(src_path):
-                return 0
-            dst_path = os.path.join(out_dir, dst_sub)
-            os.rename(src_path, dst_path)
-            count = 0
-            for rel in files_per_sub.get(src_sub, []):
-                fname = os.path.basename(rel)
-                if src_sub not in fname:
-                    continue
-                old_fpath = os.path.join(dst_path, *rel.split(os.sep)[1:])
-                new_fpath = os.path.join(os.path.dirname(old_fpath), fname.replace(src_sub, dst_sub))
-                os.rename(old_fpath, new_fpath)
-                count += 1
-            return count
+            # Rename sub string in filenames inside the rsynced tree
+            for rel in to_sync:
+                parts    = rel.split(os.sep)
+                old_path = os.path.join(out_dir, *parts)
+                new_parts = [dst_sub] + parts[1:]
+                new_parts[-1] = new_parts[-1].replace(src_sub, dst_sub)
+                new_path = os.path.join(out_dir, *new_parts)
+                os.makedirs(os.path.dirname(new_path), exist_ok=True)
+                os.rename(old_path, new_path)
+                rsync_count += 1
 
-        total_renamed = 0
-        with ThreadPoolExecutor(max_workers=min(8, os.cpu_count() or 4)) as pool:
-            futures = {
-                pool.submit(_rename_subject, src, dst): src
-                for src, dst in sub_map.items()
-            }
-            for fut in progress_bar(list(as_completed(futures)), prefix=f"Subjects"):
-                total_renamed += fut.result()
+            # Clean up the entire src_sub directory tree (not just root)
+            if os.path.isdir(src_sub_path):
+                shutil.rmtree(src_sub_path) 
 
-        print(f"Done. Renamed {total_renamed} files across {len(sub_map)} subjects.")    
+        print(f"  → Rsynced {rsync_count} files ({skipped_count} already existed)")
 
+def create_scans(out_dir):
+    for ses_dir in glob.glob(os.path.join(out_dir, "sub-*", "ses-*")):
+        rows = []
+        for nii in glob.glob(os.path.join(ses_dir, "**", "*.nii.gz"), recursive=True):
+            json_path = nii.replace(".nii.gz", ".json")
+            acq_time = "n/a"
+            if os.path.exists(json_path):
+                acq_time = json.load(open(json_path)).get("AcquisitionTime", "n/a")
+            rows.append({"filename": os.path.relpath(nii, ses_dir), "acq_time": acq_time})
+
+        if not rows:
+            continue
+
+        sub, ses = ses_dir.split(os.sep)[-2:]
+        pd.DataFrame(rows).to_csv(os.path.join(ses_dir, f"{sub}_{ses}_scans.tsv"), sep="\t", index=False)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -332,6 +361,7 @@ if __name__ == "__main__":
     parser.add_argument("--cbig_xls", required=True, help="Pattern to CBIG XLS")
     parser.add_argument("--out", required=True, help="Output directory")
     parser.add_argument("--pni", required=True, help="Path to PNI BIDS dataset")
+    parser.add_argument("--ses", nargs="+", default=["01", "a1"], help="Session(s) to process")
 
     args = parser.parse_args()
 
@@ -342,10 +372,13 @@ if __name__ == "__main__":
     print(f"-------------------------------------------")
 
     # Run main process
-    process_cbig_xls(args.cbig_xls, args.out, args.pni)
+    process_cbig_xls(args.cbig_xls, args.out, args.pni, args.ses)
 
     # Create bidsignore file
     create_bidsignore(args.out)
+
+    # Create scans.tsv file on each subjec/session directory
+    create_scans(args.out)
 
     # Run BIDS validator
     run_bids_validator(args.out)
@@ -361,11 +394,8 @@ if __name__ == "__main__":
 
     # Format the time difference to 3 decimal places
     formatted_time = f"{time_difference_minutes:.3f}"
-    print(f"PROCESSING TIME: {formatted_time} minutes")
-
-    # Create RepetitionTimePreparation = {RepetitionTime key value} keep RepetitionTime
-    # Create a key RepetitionTimeExcitation = 2 X EchoTime
-    # Create a NumberShots = try this with your best guess
+    print(f"\n-------------------------------------------")
+    print(f"Processing time: {formatted_time} minutes")
     
 
 
