@@ -14,7 +14,10 @@ import nibabel as nib
 #       PDF export from the Siemens scanner), NOT from the DICOM header.
 RTE_LUT = {
     "anat-T1w_acq-mp2rage_0.7mm_CSptx":  {None: 0.0078},                       # fixed value
+    "anat-T1w_acq-mp2rage_07mm_CSptx": {None: 0.0078},                       # fixed value
     "anat-T1w_acq-mp2rage_05mm_UP": {0.00281: 0.0089, 0.00244: 0.0078},  # echo-time variants
+    "anat-T1w_acq-mp2rage_05mm_UP_Repeat": {0.00281: 0.0089, 0.00244: 0.0078},  # echo-time variants
+    "cstfl-mp2rage-05mm": {None: 0.0078}  # MUST verify from acquisition protocol
 }
 
 #-------------------------------------------------------------------------------
