@@ -31,6 +31,14 @@ import os
 import subprocess
 import argparse
 import time
+import csv
+import getpass
+import tempfile
+
+__version__ = "3.0"
+
+# $USER
+user = getpass.getuser()
 
 # Arguments
 parser = argparse.ArgumentParser(description='Convert DICOMs to BIDS format.')
@@ -40,6 +48,7 @@ parser.add_argument('--dicoms_dir', required=False, help='Directory containing D
 parser.add_argument('--sorted_dir', required=True, help='Directory containing SORTED DICOM files')
 parser.add_argument('--bids_dir', required=True, help='Output BIDS directory')
 parser.add_argument('--force', action='store_true', help='Optional argument to overwrite the subject bids directory')
+parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
 
 args = parser.parse_args()
 dicoms_dir = os.path.abspath(args.dicoms_dir) if args.dicoms_dir else None
@@ -54,7 +63,7 @@ sub = sub.replace('sub-', '')
 ses = ses.replace('ses-', '')
 
 print('-------------------------------------------------------')
-print('         PNI 7T - DICOM to BIDS workflow')
+print(f'     PNI 7T - DICOM to BIDS workflow {__version__}    ')
 print('-------------------------------------------------------')
 print(f'Subjet:             {sub}')
 print(f'Session:            {ses}')
@@ -88,6 +97,39 @@ def validate_bids():
     print("\n[ info ] ... Running BIDS validator ...\n")
     command = f'deno run --allow-write -ERN jsr:@bids/validator {bids_dir} --ignoreWarnings --outfile {bids_dir}/bids_validator_output.txt'
     run_command(command)
+
+def participants_7t2bids(start_time):
+    print("\n[ info ] ... Adding processing information to participants_7t2bids.tsv ...\n")
+    minutes = (time.time() - start_time) / 60
+    tsv_file = os.path.join(bids_dir, "participants_7t2bids.tsv")
+
+    with open(tsv_file, newline="", encoding="utf-8") as src, \
+         tempfile.NamedTemporaryFile(
+             mode="w",
+             newline="",
+             encoding="utf-8",
+             delete=False,
+             dir=os.path.dirname(tsv_file),
+         ) as dst:
+
+        reader = csv.DictReader(src, delimiter="\t")
+        writer = csv.DictWriter(
+            dst,
+            fieldnames=reader.fieldnames,
+            delimiter="\t",
+        )
+
+        writer.writeheader()
+
+        for row in reader:
+            if row["sub"] == sub and row["ses"] == ses:
+                row["user"] = user
+                row["processing.time"] = f"{minutes:.2f}"
+                row["version"] = __version__
+
+            writer.writerow(row)
+
+    os.replace(dst.name, tsv_file)
 
 def main():
     # Set a timer
@@ -128,6 +170,10 @@ def main():
         
     elapsed_time = time.time() - start_time
     minutes, seconds = divmod(elapsed_time, 60)
+
+    # Add time and User information 
+    participants_7t2bids(start_time)
+
     print(f"Workflow completed successfully in {minutes:.0f} minutes and {seconds:.0f} seconds.")
     print('-------------------------------------------------------')
 
