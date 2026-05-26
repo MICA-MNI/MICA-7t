@@ -1,0 +1,72 @@
+# CHANGES
+____________________________________________________________________
+
+## 2026-05-26
+
+### Add Mandatory keys to MP2RAGE json
+    RepetitionTimeExcitation: required
+    RepetitionTimePreparation: required
+    NumberShots: required
+
+```bash
+bids_dir="/data_/mica3/BIDS_PNI/rawdata"
+for subses in sub*/ses*; do
+    sub=$(echo "$subses" | cut -d'/' -f1)
+    ses=$(echo "$subses" | cut -d'/' -f2)
+    mp2rage_keys.py -sub ${sub/sub-/} -ses ${ses/ses-} -bids ${bids_dir}
+done
+```
+
+## Remove fies: sub-PNC032/ses-a2, cropped volume (Acquisition error?)
+
+rm -rfv /data_/mica3/BIDS_PNI/rawdata/sub-PNC032/ses-a2/anat/*_Eq_*
+
+____________________________________________________________________
+
+## 2026-05-12
+
+The following changes are reflected in the MICA-7t v3.0
+
+### Rename `desc-` to `rec-` in anatomical filenames
+
+Replaced the `desc-` string with `rec-` in all anatomical filenames across subjects and sessions to comply with BIDS naming conventions.
+
+```bash
+for i in sub*/ses*/anat/*desc-*; do mv -v $i ${i/desc-/rec-}; done
+```
+
+---
+
+### Add `acq-07mm` string to unlabelled MP2RAGE, UNIT1, and T1map files
+
+For files in `ses-a*` sessions that match `MP2RAGE`, `UNIT1`, or `T1map` and do not already carry an `acq-05mm` or `acq-cstfl` string, insert `acq-07mm_` right after the session string in the filename.
+
+```bash
+for file in $(find sub*/ses*/anat/ \( -name "*MP2RAGE*" -o -name "*UNIT1*" -o -name "*T1map*" \) ! -name "*acq-05mm*" ! -name "*acq-cstfl*"); do
+    ses=$(echo "$file" | grep -oP 'ses-a[^_/]+' | head -n 1)
+    mv -v "$file" "${file/${ses}_/${ses}_acq-07mm_}"
+done
+```
+
+---
+
+### Generate `_scans.tsv` for each subject/session
+
+For every `sub-*/ses-*` directory, create a `_scans.tsv` file listing all `.nii.gz` files and their `AcquisitionTime` extracted from the corresponding `.json` sidecar. Directories with no `.nii.gz` files are skipped.
+
+```bash
+for subses in sub*/ses*; do
+    sub=$(echo "$subses" | cut -d'/' -f1)
+    ses=$(echo "$subses" | cut -d'/' -f2)
+    tsv="${subses}/${sub}_${ses}_scans.tsv"
+    echo -e "filename\tacq_time" > "$tsv"
+    niis=($(find "$subses" -name "*.nii.gz"))
+    for nii in "${niis[@]}"; do
+        json="${nii/.nii.gz/.json}"
+        acq_time=$(jq -r '.AcquisitionTime // "n/a"' "$json" 2>/dev/null || echo "n/a")
+        rel=$(realpath --relative-to="$subses" "$nii")
+        echo -e "${rel}\t${acq_time}" >> "$tsv"
+    done
+    [ ${#niis[@]} -eq 0 ] && rm -f "$tsv"
+done
+```
