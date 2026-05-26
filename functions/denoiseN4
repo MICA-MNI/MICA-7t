@@ -52,7 +52,7 @@ P. Coupé, P. Yger, S. Prima, P. Hellier, C. Kervrann, C. Barillot. An Optimized
 "
 
 #---------------- Declaring variables ----------------#
-tmp=/tmp/dnsN4_$RANDOM
+tmp="${TMPDIR:-/tmp}/dnsN4_$RANDOM"
 out=${tmp}/${id}.nii.gz
 outfile=${outdir}/${id}.nii.gz
 mnc=${tmp}/${id}_mnc.mnc
