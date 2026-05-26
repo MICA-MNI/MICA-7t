@@ -120,213 +120,34 @@ if [ -d ${BIDS} ]; then Error "Output directory already exist, use -force to ove
 # Save actual path
 here=$(pwd)
 
+# Get the repository path
+gitrepo=$(dirname $(dirname $(realpath "$0")))
+
 # -----------------------------------------------------------------------------------------------
 # New BIDS-naming, follow the BIDS specification:
 # https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html
-orig=(
-  "*anat-T1w_acq-mprage_07mm_UP"
-  "*fmap-b1_acq-*_p2"
-  "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP"
-  "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA"
-  "*fmap-fmri_acq-mbep2d_SE_19mm_dir-AP_Q1K"
-  "*fmap-fmri_acq-mbep2d_SE_19mm_dir-PA_Q1K"
-  "*func-rsfmri_acq-singleE_1*"
-  "*func-rsfmri_acq-mbep2d_ME_19mm"
-  "*func-rsfmri_acq-mbep2d_ME_19mm_Q1K"
-  "*func-epiencode_acq-mbep2d_ME_19mm*"
-  "*func-epiretrieve_acq-mbep2d_ME_19mm"
-  "*func-pattersep1_acq-mbep2d_ME_19mm"
-  "*func-patter*sep2_acq-mbep2d_ME_19mm"
-  "*func-semantic1_acq-mbep2d_ME_19mm"
-  "*func-semantic2_acq-mbep2d_ME_19mm"
-  "*func-spatial1_acq-mbep2d_ME_19mm"
-  "*func-spatial2_acq-mbep2d_ME_19mm"
-  "*func-movie*1_acq-mbep2d_ME_19mm"
-  "*func-movie*2_acq-mbep2d_ME_19mm"
-  "*func-movies3_acq-mbep2d_ME_19mm"
-  "*func-movies4_acq-mbep2d_ME_19mm"
-  "*func-movie1action_acq-mbep2d_ME_19mm"
-  "*func-movie2control_acq-mbep2d_ME_19mm"
-  "*func-movie3control_acq-mbep2d_ME_19mm"
-  "*func-movie4action_acq-mbep2d_ME_19mm"
-  "*func-semphon1_acq-mbep2d_ME_19mm"
-  "*func-semphon2_acq-mbep2d_ME_19mm"
-  "*func-audiobook1_acq-mbep2d_ME_19mm"
-  "*func-audiobook2_acq-mbep2d_ME_19mm"
-  "*func-caddy_acq-mbep2d_ME_19mm"
-  "*func-harsh_acq-mbep2d_ME_19mm"
-  "*func-pines_acq-mbep2d_ME_19mm"
-  "*func-bathroom_acq-mbep2d_ME_19mm"
-  "*func-oceans11_acq-mbep2d_ME_19mm"
-  "*func-social_acq-mbep2d_ME_19mm"
-  "*func-sens1_acq-mbep2d_ME_19mm"
-  "*func-sens2_acq-mbep2d_ME_19mm"
-  "*func-slient1_acq-mbep2d_ME_19mm"
-  "*func-silent1_acq-mbep2d_ME_19mm"
-  "*func-silent2_acq-mbep2d_ME_19mm"
-  "*anat-T1w_acq-mp2rage_07mm_CSptx_INV1"
-  "*anat-T1w_acq-mp2rage_07mm_CSptx_INV2"
-  "*anat-T1w_acq-mp2rage_07mm_CSptx_T1_Images"
-  "*anat-T1w_acq-mp2rage_07mm_CSptx_UNI_Images"
-  "*anat-T1w_acq-mp2rage_07mm_CSptx_UNI-DEN"
-  "*anat-T1w_acq-mp2rage_05mm_UP*_INV1"
-  "*anat-T1w_acq-mp2rage_05mm_UP*_INV2"
-  "*anat-T1w_acq-mp2rage_05mm_UP*_T1_Images"
-  "*anat-T1w_acq-mp2rage_05mm_UP*_UNI_Images"
-  "*cstfl-mp2rage-05mm_INV1"
-  "*cstfl-mp2rage-05mm_INV2"
-  "*cstfl-mp2rage-05mm_T1_Images"
-  "*cstfl-mp2rage-05mm_UNI_Images"
-  "*cstfl-mp2rage-05mm_UNI-DEN"
-  "*anat-flair_acq-0p7mm_UPAdia"
-  "*anat-flair_acq-07iso_dev3_5SD_UP"
-  "*CLEAR-SWI_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
-  "*Romeo_P_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
-  "*Romeo_Mask_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
-  "*Romeo_B0_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
-  "*Aspire_M_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
-  "*Aspire_P_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
-  "*EchoCombined_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
-  "*sensitivity_corrected_mag_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
-  "*T2star_anat-T2star_acq-me_gre_0*7iso_ASPIRE"
-  "*anat-T2star_acq-me_gre_07mm*"
-  "*T2Star_Images"
-  "*_MTON"
-  "*_MTOFF"
-  "*_T1W"
-  "*anat-mtw_acq-MTON_07mm"
-  "*anat-mtw_acq-MTOFF_07mm"
-  "*anat-mtw_acq-T1w_07mm"
-  "*anat-angio_acq-tof_03mm_inplane"
-  "*anat-angio_acq-tof_03mm_inplane_MIP_SAG"
-  "*anat-angio_acq-tof_03mm_inplane_MIP_COR"
-  "*anat-angio_acq-tof_03mm_inplane_MIP_TRA"
-)
-bids=(
-  T1w
-  acq-anat_TB1TFL
-  acq-fmri_dir-AP_epi
-  acq-fmri_dir-PA_epi
-  acq-fmriQ1K_dir-AP_epi
-  acq-fmriQ1K_dir-PA_epi
-  task-rest_acq-singleE_bold
-  task-rest_bold
-  task-rest_acq-Q1K_bold
-  task-epiencode_bold
-  task-epiretrieve_bold
-  task-patternsep1_bold
-  task-patternsep2_bold
-  task-semantic1_bold
-  task-semantic2_bold
-  task-spatial1_bold
-  task-spatial2_bold
-  task-movies1_bold
-  task-movies2_bold
-  task-movies3_bold
-  task-movies4_bold
-  task-caddy_bold
-  task-harsh_bold
-  task-pines_bold
-  task-bathroom_bold
-  task-semphon1_bold
-  task-semphon2_bold
-  task-audiobook1_bold
-  task-audiobook2_bold
-  task-caddy_bold
-  task-harsh_bold
-  task-pines_bold
-  task-bathroom_bold
-  task-oceans11_bold
-  task-social_bold
-  task-sens2_bold
-  task-sens1_bold
-  task-silent1_bold
-  task-silent1_bold
-  task-silent2_bold
-  inv-1_MP2RAGE
-  inv-2_MP2RAGE
-  T1map
-  UNIT1
-  rec-denoised_UNIT1
-  acq-05mm_inv-1_MP2RAGE
-  acq-05mm_inv-2_MP2RAGE
-  acq-05mm_T1map
-  acq-05mm_UNIT1
-  acq-cstfl_inv-1_MP2RAGE
-  acq-cstfl_inv-2_MP2RAGE
-  acq-cstfl_T1map
-  acq-cstfl_UNIT1
-  acq-cstflDenoised_UNIT1
-  FLAIR
-  FLAIR
-  acq-SWI_T2starw
-  acq-romeo_T2starw
-  acq-romeo_rec-mask_T2starw
-  acq-romeo_rec-unwrapped_T2starw
-  acq-aspire_T2starw
-  acq-aspire_T2starw
-  acq-aspire_rec-echoCombined_T2starw
-  acq-aspire_rec-echoCombinedSensitivityCorrected_T2starw
-  acq-aspire_T2starw
-  acq-me_T2starw
-  acq-me_T2starmap
-  mt-on_MTR
-  mt-off_MTR
-  acq-MTR_T1w
-  acq-mtw_mt-on_MTR
-  acq-mtw_mt-off_MTR
-  acq-mtw_T1w
-  angio
-  acq-sag_angio
-  acq-cor_angio
-  acq-tra_angio
-)
 
-origDWI=(
-  "*dwi_acq_b0*_PA_SBRef"
-  "*dwi_acq_b0*_PA"
-  "*dwi_acq_b0_PA_1p5iso_SBRef"
-  "*dwi_acq_b0_PA_1p5iso"
-  "*dwi_acq_b2000_90d-dir_AP_SBRef"
-  "*dwi_acq_b2000_90d-dir_AP"
-  "*dwi_acq_b700_40d-dir_AP_SBRef"
-  "*dwi_acq_b700_40d-dir_AP"
-  "*dwi_acq_b300_10d-dir_AP_SBRef"
-  "*dwi_acq_b300_10d-dir_AP"
-  "*dwi_acq_multib_38dir_AP_acc9_SBRef"
-  "*dwi_acq_multib_38dir_AP_acc9"
-  "*dwi_acq_multib_38dir_AP_acc9_1p5iso_SBRef"
-  "*dwi_acq_multib_38dir_AP_acc9_1p5iso"
-  "*dwi_acq_multib_38dir_AP_acc9_test_SBRef"
-  "*dwi_acq_multib_38dir_AP_acc9_test"
-  "*dwi_acq_multib_70dir_AP_acc9_SBRef"
-  "*dwi_acq_multib_70dir_AP_acc9"
-  "*dwi_acq_multib_70dir_AP_acc9_1p5iso_SBRef"
-  "*dwi_acq_multib_70dir_AP_acc9_1p5iso"
-)
+load_tsv() {
+    local file="$1" arr_orig="$2" arr_bids="$3"
+    local o b
+ 
+    [[ -f "$file" ]] || { echo "[error] TSV not found: $file" >&2; return 1; }
+ 
+    # Declare the two arrays in the caller's scope
+    eval "${arr_orig}=()"
+    eval "${arr_bids}=()"
+ 
+    while IFS=$'\t' read -r o b; do
+        [[ "$o" =~ ^#  ]] && continue   # skip comment lines
+        [[ -z "$o"     ]] && continue   # skip blank lines
+        eval "${arr_orig}+=(\"$o\")"
+        eval "${arr_bids}+=(\"$b\")"
+    done < "$file"
+}
 
-bidsDWI=(
-  acq-b0_dir-PA_sbref
-  acq-b0_dir-PA_dwi
-  acq-b01p5_dir-PA_sbref
-  acq-b01p5_dir-PA_dwi
-  acq-b2000_dir-AP_sbref
-  acq-b2000_dir-AP_dwi
-  acq-b700_dir-AP_sbref
-  acq-b700_dir-AP_dwi
-  acq-b300_dir-AP_sbref
-  acq-b300_dir-AP_dwi
-  acq-multib38_dir-AP_sbref
-  acq-multib38_dir-AP_dwi
-  acq-multib381p5_dir-AP_sbref
-  acq-multib381p5_dir-AP_dwi
-  acq-multib38Test_dir-AP_sbref
-  acq-multib38Test_dir-AP_dwi
-  acq-multib70_dir-AP_sbref
-  acq-multib70_dir-AP_dwi
-  acq-multib701p5_dir-AP_sbref
-  acq-multib701p5_dir-AP_dwi
-)
+# Create Array of Names from sequence files
+load_tsv "${gitrepo}/files/sequences.tsv" orig bids
+load_tsv "${gitrepo}/files/sequences_dwi.tsv" origDWI bidsDWI
 
 # -----------------------------------------------------------------------------------------------
 # time stamp
@@ -353,10 +174,11 @@ for k in "${!orig[@]}"; do
     Names=($(ls -d ${orig[k]}))
     for i in "${!Names[@]}"; do
        out_name="${id}${acq}run-$((i+1))_${mri}"
-       dcm2niix -z y -b y -o "$BIDS" -f "$out_name" ${Names[i]}
+       # -z compres -b bids -ba bids_anonimized
+       dcm2niix -z y -b y -ba y -o "$BIDS" -f "$out_name" ${Names[i]}
     done
   elif [ "$N" -eq 1 ]; then
-     dcm2niix -z y -b y -o "$BIDS" -f ${id}${bids_name} ${orig[k]}
+     dcm2niix -z y -b y -ba y -o "$BIDS" -f ${id}${bids_name} ${orig[k]}
   fi
 done
 
@@ -658,9 +480,6 @@ grep -v -P "^${SES}" "$sessions_tsv" > "${sessions_tsv}.tmp" && mv "${sessions_t
 echo -e "${SES}" >> "$sessions_tsv"
 
 # -----------------------------------------------------------------------------------------------
-# Get the repository path
-gitrepo=$(dirname $(dirname $(realpath "$0")))
-
 # Copy json files to the BIDS directory
 if [ ! -f "$BIDS_DIR"/participants.json ]; then cp -v "$gitrepo"/files/participants.json "$BIDS_DIR"/participants.json; fi
 
@@ -676,7 +495,7 @@ for i in ${!tasks[@]}; do
 done
 
 # Sync files to the BIDS directory
-files=("dataset_description.json" "CITATION.cff" "bids_validator_config.json" ".bidsignore")
+files=("dataset_description.json" "CITATION.cff" ".bidsignore")
 for file in "${files[@]}"; do cp -fv "${gitrepo}/files/${file}" "${BIDS_DIR}/${file}"; done
 
 # Create README

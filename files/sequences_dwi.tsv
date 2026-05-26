@@ -1,0 +1,22 @@
+# orig_pattern	bids_suffix
+# Columns: orig (glob pattern from scanner BIC Siemens Terra 7T) | bids (BIDS entity string)
+*dwi_acq_b0*_PA_SBRef	acq-b0_dir-PA_sbref
+*dwi_acq_b0*_PA	acq-b0_dir-PA_dwi
+*dwi_acq_b0_PA_1p5iso_SBRef	acq-b01p5_dir-PA_sbref
+*dwi_acq_b0_PA_1p5iso	acq-b01p5_dir-PA_dwi
+*dwi_acq_b2000_90d-dir_AP_SBRef	acq-b2000_dir-AP_sbref
+*dwi_acq_b2000_90d-dir_AP	acq-b2000_dir-AP_dwi
+*dwi_acq_b700_40d-dir_AP_SBRef	acq-b700_dir-AP_sbref
+*dwi_acq_b700_40d-dir_AP	acq-b700_dir-AP_dwi
+*dwi_acq_b300_10d-dir_AP_SBRef	acq-b300_dir-AP_sbref
+*dwi_acq_b300_10d-dir_AP	acq-b300_dir-AP_dwi
+*dwi_acq_multib_38dir_AP_acc9_SBRef	acq-multib38_dir-AP_sbref
+*dwi_acq_multib_38dir_AP_acc9	acq-multib38_dir-AP_dwi
+*dwi_acq_multib_38dir_AP_acc9_1p5iso_SBRef	acq-multib381p5_dir-AP_sbref
+*dwi_acq_multib_38dir_AP_acc9_1p5iso	acq-multib381p5_dir-AP_dwi
+*dwi_acq_multib_38dir_AP_acc9_test_SBRef	acq-multib38Test_dir-AP_sbref
+*dwi_acq_multib_38dir_AP_acc9_test	acq-multib38Test_dir-AP_dwi
+*dwi_acq_multib_70dir_AP_acc9_SBRef	acq-multib70_dir-AP_sbref
+*dwi_acq_multib_70dir_AP_acc9	acq-multib70_dir-AP_dwi
+*dwi_acq_multib_70dir_AP_acc9_1p5iso_SBRef	acq-multib701p5_dir-AP_sbref
+*dwi_acq_multib_70dir_AP_acc9_1p5iso	acq-multib701p5_dir-AP_dwi
