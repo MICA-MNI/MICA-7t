@@ -49,6 +49,7 @@ parser.add_argument('--sorted_dir', required=True, help='Directory containing SO
 parser.add_argument('--bids_dir', required=True, help='Output BIDS directory')
 parser.add_argument('--force', action='store_true', help='Optional argument to overwrite the subject bids directory')
 parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
+parser.add_argument("--skip_validation", action="store_true", help="Skip BIDS validation")
 
 args = parser.parse_args()
 dicoms_dir = os.path.abspath(args.dicoms_dir) if args.dicoms_dir else None
@@ -94,6 +95,9 @@ def mp2rage_keys():
     run_command(f'mp2rage_keys.py -sub {sub} -ses {ses} -bids {bids_dir}')
 
 def validate_bids():
+    if args.skip_validation:
+        print("\n[ info ] ... Skipping BIDS validation ...\n")
+        return
     print("\n[ info ] ... Running BIDS validator ...\n")
     command = f'deno run --allow-write -ERN jsr:@bids/validator {bids_dir} --ignoreWarnings --outfile {bids_dir}/bids_validator_output.txt'
     run_command(command)
