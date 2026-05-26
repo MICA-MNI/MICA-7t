@@ -15,7 +15,7 @@ message: MICA lab, Brain Imaging Center, Montreal Neurologial Institute and Hosp
 identifiers:
   - description: "The concept DOI of the pre-release version."
     type: doi
-    value: 10.17605/OSF.IO/MHQ3F
+    value: https://doi.org/10.17605/OSF.IO/MHQ3F
 
 keywords:
   - dataset
