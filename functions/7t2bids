@@ -451,7 +451,7 @@ fmap=$(ls -R ${BIDS}/fmap | grep gz | wc -l)
 # check mandatory inputs: -in Is $SUBJ_DIR found?
 tsv_file="$BIDS_DIR"/participants_7t2bids.tsv
 # Check if file exist
-if [ ! -f "$tsv_file" ]; then echo -e "sub\tses\tdate\tN.anat\tN.dwi\tN.func\tN.fmap\tdicoms\tuser\tprocessing.time" > "$tsv_file"; fi
+if [ ! -f "$tsv_file" ]; then echo -e "sub\tses\tdate\tN.anat\tN.dwi\tN.func\tN.fmap\tdicoms\tuser\tprocessing.time\tversion" > "$tsv_file"; fi
 
 # -----------------------------------------------------------------------------------------------
 # Add the new subject to the participants.tsv file
@@ -495,7 +495,7 @@ for i in ${!tasks[@]}; do
 done
 
 # Sync files to the BIDS directory
-files=("dataset_description.json" "CITATION.cff" ".bidsignore")
+files=("dataset_description.json" "CITATION.cff" ".bidsignore" "CHANGES")
 for file in "${files[@]}"; do cp -fv "${gitrepo}/files/${file}" "${BIDS_DIR}/${file}"; done
 
 # Create README
@@ -517,4 +517,4 @@ time_difference=$(printf "%0.3f\n" ${time_difference})
 Info "GLOBAL micapipe running time with $PROC processing:\033[38;5;220m ${time_difference} minutes \033[38;5;141m"
 
 # Add information about subject
-echo -e "${Subj}\t${SES/ses-/}\t${dat}\t${anat}\t${dwi}\t${func}\t${fmap}\t${SUBJ_DIR}\t${USER}\t${time_difference}" >> "$tsv_file"
+echo -e "${Subj}\t${SES/ses-/}\t${dat}\t${anat}\t${dwi}\t${func}\t${fmap}\t${SUBJ_DIR}" >> "$tsv_file"
