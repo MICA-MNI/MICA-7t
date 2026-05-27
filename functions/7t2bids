@@ -175,10 +175,10 @@ for k in "${!orig[@]}"; do
     for i in "${!Names[@]}"; do
        out_name="${id}${acq}run-$((i+1))_${mri}"
        # -z compres -b bids -ba bids_anonimized
-       dcm2niix -z y -b y -ba y -o "$BIDS" -f "$out_name" ${Names[i]}
+       dcm2niix -z y -b y -ba n -o "$BIDS" -f "$out_name" ${Names[i]}
     done
   elif [ "$N" -eq 1 ]; then
-     dcm2niix -z y -b y -ba y -o "$BIDS" -f ${id}${bids_name} ${orig[k]}
+     dcm2niix -z y -b y -ba n -o "$BIDS" -f ${id}${bids_name} ${orig[k]}
   fi
 done
 
@@ -464,13 +464,16 @@ if [ ! -f "$participants_tsv" ]; then echo -e "participant_id\tsite\tgroup" > "$
 grep -v -P "^sub-${Subj}" "$participants_tsv" > "${participants_tsv}.tmp" && mv "${participants_tsv}.tmp" "$participants_tsv"
 
 # Add information about subject
-[[ "$Subj" == *PNC* ]] && group="Healthy" ||
-[[ "$Subj" == *PNA* ]] && group="Autism" ||
-[[ "$Subj" == *PNE* ]] && group="Epilepsy" ||
-[[ "$Subj" == *PNF* ]] && group="Family" ||
-[[ "$Subj" == *Pilot* ]] && group="Pilot"
+case "$Subj" in
+    *PNC*)   group="Healthy" ;;
+    *PNA*)   group="Autism" ;;
+    *PNE*)   group="Epilepsy" ;;
+    *PNF*)   group="Family" ;;
+    *Pilot*) group="Pilot" ;;
+esac
 echo -e "sub-${Subj}\tMontreal_SiemmensTerra7T\t${group}" >> "$participants_tsv"
 
+# -----------------------------------------------------------------------------------------------
 # create a sessions tsv
 sessions_tsv="${BIDS_DIR}/sub-${Subj}/sub-${Subj}_sessions.tsv"
 if [ ! -f "$sessions_tsv" ]; then echo -e "session_id" > "$sessions_tsv"; fi
@@ -478,6 +481,22 @@ if [ ! -f "$sessions_tsv" ]; then echo -e "session_id" > "$sessions_tsv"; fi
 grep -v -P "^${SES}" "$sessions_tsv" > "${sessions_tsv}.tmp" && mv "${sessions_tsv}.tmp" "$sessions_tsv"
 # Add information about subject
 echo -e "${SES}" >> "$sessions_tsv"
+
+# -----------------------------------------------------------------------------------------------
+# Create a scans tsv
+tsv_scans="${BIDS}/${id}scans.tsv"
+mapfile -t niis < <(find "$BIDS" -name "*.nii.gz" | sort)
+
+if [ ${#niis[@]} -gt 0 ]; then
+    printf "filename\tacq_time\n" > "$tsv_scans"
+
+    for nii in "${niis[@]}"; do
+        json="${nii%.nii.gz}.json"
+        acq_time=$(jq -r '.AcquisitionDateTime // "n/a"' "$json" 2>/dev/null || printf "n/a")
+        rel="${nii#$BIDS/}"
+        printf "%s\t%s\n" "$rel" "$acq_time" >> "$tsv_scans"
+    done
+fi
 
 # -----------------------------------------------------------------------------------------------
 # Copy json files to the BIDS directory
@@ -502,11 +521,39 @@ for file in "${files[@]}"; do cp -fv "${gitrepo}/files/${file}" "${BIDS_DIR}/${f
 echo -e "The Presicion NeuroImaging (PNI) dataset was provided by the Multimodal Imaging and Connectome Analysis Lab, Montreal Neurological Institute and Hospital, The Neuro.\n\nIf you reference this dataset in your publications, please acknowledge its authors." > "$BIDS_DIR"/README
 
 # -----------------------------------------------------------------------------------------------
+# Anonimize json keys
+find "${BIDS}" -type f -name "*.json" -exec sh -c '
+for f; do
+    jq "del(
+        .SeriesInstanceUID,
+        .StudyInstanceUID,
+        .ReferringPhysicianName,
+        .StudyID,
+        .PatientName,
+        .PatientID,
+        .PatientBirthDate,
+        .PatientSex,
+        .PatientSize,
+        .PatientWeight,
+        .PatientAge
+    )" "$f" > "${f}.tmp" &&
+    mv "${f}.tmp" "$f"
+done
+' sh {} +
+
+# -----------------------------------------------------------------------------------------------
 # Go back to initial directory
 cd "$here"
 
 # Remove any tmp files if any
 if ls "${BIDS}"/tmp* 1> /dev/null 2>&1; then cmd rm "$BIDS"/tmp*; fi
+
+# -----------------------------------------------------------------------------------------------#
+# Remove existing entry if it exists
+grep -v -P "^${Subj}\t${SES/ses-/}" "$tsv_file" > "${tsv_file}.tmp" && mv "${tsv_file}.tmp" "$tsv_file"
+
+# Add information about subject
+echo -e "${Subj}\t${SES/ses-/}\t${dat}\t${anat}\t${dwi}\t${func}\t${fmap}\t${SUBJ_DIR}" >> "$tsv_file"
 
 # -----------------------------------------------------------------------------------------------#
 #	Total Running Time
@@ -515,6 +562,3 @@ time_difference=$(echo "$end_time - $start_time" | bc)
 time_difference=$(echo print $time_difference/60 | perl)
 time_difference=$(printf "%0.3f\n" ${time_difference})
 Info "GLOBAL micapipe running time with $PROC processing:\033[38;5;220m ${time_difference} minutes \033[38;5;141m"
-
-# Add information about subject
-echo -e "${Subj}\t${SES/ses-/}\t${dat}\t${anat}\t${dwi}\t${func}\t${fmap}\t${SUBJ_DIR}" >> "$tsv_file"
