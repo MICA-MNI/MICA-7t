@@ -72,6 +72,10 @@ if dicoms_dir is not None:
     print(f'dicoms directory:   {dicoms_dir}')
 print(f'sorted directory:   {sorted_dir}')
 print(f'bids directory:     {bids_dir}')
+if args.skip_validation:
+    print(f'BIDS validation:   False')
+else:
+    print(f'BIDS validation:   True')
 if force:
     print(f'Overwrite subject:   {force}')
     force_flag=' -force'
