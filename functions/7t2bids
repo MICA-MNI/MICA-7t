@@ -448,12 +448,12 @@ dwi=$(ls -R ${BIDS}/dwi | grep gz | wc -l)
 func=$(ls -R ${BIDS}/func | grep gz | wc -l)
 fmap=$(ls -R ${BIDS}/fmap | grep gz | wc -l)
 
+# -----------------------------------------------------------------------------------------------
 # check mandatory inputs: -in Is $SUBJ_DIR found?
 tsv_file="$BIDS_DIR"/participants_7t2bids.tsv
 # Check if file exist
 if [ ! -f "$tsv_file" ]; then echo -e "sub\tses\tdate\tN.anat\tN.dwi\tN.func\tN.fmap\tdicoms\tuser\tprocessing.time\tversion" > "$tsv_file"; fi
 
-# -----------------------------------------------------------------------------------------------
 # Add the new subject to the participants.tsv file
 participants_tsv="$BIDS_DIR"/participants.tsv
 
@@ -489,10 +489,13 @@ mapfile -t niis < <(find "$BIDS" -name "*.nii.gz" | sort)
 
 if [ ${#niis[@]} -gt 0 ]; then
     printf "filename\tacq_time\n" > "$tsv_scans"
-
     for nii in "${niis[@]}"; do
         json="${nii%.nii.gz}.json"
         acq_time=$(jq -r '.AcquisitionDateTime // "n/a"' "$json" 2>/dev/null || printf "n/a")
+        if [[ $acq_time != "n/a" ]]; then
+            IFS='T:.' read -r d h m s _ <<< "$acq_time"
+            printf -v acq_time '%sT%02d:%02d:%02d' "$d" "$h" "$m" "$s"
+        fi
         rel="${nii#$BIDS/}"
         printf "%s\t%s\n" "$rel" "$acq_time" >> "$tsv_scans"
     done
@@ -515,7 +518,7 @@ done
 
 # Sync files to the BIDS directory
 files=("dataset_description.json" "CITATION.cff" ".bidsignore" "CHANGES")
-for file in "${files[@]}"; do cp -fv "${gitrepo}/files/${file}" "${BIDS_DIR}/${file}"; done
+for file in "${files[@]}"; do cp -fv "${gitrepo}/files/${file}" "${BIDS_DIR}/${file}"; chmod 664 "${BIDS_DIR}/${file}"; done
 
 # Create README
 echo -e "The Presicion NeuroImaging (PNI) dataset was provided by the Multimodal Imaging and Connectome Analysis Lab, Montreal Neurological Institute and Hospital, The Neuro.\n\nIf you reference this dataset in your publications, please acknowledge its authors." > "$BIDS_DIR"/README
@@ -554,6 +557,9 @@ grep -v -P "^${Subj}\t${SES/ses-/}" "$tsv_file" > "${tsv_file}.tmp" && mv "${tsv
 
 # Add information about subject
 echo -e "${Subj}\t${SES/ses-/}\t${dat}\t${anat}\t${dwi}\t${func}\t${fmap}\t${SUBJ_DIR}" >> "$tsv_file"
+
+# Fix permissions
+chmod 664 "$tsv_file" "$participants_tsv"
 
 # -----------------------------------------------------------------------------------------------#
 #	Total Running Time
