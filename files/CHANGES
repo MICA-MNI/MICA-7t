@@ -1,5 +1,62 @@
 # CHANGES
-____________________________________________________________________
+
+---
+
+## 2026-05-27
+
+### Generate `_scans.tsv` for each subject/session
+
+> PATCH database: acq_time in _scans.tsv files (Fixed on version v3.0)
+
+For every `sub-*/ses-*` directory, create a `_scans.tsv` file listing all `.nii.gz` files and their `AcquisitionTime` extracted from the corresponding `.json` sidecar. Directories with no `.nii.gz` files are skipped.
+
+```bash
+cd ${data_dir}/sorted/
+echo "sub,ses,AcquisitionDate" > pni_AcquisitionDate.csv
+for dir in sub*_ses*; do
+    sub=${dir%%_*}
+    ses=${dir#*_}
+    dcm=$(printf '%s\n' "$dir"/dicoms_sorted/*/* | head -n 1)
+    [[ -f "$dcm" ]] || {
+        echo "No DICOM found in $dir" >&2
+        continue
+    }
+    echo "$dir: $dcm"
+    AcquisitionDate=$(
+        dcmdump +P AcquisitionDate "$dcm" 2>/dev/null |
+        awk -F'[][]' '{print $2}'
+    )
+    echo "$sub,$ses,$AcquisitionDate" >> pni_AcquisitionDate.csv
+done
+```
+
+```bash
+cd ${bids_dir}
+declare -A date
+while IFS=, read -r sub ses acq; do
+    [[ $sub == sub ]] && continue
+    date["$sub,$ses"]="${acq:0:4}-${acq:4:2}-${acq:6:2}"
+done < pni_AcquisitionDate.csv
+
+for subses in sub-*/ses-*; do
+    sub=${subses%%/*}
+    ses=${subses##*/}
+
+    mapfile -t niis < <(find "$subses" -type f -name '*.nii.gz')
+    [ ${#niis[@]} -eq 0 ] && continue
+
+    {
+    printf "filename\tacq_time\n"
+    for nii in "${niis[@]}"; do
+        IFS=':.' read -r h m s _ < <(jq -r '.AcquisitionTime' "${nii%.nii.gz}.json")
+        printf "%s\t%sT%02d:%02d:%02d\n" \
+            "${nii#"$subses"/}" \
+            "${date["$sub,$ses"]}" \
+            "$h" "$m" "$s"
+    done
+} | tee "$subses/${sub}_${ses}_scans.tsv"
+done
+```
 
 ## 2026-05-26
 
@@ -21,7 +78,7 @@ done
 
 rm -rfv /data_/mica3/BIDS_PNI/rawdata/sub-PNC032/ses-a2/anat/*_Eq_*
 
-____________________________________________________________________
+---
 
 ## 2026-05-12
 
@@ -45,28 +102,5 @@ For files in `ses-a*` sessions that match `MP2RAGE`, `UNIT1`, or `T1map` and do 
 for file in $(find sub*/ses*/anat/ \( -name "*MP2RAGE*" -o -name "*UNIT1*" -o -name "*T1map*" \) ! -name "*acq-05mm*" ! -name "*acq-cstfl*"); do
     ses=$(echo "$file" | grep -oP 'ses-a[^_/]+' | head -n 1)
     mv -v "$file" "${file/${ses}_/${ses}_acq-07mm_}"
-done
-```
-
----
-
-### Generate `_scans.tsv` for each subject/session
-
-For every `sub-*/ses-*` directory, create a `_scans.tsv` file listing all `.nii.gz` files and their `AcquisitionTime` extracted from the corresponding `.json` sidecar. Directories with no `.nii.gz` files are skipped.
-
-```bash
-for subses in sub*/ses*; do
-    sub=$(echo "$subses" | cut -d'/' -f1)
-    ses=$(echo "$subses" | cut -d'/' -f2)
-    tsv="${subses}/${sub}_${ses}_scans.tsv"
-    echo -e "filename\tacq_time" > "$tsv"
-    niis=($(find "$subses" -name "*.nii.gz"))
-    for nii in "${niis[@]}"; do
-        json="${nii/.nii.gz/.json}"
-        acq_time=$(jq -r '.AcquisitionTime // "n/a"' "$json" 2>/dev/null || echo "n/a")
-        rel=$(realpath --relative-to="$subses" "$nii")
-        echo -e "${rel}\t${acq_time}" >> "$tsv"
-    done
-    [ ${#niis[@]} -eq 0 ] && rm -f "$tsv"
 done
 ```
