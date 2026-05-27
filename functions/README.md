@@ -2,16 +2,18 @@
 
 ## Directory Contents
 
-| **File**                    | **Description**                                                  |
-|-----------------------------|------------------------------------------------------------------|
-| `dcm2bids.py`               | Python script for converting DICOM data to BIDS format, with BIDS validation |
-| `dcmSort.py`                | Python script to sort DICOM files (based on `pydicom`)           |
-| `group_check.py`            | Python script for checking group characteristics or data integrity|
-| `7t2bids`                   | Script to convert 7T MRI data to BIDS format, with BIDS validation           |
-| `dcmSort`                   | Bash script to sort DICOM files (*legacy code*).                 |
-| `denoiseN4`                 | Script for applying N4ITK denoising to MRI data                  |
-| `post-qc_fastsurfer.sh`     | Shell script for post-processing quality control with FreeSurfer |
-| `utilities.sh`              | Shell script with various utility functions for MRI processing   |
+| **File**               | **Workflow**  | **Description** |
+|------------------------|---------------|-----------------|
+| `dcm2bids.py`          | PNI           | Python script for converting DICOM data to BIDS format, with BIDS validation. |
+| `dcmSort.py`           | PNI           | Python script to sort DICOM files (based on `pydicom`). |
+| `7t2bids`              | PNI           | Script to convert 7T MRI data to BIDS format, with BIDS validation. |
+| `dcmSort`              | PNI           | DEPRECATED Bash script to sort DICOM files (legacy code). |
+| `mp2rage_keys.py`      | PNI           | Patches MP2RAGE BIDS JSON sidecars with required keys missing after dcm2bids. |
+| `denoiseN4`            | micapipe 7T   | Script for applying N4ITK denoising to MRI data. |
+| `post-qc_fastsurfer.sh`| micapipe 7T   | Shell script for post-processing quality control with FreeSurfer. |
+| `utilities.sh`         | general       | Shell script with various utility functions for MRI processing. |
+| `cbig_workflow.py`     | cbig          | Prepares the files from PNI to CBIG ingestion. |
+| `cbig_deidentify.sh`   | cbig          | Defaces and denoises anatomical images/JSON for CBIG ingestion and data release. |
 
 ## Script usage
 
@@ -31,6 +33,7 @@ dcmSort DICOMS_DIR SORTED_DIR
 
 ### Denoising with N4 and NLM
 ```bash
+export TMPDIR=<custom temporary directory>
 denoiseN4 NIFTI OUT_NAME OUT_DIRECTORY N_THREADS
 ```
 

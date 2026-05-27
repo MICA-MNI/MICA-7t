@@ -1,6 +1,6 @@
 #!/bin/bash
 # ----------------------------------------------------------
-# Deface and rename anat images 
+# Deface and Denoise anat images 
 # for CBIG ingestion/data release
 # ----------------------------------------------------------
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# MICA dicoms_sorted to BIDS v.1.5.1
+# MICA dicoms_sorted to BIDS v.1.11.1
 
 Col="38;5;83m" # Color code
 #---------------- FUNCTION: HELP ----------------#
@@ -22,7 +22,7 @@ NOTE: This script REQUIRES dcm2niix to work:
       https://github.com/rordenlab/dcm2niix
 
 RRC
-McGill University, MNI, MICA-lab, June 2021. Updated: 2024-December v.2.0, 2025-January v2.1
+McGill University, MNI, MICA-lab, June 2021. Updated: 2024-December v.2.0, 2025-January v2.1, 2026-May v3.1
 raul.rodriguezcruces@mcgill.ca
 "
 }

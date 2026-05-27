@@ -6,7 +6,7 @@
 
 ### Generate `_scans.tsv` for each subject/session
 
-> PATCH database: acq_time in _scans.tsv files (Fixed on version v3.0)
+> PATCH database: acq_time in _scans.tsv files (Fixed on version v3.1)
 
 For every `sub-*/ses-*` directory, create a `_scans.tsv` file listing all `.nii.gz` files and their `AcquisitionTime` extracted from the corresponding `.json` sidecar. Directories with no `.nii.gz` files are skipped.
 acq_time were formatted according to the BIDS specification (YYYY-MM-DDTHH:mm:ss).
