@@ -17,10 +17,10 @@ img_singularity=/data/mica1/01_programs/micapipe-v0.2.0/micapipe_"${version}".si
 
 # 3. micapipe command
 # Local variables
-bids=/data_/mica3/BIDS_PNI/cbig/bids
-out=/data_/mica3/BIDS_PNI/cbig/bids
+bids=/host/bb-compx-03/export02/databases/BIDS_PNI/test
+out=/host/bb-compx-03/export02/databases/BIDS_PNI/test
 fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
-tmpDir=/data/mica2/tmpDir
+tmpDir=/host/bb-compx-03/export02/tmp/
 threads=15
 
 # Create command string
