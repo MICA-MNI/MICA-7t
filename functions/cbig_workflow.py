@@ -61,6 +61,7 @@ import pandas as pd
 import time
 import tempfile
 import sys
+from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 def progress_bar(iterable, prefix="", length=40):
@@ -336,7 +337,14 @@ def process_cbig_xls(cbig_xls_path, out_dir, pni_dir=None, sessions=None):
 
         print(f"  → Rsynced {rsync_count} files ({skipped_count} already existed)")
 
+def create_sessions(out_dir):
+    for ses_dir in glob.glob(os.path.join(out_dir, "sub-*", "ses-*")):
+        sub, ses = ses_dir.split(os.sep)[-2:]
+        sessions_tsv = os.path.join(out_dir, sub, f"{sub}_sessions.tsv")
+        pd.DataFrame({"session_id": [ses]}).to_csv(sessions_tsv, sep="\t", index=False)
+
 def create_scans(out_dir):
+    fixed_date="2026-10-01T"
     for ses_dir in glob.glob(os.path.join(out_dir, "sub-*", "ses-*")):
         rows = []
         for nii in glob.glob(os.path.join(ses_dir, "**", "*.nii.gz"), recursive=True):
@@ -344,8 +352,9 @@ def create_scans(out_dir):
             acq_time = "n/a"
             if os.path.exists(json_path):
                 acq_time = json.load(open(json_path)).get("AcquisitionTime", "n/a")
-            rows.append({"filename": os.path.relpath(nii, ses_dir), "acq_time": acq_time})
-
+                if acq_time != "n/a":
+                    acq_time = (datetime.strptime(json.load(open(json_path))["AcquisitionTime"].split(".")[0],"%H:%M:%S").strftime("%H:%M:%S"))
+            rows.append({"filename": os.path.relpath(nii, ses_dir), f"{fixed_date}acq_time": acq_time})
         if not rows:
             continue
 
