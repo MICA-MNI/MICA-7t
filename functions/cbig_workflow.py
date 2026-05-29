@@ -338,12 +338,16 @@ def process_cbig_xls(cbig_xls_path, out_dir, pni_dir=None, sessions=None):
         print(f"  → Rsynced {rsync_count} files ({skipped_count} already existed)")
 
 def create_sessions(out_dir):
+    print(f"-------------------------------------------")
+    print("Creating sessions files...")
     for ses_dir in glob.glob(os.path.join(out_dir, "sub-*", "ses-*")):
         sub, ses = ses_dir.split(os.sep)[-2:]
         sessions_tsv = os.path.join(out_dir, sub, f"{sub}_sessions.tsv")
         pd.DataFrame({"session_id": [ses]}).to_csv(sessions_tsv, sep="\t", index=False)
 
 def create_scans(out_dir):
+    print(f"-------------------------------------------")
+    print("Creating scans files...")
     fixed_date="2026-10-01T"
     for ses_dir in glob.glob(os.path.join(out_dir, "sub-*", "ses-*")):
         rows = []
@@ -354,7 +358,7 @@ def create_scans(out_dir):
                 acq_time = json.load(open(json_path)).get("AcquisitionTime", "n/a")
                 if acq_time != "n/a":
                     acq_time = (datetime.strptime(json.load(open(json_path))["AcquisitionTime"].split(".")[0],"%H:%M:%S").strftime("%H:%M:%S"))
-            rows.append({"filename": os.path.relpath(nii, ses_dir), f"{fixed_date}acq_time": acq_time})
+            rows.append({"filename": os.path.relpath(nii, ses_dir), "acq_time": f'{fixed_date}{acq_time}'})
         if not rows:
             continue
 
@@ -389,6 +393,9 @@ if __name__ == "__main__":
     # Create scans.tsv file on each subjec/session directory
     create_scans(args.out)
 
+    # Create scans.tsv file on each subjec/session directory
+    create_sessions(args.out)
+
     # Run BIDS validator
     run_bids_validator(args.out)
 
@@ -405,6 +412,4 @@ if __name__ == "__main__":
     formatted_time = f"{time_difference_minutes:.3f}"
     print(f"\n-------------------------------------------")
     print(f"Processing time: {formatted_time} minutes")
-    
-
 
