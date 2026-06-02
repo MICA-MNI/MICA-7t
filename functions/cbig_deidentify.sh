@@ -16,11 +16,11 @@ version=v0.2.3
 img_singularity=/data/mica1/01_programs/micapipe-v0.2.0/micapipe_"${version}".sif
 
 # 3. micapipe command
-# Local variables
-bids=/host/bb-compx-03/export02/databases/BIDS_PNI/test
-out=/host/bb-compx-03/export02/databases/BIDS_PNI/test
+# Local variables 
+bids=/host/bb-compx-03/export02/databases/BIDS_PNI/rawdata
+out=/host/bb-compx-03/export02/databases/BIDS_PNI/rawdata
 fs_lic=/data_/mica1/01_programs/freesurfer-7.3.2/license.txt
-tmpDir=/host/bb-compx-03/export02/tmp/
+tmpDir=/host/bb-compx-03/export02/tmp
 threads=15
 
 # Create command string
@@ -69,7 +69,7 @@ denoise_mp2rage_sequences() {
 
             # Copy the UNI json and add:
             bids_uni="${anat_dir}/sub-${sub}_ses-${ses}${suffix}_UNIT1.nii.gz"
-            bids_uni_dns="${anat_dir}/sub-${sub}_ses-${ses}_desc-denoised${suffix}_UNIT1.nii.gz"
+            bids_uni_dns="${anat_dir}/sub-${sub}_ses-${ses}_rec-denoised${suffix}_UNIT1.nii.gz"
             cp "${bids_uni%.nii.gz}.json" "${bids_uni_dns%.nii.gz}.json"
 
             # Add fields to the new json
@@ -86,26 +86,9 @@ denoise_mp2rage_sequences() {
     done
 }
 
-function add_mp2rage_metadata() {
-    local json_file="$1"
-
-    jq '. + {
-        "RepetitionTimePreparation": .RepetitionTime,
-        "RepetitionTimeExcitation": (.EchoTime * 2),
-        "NumberShots": [
-            (.ReconMatrixPE * (.PartialFourier - 0.5)),
-            (.ReconMatrixPE / 2)
-        ]
-    }' "${json_file}" > tmp.json && mv tmp.json "${json_file}"
-}
-
 # ----------------------------------------------------------
 # Timer
 aloita=$(date +%s)
-
-# ----------------------------------------------------------
-# Add MP2RAGE keys: RepetitionTimePreparation, RepetitionTimeExcitation, NumberShots
-for i in sub-${sub}/ses-${ses}/anat/*MP2RAGE.json; do add_mp2rage_metadata $i; done
 
 # ----------------------------------------------------------
 # Denoise UNI images
@@ -114,26 +97,16 @@ denoise_mp2rage_sequences $sub $ses $bids
 # ----------------------------------------------------------
 # Run Defacer — select best available denoised UNIT1 file
 for acq in "_acq-05mm" "_acq-05mm_run-1" ""; do
-  uni="${bids}/sub-${sub}/ses-${ses}/anat/sub-${sub}_ses-${ses}_desc-denoised${acq}_UNIT1.nii.gz"
+  uni="${bids}/sub-${sub}/ses-${ses}/anat/sub-${sub}_ses-${ses}_rec-denoised${acq}_UNIT1.nii.gz"
   [[ -f "$uni" ]] && break
 done
-
 if [[ ! -f "$uni" ]]; then echo "ERROR: No denoised UNIT1 file found"; fi
-
-uni_dns="/bids/sub-${sub}/ses-${ses}/anat/sub-${sub}_ses-${ses}_desc-denoised${acq}_UNIT1.nii.gz"
-
 echo -e "----------------------------------------------------------\n\tAnonymizing using reference: ${acq:-default}\n----------------------------------------------------------"
 # micapipe_dev
-micapipe_anonymize_v2 \
+micapipe_deidentify \
   -bids ${bids} -out ${out} -threads "${threads}" -sub "${sub}" -ses "${ses}" \
-  -deface -reface -regSynth -robust \
+  -deface -regSynth -robust \
   -T1 "$uni"
-
-# Singularity
-${command} /opt/micapipe/functions/micapipe_anonymize \
-  -bids /bids -out /out -threads "${threads}" -sub "${sub}" -ses "${ses}" \
-  -deface -reface -regSynth -robust \
-  -T1 "$uni_dns"
 
 # Processing time
 lopuu=$(date +%s)
