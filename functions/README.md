@@ -37,3 +37,42 @@ export TMPDIR=<custom temporary directory>
 denoiseN4 NIFTI OUT_NAME OUT_DIRECTORY N_THREADS
 ```
 
+## PNI to C-BIG
+Run the `pni2cbig.py` script from the MICA-7 repository to generate the CBIG-compatible dataset structure and participant files.
+
+```bash
+
+# Set the directory to PNI database
+pni_dir=/data_/mica3/BIDS_PNI/rawdata
+pni_cbig=/host/bb-compx-03/export02/databases/BIDS_PNI/rawdata
+xls=/host/bb-compx-03/export02/databases/BIDS_PNI/CBIG_data-2026-03-31T18_16_54.348Z.xls
+
+# Run the script to organize the data
+cbig_workflow.py \
+	--cbig_xls ${xls} \
+	--out ${pni_cbig} \
+	--pni ${pni_dir}
+```
+
+
+## Step 2: Deface and replace
+
+Deface and rename all anatomical (anat) files to ensure they comply with CBIG ingestion requirements and subject anonymization standards.
+
+```bash
+
+# Change directory to the CBIG BIDS
+cd ${pni_dir}/cbig/bids
+
+# For each subject deface and rename
+> Note: keep a log of the subjects refaced at the top `/cbig`.
+
+for subses in sub*/ses*; do
+    sub=${subses%%/*}
+    ses=${subses##*/}
+    echo cbig_deidentify.sh "${sub/sub-}" "${ses/ses-}"
+done
+
+```
+
+
