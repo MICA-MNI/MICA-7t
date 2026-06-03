@@ -82,8 +82,8 @@ echo -e "Input file:  \033[38;5;208m${NII}\033[0m"
 echo -e "Output name: \033[38;5;208m${id}\033[0m"
 echo -e "Output dir:  \033[38;5;208m${outdir}\033[0m"
 echo -e "Threads:     \033[38;5;208m${threads}\033[0m"
-echo -e "NLM sigma:   \033[38;5;208m${beta}\033[0m"
-echo -e "NLM beta:    \033[38;5;208m${sigma}\033[0m"
+echo -e "NLM sigma:   \033[38;5;208m${sigma}\033[0m"
+echo -e "NLM beta:    \033[38;5;208m${beta}\033[0m"
 echo -e "\n\nIf you use this script please remember to reference the developers:
 Tustison, N. J., Avants, B. B., Cook, P. A., Zheng, Y., Egan, A., Yushkevich, P. A., & Gee, J. C. (2010). N4ITK: improved N3 bias correction. IEEE transactions on medical imaging, 29(6), 1310-1320.  
 P. Coupé, P. Yger, S. Prima, P. Hellier, C. Kervrann, C. Barillot. An Optimized Blockwise NonLocal Means Denoising Filter for 3-D Magnetic Resonance Images. IEEE Transactions on Medical Imaging, 27(4):425–441, 2008.
@@ -118,7 +118,7 @@ echo  -e "\033[38;5;45m\n[INFO]... Creando un archivo minc \033[0m"
 mri_convert $NII ${mnc}
 
 echo  -e "\033[38;5;45m\n[INFO]... Aplicando la limpieza de ruido con non-local means \033[0m"
-mincnlm ${mnc} ${mncdn} -mt ${threads} -sigma ${beta} -beta ${sigma}
+mincnlm ${mnc} ${mncdn} -mt ${threads} -sigma ${sigma} -beta ${beta}
 
 echo  -e "\033[38;5;45m\n[INFO]... Transformando de minc a nifti \033[0m"
 mri_convert ${mncdn} $outfile
