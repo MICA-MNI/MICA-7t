@@ -9,7 +9,7 @@
 | `7t2bids`              | PNI           | Script to convert 7T MRI data to BIDS format, with BIDS validation. |
 | `dcmSort`              | PNI           | DEPRECATED Bash script to sort DICOM files (legacy code). |
 | `mp2rage_keys.py`      | PNI           | Patches MP2RAGE BIDS JSON sidecars with required keys missing after dcm2bids. |
-| `denoiseN4`            | micapipe 7T   | Script for applying N4ITK denoising to MRI data. |
+| `denoiseNLM`            | micapipe 7T   | Script for applying minc-non local means denoising to MRI data. |
 | `post-qc_fastsurfer.sh`| micapipe 7T   | Shell script for post-processing quality control with FreeSurfer. |
 | `utilities.sh`         | general       | Shell script with various utility functions for MRI processing. |
 | `cbig_workflow.py`     | cbig          | Prepares the files from PNI to CBIG ingestion. |
@@ -25,16 +25,16 @@ dcm2bids.py --sub SUB --ses SES --dicoms_dir DICOMS_DIR --sorted_dir SORTED_DIR 
 ### Modular workflow from DICOMS to BIDS
 ```bash
 # Fisrt sort the dicoms
-dcmSort DICOMS_DIR SORTED_DIR
+dcmSort <DICOMS_DIR> <SORTED_DIR>
 
 # Then create the BIDS directory (SUB without sub-, SES without ses-)
-7t2bids -in SORTED_DIR -id SUB -ses SES -bids BIDS_DIR 
+7t2bids -in <SORTED_DIR> -id <SUB> -ses <SES> -bids <BIDS_DIR>
 ```
 
 ### Denoising with N4 and NLM
 ```bash
 export TMPDIR=<custom temporary directory>
-denoiseN4 NIFTI OUT_NAME OUT_DIRECTORY N_THREADS
+denoiseNLM <NII> <ID> <OUTDIR> [-threads N] [-sigma S] [-beta B]
 ```
 
 ## PNI to C-BIG
