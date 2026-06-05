@@ -102,12 +102,26 @@ for acq in "_acq-05mm" "_acq-05mm_run-1" ""; do
 done
 if [[ ! -f "$uni" ]]; then echo "ERROR: No denoised UNIT1 file found"; fi
 echo -e "----------------------------------------------------------\n\tAnonymizing using reference: ${acq:-default}\n----------------------------------------------------------"
+
 # micapipe_dev
 micapipe_deidentify \
   -bids ${bids} -out ${out} -threads "${threads}" -sub "${sub}" -ses "${ses}" \
   -deface -regSynth -robust \
   -T1 "$uni"
 
+# ----------------------------------------------------------
+# Once the process was succesfull UNLINK all symlinks
+find . -type l -exec unlink {} \;
+
+# ----------------------------------------------------------
+# ACQUISITIONS file
+# Add the string re-deface to the ant files
+sed -i 's/mm_/mm_rec-deface_/g' ${bids}/sub-${sub}/ses-${ses}/*scans.tsv
+
+# Remove denoise entries that might exist
+sed -i '/rec-denoised/d' ${bids}/sub-${sub}/ses-${ses}/*scans.tsv
+
+# ----------------------------------------------------------
 # Processing time
 lopuu=$(date +%s)
 eri=$(echo "$lopuu - $aloita" | bc)
