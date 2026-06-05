@@ -26,16 +26,7 @@
     "DatasetDOI": "DOI 10.17605/OSF.IO/MHQ3F",
     "GeneratedBy": [
   {
-    "Name": "mp2rage_denoise.py",
-    "Version": "0.2.3",
-    "Container": {
-      "Type": "Docker",
-      "Tag": "micapipe/micapipe:v0.2.3"
-    },
-    "Description": "MP2RAGE denoising applied to structural images for data sharing"
-  },
-  {
-    "Name": "micapipe_de-identify",
+    "Software": "micapipe_de-identify",
     "Version": "1.0.0",
     "Container": {
       "Type": "Docker",
