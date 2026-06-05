@@ -58,7 +58,7 @@ This workflow is composed of three modular steps: the first sorts the DICOMs to 
 
 > **Note**: this workflow replaces the previous Bash scripts `dcmSort` and `7t2bids`. `dcmSort` was updated and rewritten in Python using `pydicom`. `7t2bids` is still integrated in the workflow.
 
-### Singularity command v3.1:
+### Singularity command v3.2:
 ```bash
 sub=PNE018
 ses=a1
@@ -69,8 +69,8 @@ bids_dir="/data_/mica3/BIDS_PNI/rawdata"
 dicoms_dir="${data_dir}/sorted/sub-${sub}_ses-${ses}/dicoms"
 sorted_dir="${data_dir}/sorted/sub-${sub}_ses-${ses}/dicoms_sorted"
 
-# Path to singularity image v3.1
-dcm2bids_img=/data/mica1/01_programs/MICA-7t/7t2bids_v3.1.sif
+# Path to singularity image v3.2
+dcm2bids_img=/data/mica1/01_programs/MICA-7t/7t2bids_v3.2.sif
 
 # Run dcm2bids.py with singularity container
 singularity run --containall \
@@ -82,6 +82,19 @@ singularity run --containall \
         --sorted_dir "${sorted_dir}" \
         --bids_dir "${bids_dir}"
 ```
+
+### OPTIONAL BIDS validation v2.4.1:
+```bash
+dcm2bids_img=/data_/mica1/01_programs/MICA-7t/7t2bids_v3.2.sif
+bids_dir=/data_/mica3/BIDS_PNI/rawdata
+
+singularity exec --containall \
+      -B "${bids_dir}":"${bids_dir}" \
+        "${dcm2bids_img}" \
+        deno run --allow-write -ERN jsr:@bids/validator "${bids_dir}" \
+        --ignoreWarnings --outfile /"${bids_dir}/bids_validator_output.txt"
+```
+
 
 ## 3. Copy behavior data
 This step is to copy the behavior data from cognitive tasks.
