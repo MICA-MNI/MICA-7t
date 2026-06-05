@@ -58,7 +58,7 @@ denoise_mp2rage_sequences() {
         bids_uni="${anat_dir_singularity}/sub-${sub}_ses-${ses}${suffix}_UNIT1.nii.gz"
         bids_inv1="${anat_dir_singularity}/sub-${sub}_ses-${ses}${suffix}_inv-1_MP2RAGE.nii.gz"
         bids_inv2="${anat_dir_singularity}/sub-${sub}_ses-${ses}${suffix}_inv-2_MP2RAGE.nii.gz"
-        bids_uni_dns="${anat_dir_singularity}/sub-${sub}_ses-${ses}_rec-denoised${suffix}_UNIT1.nii.gz"
+        bids_uni_dns="${anat_dir_singularity}/sub-${sub}_ses-${ses}_${suffix}_desc-denoised_UNIT1.nii.gz"
 
         # Denoising UNI image add rec-denoise, based on:
         # https://github.com/bids-standard/bids-specification/issues/1890
@@ -69,7 +69,7 @@ denoise_mp2rage_sequences() {
 
             # Copy the UNI json and add:
             bids_uni="${anat_dir}/sub-${sub}_ses-${ses}${suffix}_UNIT1.nii.gz"
-            bids_uni_dns="${anat_dir}/sub-${sub}_ses-${ses}_rec-denoised${suffix}_UNIT1.nii.gz"
+            bids_uni_dns="${anat_dir}/sub-${sub}_ses-${ses}_${suffix}_desc-denoised_UNIT1.nii.gz"
             cp "${bids_uni%.nii.gz}.json" "${bids_uni_dns%.nii.gz}.json"
 
             # Add fields to the new json
