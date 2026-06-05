@@ -35,7 +35,7 @@ import csv
 import getpass
 import tempfile
 
-__version__ = "3.1"
+__version__ = "3.2"
 
 # $USER
 user = getpass.getuser()
