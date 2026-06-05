@@ -7,8 +7,8 @@ Movies_rename.csv
 bids_validator_output.txt
 # bids_validator_config.json (FIXED on v3.0)
 
-# Ignore all the Scaner derivativatives
-# sub*/ses*/anat/*desc-* (FIXED on v3.0)
+# Ignore all the Scaner derivativatives (DENOISED)
+sub*/ses*/anat/*desc-*
 
 # Ignore all the ERROR of bids validator v2.0.3 of inv-?_MP2RAGE (FIXED on v3.0)
 # SIDECAR_KEY_REQUIRED: {RepetitionTimeExcitation, RepetitionTimePreparation, NumberShots}
