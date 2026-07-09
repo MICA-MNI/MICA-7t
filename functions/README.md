@@ -24,7 +24,7 @@ dcm2bids.py --sub SUB --ses SES --dicoms_dir DICOMS_DIR --sorted_dir SORTED_DIR 
 
 ### Modular workflow from DICOMS to BIDS
 ```bash
-# Fisrt sort the dicoms
+# First sort the dicoms
 dcmSort <DICOMS_DIR> <SORTED_DIR>
 
 # Then create the BIDS directory (SUB without sub-, SES without ses-)

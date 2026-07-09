@@ -58,7 +58,7 @@ This workflow is composed of three modular steps: the first sorts the DICOMs to 
 
 > **Note**: this workflow replaces the previous Bash scripts `dcmSort` and `7t2bids`. `dcmSort` was updated and rewritten in Python using `pydicom`. `7t2bids` is still integrated in the workflow.
 
-### Singularity command v3.2:
+### Singularity command v3.3:
 ```bash
 sub=PNE018
 ses=a1
@@ -69,8 +69,8 @@ bids_dir="/data_/mica3/BIDS_PNI/rawdata"
 dicoms_dir="${data_dir}/sorted/sub-${sub}_ses-${ses}/dicoms"
 sorted_dir="${data_dir}/sorted/sub-${sub}_ses-${ses}/dicoms_sorted"
 
-# Path to singularity image v3.2
-dcm2bids_img=/data/mica1/01_programs/MICA-7t/7t2bids_v3.2.sif
+# Path to singularity image v3.3
+dcm2bids_img=/data/mica1/01_programs/MICA-7t/7t2bids_v3.3.sif
 
 # Run dcm2bids.py with singularity container
 singularity run --containall \
