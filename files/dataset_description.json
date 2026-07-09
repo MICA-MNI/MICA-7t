@@ -1,7 +1,9 @@
 {
     "Name": "Precision NeuroImaging and Connectomics (PNC)",
     "BIDSVersion": "1.11.1",
-    "BIDSValidator": "deno bids-validator 2.0.11",
+    "BIDSValidator": "bids-validator 2.0.11",
+    "denoVersion": "",
+    "dcm2niixVersion": "v1.0.20260416",
     "DatasetType": "raw",
     "Description": "Structural MP2RAGE images were denoised and deidentified for data sharing. MP2RAGE denoising was applied using mp2rage_denoise.py from micapipe v0.2.3 and defacing with micapipe_de-identify from micapipe v1.0.0.",
     "License": "CC0 1.0 Universal",
@@ -26,11 +28,11 @@
     "DatasetDOI": "DOI 10.17605/OSF.IO/MHQ3F",
     "GeneratedBy": [
   {
-    "Software": "micapipe_de-identify",
-    "Version": "1.0.0",
+    "Name": "7t2bids",
+    "Version": "v3.3",
     "Container": {
       "Type": "Docker",
-      "Tag": "micapipe/micapipe:v1.0.0"
+      "Tag": "micalab/7t2bids:v3.3"
     },
     "Description": "Defacing applied to structural images for data sharing"
   }
