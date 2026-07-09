@@ -35,7 +35,7 @@ import csv
 import getpass
 import tempfile
 
-__version__ = "3.2"
+__version__ = "3.3"
 
 # $USER
 user = getpass.getuser()
@@ -138,6 +138,7 @@ def participants_7t2bids(start_time):
             writer.writerow(row)
 
     os.replace(dst.name, tsv_file)
+    os.chmod(tsv_file, 0o664)
 
 def main():
     # Set a timer
