@@ -51,15 +51,15 @@ RUN apt-get update -qq \
 RUN pip install --no-cache-dir pydicom nibabel
 
 # --------------------------------
-# Install deno v2.2.3
+# Install deno v2.9.2
 ENV DENO_DIR=/opt/deno_cache
 ENV DENO_INSTALL="/opt/.deno"
 RUN curl -fsSL https://deno.land/install.sh | sh
 ENV PATH="$DENO_INSTALL/bin:$PATH"
 
 # --------------------------------
-# Compile bids-validator v2.0.3
-RUN deno compile -ERN -o bids-validator jsr:@bids/validator
+# Compile bids-validator v2.0.11
+RUN deno compile -ERN -o bids-validator jsr:@bids/validator@2.0.11
 
 # ---------- Non-root user ----------
 RUN useradd -m -u 1000 appuser
