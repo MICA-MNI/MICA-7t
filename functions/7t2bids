@@ -22,10 +22,12 @@ NOTE: This script REQUIRES dcm2niix to work:
       https://github.com/rordenlab/dcm2niix
 
 RRC
-McGill University, MNI, MICA-lab, June 2021. Updated: 2024-December v.2.0, 2025-January v2.1, 2026-May v3.1
+McGill University, MNI, MICA-lab, June 2021. Updated: 2024-December v.2.0, 2025-January v2.1, 2026-May v3.1, 2026-July v3.3
 raul.rodriguezcruces@mcgill.ca
 "
 }
+
+version="v3.3"
 
 # File permissions: Files will be created with rw-rw-r-- & Directories will be created with rwxrwxr-x 
 umask 002
@@ -95,10 +97,10 @@ fi
 
 echo -e "\n\033[38;5;141m
 -------------------------------------------------------------
-        DICOM to BIDS - Subject $Subj - Session $SES
+        DICOM to BIDS $version - Subject $Subj - Session $SES
 -------------------------------------------------------------\033[0m"
 
-# argument check out & WarningINGS
+# argument check out & Warnings
 if [ "${#arg[@]}" -eq 0 ]; then help; exit 0; fi
 if [[ -z $(which dcm2niix) ]]; then Error "dcm2niix NOT found"; exit 0; else Info "dcm2niix was found and is ready to work."; fi
 
@@ -519,6 +521,15 @@ done
 # Sync files to the BIDS directory
 files=("dataset_description.json" "CITATION.cff" ".bidsignore" "CHANGES")
 for file in "${files[@]}"; do cp -fv "${gitrepo}/files/${file}" "${BIDS_DIR}/${file}"; chmod 664 "${BIDS_DIR}/${file}"; done
+
+# Update versions in dataset_description.json
+dataset_description="${BIDS_DIR}/dataset_description.json"
+deno_version=$(deno --version | awk 'NR==1{print $2}')
+bids_validator_version=$(deno run --allow-write -ERN jsr:@bids/validator --version)
+
+jq --arg deno "$deno_version" --arg bids "$bids_validator_version" --arg version "$version" \
+'.denoVersion=$deno | .BIDSValidator=$bids | .GeneratedBy[0].Version=$version | .GeneratedBy[0].Container.Tag=("micalab/7t2bids:"+$version)' \
+"$dataset_description" > "${dataset_description}.tmp" && mv "${dataset_description}.tmp" "$dataset_description"
 
 # Create README
 echo -e "The Presicion NeuroImaging (PNI) dataset was provided by the Multimodal Imaging and Connectome Analysis Lab, Montreal Neurological Institute and Hospital, The Neuro.\n\nIf you reference this dataset in your publications, please acknowledge its authors." > "$BIDS_DIR"/README
