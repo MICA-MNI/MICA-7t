@@ -166,7 +166,7 @@ cmd cd $SUBJ_DIR
 # dicomx to Nifti with BIDS Naming
 for k in "${!orig[@]}"; do
   bids_name=${bids[k]}
-  mri="${bids_name##*_}"                                                                                                                                                      
+  mri="${bids_name##*_}"
   acq="${bids_name%_*}"
   # Check if acq_string is not empty
   if [[ ${acq} == ${mri} ]]; then acq=""; else acq="${acq}_"; fi
@@ -235,8 +235,9 @@ replace_suffix() {
 replace_suffix "bold_ph" "part-phase_bold" "$BIDS/func"
 replace_suffix "MTR_ph" "part-phase_MTR" "$BIDS/anat"
 replace_suffix "part-mag_T2starw_ph" "part-phase_T2starw" "$BIDS/anat"
-replace_suffix "unwrapped_T2starw_ph" "Unwrapped_part-phase_T2starw" "$BIDS/anat"
+replace_suffix "Unwrapped_T2starw_ph" "Unwrapped_part-phase_T2starw" "$BIDS/anat"
 replace_suffix "T1w_ph" "part-phase_T1w" "$BIDS/anat"
+replace_suffix "T2starw_ph" "part-phase_T2starw" "$BIDS/anat"
 
 # Remove the run-? from the task-rest when there is only 1 run
 # This only affects the acquisitions that contain the phase encoded inside the same acquisition: e.g rest and rest_Q1k
@@ -359,7 +360,7 @@ Info "DWI acquisitions"
 # Loop through the directories of DWI acquisitions
 for k in "${!origDWI[@]}"; do
   bids_name=${bidsDWI[k]}
-  mri="${bids_name##*_}"                                                                                                                                                      
+  mri="${bids_name##*_}"
   acq="${bids_name%_*}"
   # Check if acq_string is not empty
   if [[ ${acq} == ${mri} ]]; then acq=""; else acq="${acq}_"; fi
@@ -496,7 +497,7 @@ if [ ${#niis[@]} -gt 0 ]; then
         acq_time=$(jq -r '.AcquisitionDateTime // "n/a"' "$json" 2>/dev/null || printf "n/a")
         if [[ $acq_time != "n/a" ]]; then
             IFS='T:.' read -r d h m s _ <<< "$acq_time"
-            printf -v acq_time '%sT%02d:%02d:%02d' "$d" "$h" "$m" "$s"
+            printf -v acq_time '%sT%02d:%02d:%02d' "$d" "$((10#$h))" "$((10#$m))" "$((10#$s))"
         fi
         rel="${nii#$BIDS/}"
         printf "%s\t%s\n" "$rel" "$acq_time" >> "$tsv_scans"
@@ -525,7 +526,7 @@ for file in "${files[@]}"; do cp -fv "${gitrepo}/files/${file}" "${BIDS_DIR}/${f
 # Update versions in dataset_description.json
 dataset_description="${BIDS_DIR}/dataset_description.json"
 deno_version=$(deno --version | awk 'NR==1{print $2}')
-bids_validator_version=$(deno run --allow-write -ERN jsr:@bids/validator --version)
+bids_validator_version=$(deno run --allow-write -ERN jsr:@bids/validator --version | sed -E 's/\x1B\[[0-9;]*[mK]//g')
 
 jq --arg deno "$deno_version" --arg bids "$bids_validator_version" --arg version "$version" \
 '.denoVersion=$deno | .BIDSValidator=$bids | .GeneratedBy[0].Version=$version | .GeneratedBy[0].Container.Tag=("micalab/7t2bids:"+$version)' \
@@ -578,4 +579,4 @@ end_time=$(date +%s)
 time_difference=$(echo "$end_time - $start_time" | bc)
 time_difference=$(echo print $time_difference/60 | perl)
 time_difference=$(printf "%0.3f\n" ${time_difference})
-Info "GLOBAL micapipe running time with $PROC processing:\033[38;5;220m ${time_difference} minutes \033[38;5;141m"
+Info "7t2bids running time:\033[38;5;220m ${time_difference} minutes \033[38;5;141m"
