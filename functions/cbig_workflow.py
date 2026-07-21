@@ -160,6 +160,9 @@ def process_cbig_xls(cbig_xls_path, out_dir, pni_dir=None, sessions=None):
     df = df[["participant_id", "DCCID", "MICSID",
              "sex", "age", "registration", 
              "site", "entity", "status", "diagnosis"]]
+    
+    # Map diagnosis values to C-BIG-compliant values
+    df["diagnosis"] = df["diagnosis"].replace({"Healthy Control": "Control", "Other": "Disease"})
 
     os.makedirs(out_dir, exist_ok=True)
     
