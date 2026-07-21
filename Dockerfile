@@ -58,8 +58,8 @@ RUN curl -fsSL https://deno.land/install.sh | sh
 ENV PATH="$DENO_INSTALL/bin:$PATH"
 
 # --------------------------------
-# Compile bids-validator v2.0.11
-RUN deno compile -ERN -o bids-validator jsr:@bids/validator@2.0.11
+# Compile bids-validator
+RUN deno compile -ERN -o bids-validator jsr:@bids/validator
 
 # ---------- Non-root user ----------
 RUN useradd -m -u 1000 appuser
