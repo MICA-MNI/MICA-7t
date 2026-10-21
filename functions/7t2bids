@@ -342,6 +342,30 @@ if ls "$BIDS"/anat/*"_run-"*MTR* 1> /dev/null 2>&1; then
   done
 fi
 
+# A magnitude and its phase exported under one series name (acq-me T2starw, until
+# 2025) come out as run-1 (part-mag) and run-2 (part-phase) of one acquisition.
+# Merge each such pair into one run; leave anything else (real repeats) alone.
+mag_phase_pairs() {
+  local dir=$1 acq=$2 suffix=$3
+  local runs=($(ls "$dir"/*"_${acq}_run-"*"_${suffix}.nii.gz" 2>/dev/null | grep -oP 'run-\d+' | sort -u -V))
+  if [[ ${#runs[@]} -eq 0 || $(( ${#runs[@]} % 2 )) -ne 0 ]]; then return 0; fi
+  local i
+  for ((i=0; i<${#runs[@]}; i+=2)); do
+    if ls "$dir"/*"_${acq}_${runs[i]}_"*part-phase* 1> /dev/null 2>&1; then return 0; fi
+    if ! ls "$dir"/*"_${acq}_${runs[i]}_"*part-mag* 1> /dev/null 2>&1; then return 0; fi
+    if ls "$dir"/*"_${acq}_${runs[i+1]}_"*part-mag* 1> /dev/null 2>&1; then return 0; fi
+    if ! ls "$dir"/*"_${acq}_${runs[i+1]}_"*part-phase* 1> /dev/null 2>&1; then return 0; fi
+  done
+  Info "${acq} ${suffix}: run pairs are magnitude and phase of one acquisition"
+  local run_num
+  for ((i=0; i<${#runs[@]}; i+=2)); do
+    if [[ ${#runs[@]} -eq 2 ]]; then run_num=""; else run_num="run-$((i / 2 + 1))_"; fi
+    replace_suffix "_${acq}_${runs[i]}_" "_${acq}_${run_num}" "$dir"
+    replace_suffix "_${acq}_${runs[i+1]}_" "_${acq}_${run_num}" "$dir"
+  done
+}
+mag_phase_pairs "$BIDS/anat" "acq-me" "T2starw"
+
 # Remove bvals and bvecs from MP2RAGE
 if ls "$BIDS"/anat/*MP2RAGE.bv* 1> /dev/null 2>&1; then
   Info "Remove MP2RAGE bval and bvecs"

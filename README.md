@@ -476,6 +476,8 @@ micapipe_cleanup -sub "${sub}" \
 
 > Each functional MRI acquisition includes three echoes and a phase. The final string will contain the identifier `echo-` followed by the echo number (e.g., `task-rest_echo-1_bold`). Additionally, the string `part-phase` will be included to identify the phase (e.g., `task-rest_echo-1_part-phase_bold`).
 
+> Since September 2025 the scanner exports the phase of the resting state, the DWI and their SBRefs as a separate series named like the magnitude plus `_Pha` (e.g. `func-rsfmri_acq-mbep2d_ME_19mm_Pha`). `7t2bids` converts each `_Pha` series under its magnitude's name as `part-phase` (e.g. `task-rest_echo-1_part-phase_bold`, `acq-multib38_dir-AP_part-phase_dwi`, `acq-multib38_dir-AP_part-phase_sbref`), so no `_Pha` entry is needed in the sequence tables.
+
 ## Diffusion weighted Imaging
 | Session  | Acquisition                              | BIDS dir | BIDS name                  |
 |----------|------------------------------------------|----------|----------------------------|
