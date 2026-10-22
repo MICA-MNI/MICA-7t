@@ -9,6 +9,7 @@
 *func-rsfmri_acq-singleE_1*	task-rest_acq-singleE_bold
 *func-rsfmri_acq-mbep2d_ME_19mm	task-rest_bold
 *func-rsfmri_acq-mbep2d_ME_19mm_Q1K	task-rest_acq-Q1K_bold
+*func-rsfmri_acq-mbep2d_ME_19mm_Pha	task-rest_part-phase_bold
 *func-epiencode_acq-mbep2d_ME_19mm*	task-epiencode_bold
 *func-epiretrieve_acq-mbep2d_ME_19mm	task-epiretrieve_bold
 *func-pattersep1_acq-mbep2d_ME_19mm	task-patternsep1_bold

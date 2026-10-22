@@ -154,14 +154,16 @@ load_tsv "${gitrepo}/files/sequences_dwi.tsv" origDWI bidsDWI
 # -----------------------------------------------------------------------------------------------
 # Phase exported as its own series
 # Since September 2025 the Terra exports the phase of the resting state, the DWI
-# and their SBRefs as a series of its own, named like the magnitude series plus
-# "_Pha" (before, both shared one name). A "_Pha" series is converted under its
-# magnitude's BIDS name with "_ph" appended, which the renames below turn into
-# part-phase. dcm2niix appends "_ph" itself when the ImageType says P (resting
+# and their SBRefs as a series of its own, named like the magnitude plus "_Pha"
+# (before, both shared one name). Those series have their own rows in
+# sequences*.tsv, whose BIDS name carries "part-phase" (e.g. task-rest_part-phase_bold).
+# Such a row is converted under its magnitude's name with "_ph" appended, which
+# the renames below turn into part-phase in its BIDS position (after run- and
+# echo-). dcm2niix appends "_ph" itself when the ImageType says P (resting
 # state, SBRef) but not for DWI phase, so it is added where it is missing.
 separate_phase=()
 convert_phase() {
-  local pattern="${1}_Pha" bids_name=$2
+  local pattern=$1 bids_name=${2/part-phase_/}
   shift 2
   local mri="${bids_name##*_}" acq="${bids_name%_*}"
   if [[ ${acq} == ${mri} ]]; then acq=""; else acq="${acq}_"; fi
@@ -213,19 +215,20 @@ for k in "${!orig[@]}"; do
   acq="${bids_name%_*}"
   # Check if acq_string is not empty
   if [[ ${acq} == ${mri} ]]; then acq=""; else acq="${acq}_"; fi
-  # Find the dicoms_sorted with the sequence name (quiet); "_Pha" series are phase, converted below
-  Names=($(ls -d ${orig[k]} 2>/dev/null | grep -v '_Pha$'))
-  N=${#Names[@]}
+  # A phase series exported on its own (see convert_phase)
+  if [[ ${bids_name} == *part-phase_* ]]; then convert_phase "${orig[k]}" "${bids_name}" -ba n; continue; fi
+  # Find the number of dicoms_sorted with the sequence name (quiet)
+  N=$(ls -d ${orig[k]} 2>/dev/null | wc -l)
   if [ "$N" -gt 1 ]; then
+    Names=($(ls -d ${orig[k]}))
     for i in "${!Names[@]}"; do
        out_name="${id}${acq}run-$((i+1))_${mri}"
        # -z compres -b bids -ba bids_anonimized
        dcm2niix -z y -b y -ba n -o "$BIDS" -f "$out_name" ${Names[i]}
     done
   elif [ "$N" -eq 1 ]; then
-     dcm2niix -z y -b y -ba n -o "$BIDS" -f ${id}${bids_name} ${Names[0]}
+     dcm2niix -z y -b y -ba n -o "$BIDS" -f ${id}${bids_name} ${orig[k]}
   fi
-  convert_phase "${orig[k]}" "${bids_name}" -ba n
 done
 
 # Moving files to their correct directory location
@@ -287,7 +290,7 @@ replace_suffix "T2starw_ph" "part-phase_T2starw" "$BIDS/anat"
 # This only affects the acquisitions that contain the phase encoded inside the same acquisition: e.g rest and rest_Q1k
 func_rename() {
   func_acq=$1
-  # A separate "_Pha" series means run-1/run-2 are two real runs, not magnitude and phase
+  # A phase with its own "_Pha" series means run-1/run-2 are two real runs, not magnitude and phase
   if phase_is_separate "${func_acq}"; then return 0; fi
   # remove run-? from echo-?_bold if there are 6 files (ONLY 1 run)"
   # Extract unique run numbers from the filenames
@@ -434,18 +437,19 @@ for k in "${!origDWI[@]}"; do
   acq="${bids_name%_*}"
   # Check if acq_string is not empty
   if [[ ${acq} == ${mri} ]]; then acq=""; else acq="${acq}_"; fi
-  # Find the dicoms_sorted with the sequence name (quiet); "_Pha" series are phase, converted below
-  Names=($(ls -d ${origDWI[k]} 2>/dev/null | grep -v '_Pha$'))
-  N=${#Names[@]}
+  # A phase series exported on its own (see convert_phase)
+  if [[ ${bids_name} == *part-phase_* ]]; then convert_phase "${origDWI[k]}" "${bids_name}"; continue; fi
+  # Find the number of dicoms_sorted with the sequence name (quiet)
+  N=$(ls -d ${origDWI[k]} 2>/dev/null | wc -l)
   if [ "$N" -gt 1 ]; then
+    Names=($(ls -d ${origDWI[k]}))
     for i in "${!Names[@]}"; do
        out_name="${id}${acq}run-$((i+1))_${mri}"
        dcm2niix -z y -b y -o "$BIDS" -f "$out_name" ${Names[i]}
     done
   elif [ "$N" -eq 1 ]; then
-     dcm2niix -z y -b y -o "$BIDS" -f ${id}${bids_name} ${Names[0]}
+     dcm2niix -z y -b y -o "$BIDS" -f ${id}${bids_name} ${origDWI[k]}
   fi
-  convert_phase "${origDWI[k]}" "${bids_name}"
 done
 
 # Change directory 
@@ -461,7 +465,7 @@ if ls "$BIDS"/anat/*ROI* 1> /dev/null 2>&1; then rm "$BIDS"/anat/*ROI*; fi
 
 dwi_rename() {
     local dwi_acq=$1
-    # A separate "_Pha" series means run-1/run-2 are two real runs, not magnitude and phase
+    # A phase with its own "_Pha" series means run-1/run-2 are two real runs, not magnitude and phase
     if phase_is_separate "${dwi_acq}"; then return 0; fi
     # If there is two files, remove the run-? and and the second file will be the phase
     dwis=($(ls ${BIDS}/dwi/*${dwi_acq}*_dwi.nii.gz))
