@@ -1,21 +1,27 @@
 #!/usr/bin/env python3
-"""Rename the run entities 7t2bids got wrong in an existing BIDS_PNI tree.
+"""Fix the run entities of sessions already in a BIDS_PNI tree.
 
-Two problems the converter has since been fixed for, applied to sessions it
-already converted:
+It applies the rules of rcruces/preproc_reports drafts/2026_bids-eval_runs.py
+to existing files, by renaming only. An acquisition family is a set of files
+that share every entity except run and part (echo included). For each family
+that has run entities:
 
-1. acq-me T2starw: the magnitude and its phase were exported under one series
-   name and came out as run-1 (part-mag) and run-2 (part-phase) of a single
-   acquisition. Each such pair becomes one run, or no run when there is one
-   pair (RUN_SEPARATES_MAG_PHASE in details.tsv).
-2. A phase file left with dcm2niix's "_ph" suffix, as rec-unwrapped T2starw
-   with more than one run was (sub-PNE098 ses-a1): "X_T2starw_ph" becomes
-   "X_part-phase_T2starw" and its JSON gains "Units": "rad", as 7t2bids gives
-   every phase file.
+- RUN_SEPARATES_MAG_PHASE: runs that come in magnitude-then-phase pairs
+  (run-1 part-mag or no part, run-2 part-phase) are one acquisition each. The
+  pair is merged into one run, or into no run when there is a single pair.
+  This covers the acq-me T2starw of the old protocol, and sub-PNA004 ses-a1's
+  rest (run-2 magnitude, run-3 phase).
+- RUN_SHOULD_BE_OMITTED: a single run loses its run entity.
+- RUN_NONCONTIGUOUS: runs are renumbered 1..n in their order.
 
-Each session's scans.tsv is updated to the new names. Nothing is overwritten,
-nothing is deleted, and sessions where the files do not look exactly like
-these cases are left alone. Without --apply it only prints what it would do.
+It also renames phase files left with dcm2niix's "_ph" suffix
+(rec-unwrapped_run-?_T2starw_ph in sub-PNE098 ses-a1) to part-phase, adding
+"Units": "rad" to their JSON as 7t2bids does for every phase file.
+
+Every file of a renamed stem moves with it (.nii.gz, .json, .bval, .bvec), and
+the session's scans.tsv follows. Nothing is overwritten or deleted. A family
+that fits none of these shapes is reported and left alone. Without --apply it
+only prints what it would do.
 
     patch_pni_runs.py /data_/mica3/BIDS_PNI/rawdata            # dry run
     patch_pni_runs.py /data_/mica3/BIDS_PNI/rawdata --apply
@@ -33,56 +39,121 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-RUN = re.compile(r"_acq-me_(run-\d+)_(echo-\d+_part-(mag|phase))_T2starw\.(nii\.gz|json)$")
-LEFTOVER_PH = re.compile(r"^(.*)_T2starw_ph\.(nii\.gz|json)$")
+DATATYPES = ("anat", "func", "fmap", "dwi")
+EXTENSIONS = (".nii.gz", ".json", ".bval", ".bvec")
+ENTITY = re.compile(r"^([A-Za-z0-9]+)-(.+)$")
+LEFTOVER_PH = re.compile(r"^(.*)_T2starw_ph$")
 
 
-def mag_phase_renames(anat: Path) -> list[tuple[Path, Path]]:
-    """acq-me T2starw runs that are magnitude/phase pairs, merged."""
-    runs: dict[str, dict[str, list[Path]]] = defaultdict(lambda: defaultdict(list))
-    for path in anat.iterdir():
-        match = RUN.search(path.name)
+def split(name: str) -> tuple[str, str] | None:
+    for extension in EXTENSIONS:
+        if name.endswith(extension):
+            return name[: -len(extension)], extension
+    return None
+
+
+def entities(stem: str) -> tuple[dict[str, str], str]:
+    tokens = stem.split("_")
+    found = {}
+    for token in tokens[:-1]:
+        match = ENTITY.match(token)
         if match:
-            runs[match.group(1)][match.group(3)].append(path)
-    if not runs or len(runs) % 2:
-        return []
-    ordered = sorted(runs, key=lambda run: int(run.split("-")[1]))
-    pairs = [(ordered[i], ordered[i + 1]) for i in range(0, len(ordered), 2)]
-    for magnitude, phase in pairs:
-        if set(runs[magnitude]) != {"mag"} or set(runs[phase]) != {"phase"}:
-            return []
-    renames = []
-    for index, (magnitude, phase) in enumerate(pairs):
-        new_run = "" if len(pairs) == 1 else f"run-{index + 1}_"
-        for run in (magnitude, phase):
-            for kind in runs[run].values():
-                for path in sorted(kind):
-                    target = path.with_name(
-                        path.name.replace(f"_acq-me_{run}_", f"_acq-me_{new_run}")
-                    )
-                    if target != path:
-                        renames.append((path, target))
-    return renames
+            found[match.group(1)] = match.group(2)
+    return found, tokens[-1]
 
 
-def leftover_ph_renames(anat: Path) -> list[tuple[Path, Path]]:
-    renames = []
-    for path in anat.iterdir():
-        match = LEFTOVER_PH.match(path.name)
-        if match:
-            renames.append(
-                (path, path.with_name(f"{match.group(1)}_part-phase_T2starw.{match.group(2)}"))
-            )
-    return renames
+def family_of(stem: str) -> str | None:
+    found, suffix = entities(stem)
+    if "sub" not in found:
+        return None
+    kept = [f"{k}-{v}" for k, v in found.items() if k not in ("sub", "ses", "run", "part")]
+    return "_".join(kept + [suffix])
 
 
-def update_scans(session: Path, renames: list[tuple[Path, Path]], apply: bool) -> int:
+def with_run(stem: str, old: int, new: int | None) -> str:
+    return stem.replace(f"_run-{old}_", "_" if new is None else f"_run-{new}_")
+
+
+def new_runs(stems: set[str]) -> tuple[dict[int, int | None] | None, str]:
+    """How the runs of one family should be numbered, and which rule says so."""
+    kinds: dict[int, set[str]] = defaultdict(set)
+    for stem in stems:
+        found, _ = entities(stem)
+        if "run" not in found or not found["run"].isdigit():
+            return None, ""
+        kinds[int(found["run"])].add(found.get("part", "mag"))
+    runs = sorted(kinds)
+    if len(runs) % 2 == 0 and all(
+        kinds[runs[i]] == {"mag"} and kinds[runs[i + 1]] == {"phase"}
+        for i in range(0, len(runs), 2)
+    ):
+        pairs = len(runs) // 2
+        mapping = {}
+        for index in range(pairs):
+            new = None if pairs == 1 else index + 1
+            mapping[runs[2 * index]] = new
+            mapping[runs[2 * index + 1]] = new
+        return mapping, "RUN_SEPARATES_MAG_PHASE"
+    if len(runs) == 1:
+        return {runs[0]: None}, "RUN_SHOULD_BE_OMITTED"
+    if runs != list(range(1, len(runs) + 1)):
+        return {run: index + 1 for index, run in enumerate(runs)}, "RUN_NONCONTIGUOUS"
+    return {}, ""
+
+
+def session_renames(session: Path) -> tuple[list[tuple[Path, Path, str]], list[str]]:
+    renames: list[tuple[Path, Path, str]] = []
+    skipped: list[str] = []
+    for datatype in DATATYPES:
+        folder = session / datatype
+        if not folder.is_dir():
+            continue
+        files: dict[str, list[Path]] = defaultdict(list)
+        for path in folder.iterdir():
+            parts = split(path.name)
+            if parts:
+                files[parts[0]].append(path)
+
+        # Phase files that kept dcm2niix's "_ph" become part-phase first.
+        for stem in sorted(files):
+            match = LEFTOVER_PH.match(stem)
+            if match:
+                new_stem = f"{match.group(1)}_part-phase_T2starw"
+                for path in files.pop(stem):
+                    renames.append((path, folder / (new_stem + split(path.name)[1]), "LEFTOVER_PH"))
+                files[new_stem] = []
+
+        families: dict[str, set[str]] = defaultdict(set)
+        for stem in files:
+            if "_run-" in stem:
+                family = family_of(stem)
+                if family:
+                    families[family].add(stem)
+        planned = {old.name for old, _, _ in renames}
+        for family, stems in sorted(families.items()):
+            mapping, rule = new_runs(stems)
+            if mapping is None:
+                skipped.append(f"{datatype}/{family}: run is not a number")
+                continue
+            for old_run, new_run in sorted(mapping.items()):
+                for stem in sorted(stems):
+                    if f"_run-{old_run}_" not in stem or new_run == old_run:
+                        continue
+                    new_stem = with_run(stem, old_run, new_run)
+                    for path in files.get(stem, []):
+                        if path.name in planned:
+                            continue
+                        renames.append((path, folder / (new_stem + split(path.name)[1]), rule))
+    return renames, skipped
+
+
+def update_scans(session: Path, renames: list[tuple[Path, Path, str]], apply: bool) -> int:
     scans = next(iter(session.glob("*_scans.tsv")), None)
     if scans is None:
         return 0
     mapping = {
         f"{old.parent.name}/{old.name}": f"{new.parent.name}/{new.name}"
-        for old, new in renames
+        for old, new, _ in renames
         if old.name.endswith(".nii.gz")
     }
     lines = scans.read_text(encoding="utf-8").splitlines(keepends=True)
@@ -111,28 +182,34 @@ def main(arguments: list[str]) -> int:
     args = parser.parse_args(arguments)
 
     total = 0
-    for anat in sorted(args.rawdata.glob("sub-*/ses-*/anat")):
-        session = anat.parent
-        renames = mag_phase_renames(anat) + leftover_ph_renames(anat)
+    sessions = 0
+    for session in sorted(args.rawdata.glob("sub-*/ses-*")):
+        if not session.is_dir():
+            continue
+        renames, skipped = session_renames(session)
+        for reason in skipped:
+            print(f"LEAVE {session.relative_to(args.rawdata)} {reason}", file=sys.stderr)
         if not renames:
             continue
-        # Renames run pair by pair, so a target may be a file renamed earlier in the list.
-        moving = {old for old, _ in renames}
-        clashes = [new for _, new in renames if new.exists() and new not in moving]
-        if clashes:
-            print(f"SKIP {session}: would overwrite {clashes[0].name}", file=sys.stderr)
+        # Runs are renamed lowest first, so a target may be a file moved earlier in the list.
+        moving = {old for old, _, _ in renames}
+        clashes = [new for _, new, _ in renames if new.exists() and new not in moving]
+        if clashes or len({new for _, new, _ in renames}) != len(renames):
+            print(f"SKIP {session.relative_to(args.rawdata)}: would overwrite "
+                  f"{clashes[0].name if clashes else 'a file it renames'}", file=sys.stderr)
             continue
         print(f"## {session.relative_to(args.rawdata)}")
-        for old, new in renames:
-            print(f"  mv {old.name} -> {new.name}")
+        for old, new, rule in renames:
+            print(f"  {rule}: {old.parent.name}/{old.name} -> {new.name}")
             if args.apply:
                 old.rename(new)
-                if LEFTOVER_PH.match(old.name) and new.name.endswith(".json"):
+                if rule == "LEFTOVER_PH" and new.name.endswith(".json"):
                     add_units(new)
-        lines = update_scans(session, renames, args.apply)
-        print(f"  scans.tsv: {lines} line(s)")
+        print(f"  scans.tsv: {update_scans(session, renames, args.apply)} line(s)")
         total += len(renames)
-    print(f"{'renamed' if args.apply else 'would rename'} {total} file(s)")
+        sessions += 1
+    verb = "renamed" if args.apply else "would rename"
+    print(f"{verb} {total} file(s) in {sessions} session(s)")
     return 0
 
 
