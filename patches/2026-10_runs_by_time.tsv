@@ -1,0 +1,33 @@
+# Families that mixed files with and without run in BIDS_PNI (2026-10-22).
+# Each acquisition gets its run from its order in the session (SeriesNumber, AcquisitionTime in its JSON).
+# session	old stem	new stem
+# PNA004: rest series 11 (10:09, magnitude only) -> run-1; series 40/41 (11:33, magnitude + phase) -> run-2; fmap series 12/13 (10:18) -> run-1
+sub-PNA004/ses-a1	func/sub-PNA004_ses-a1_task-rest_echo-1_bold	func/sub-PNA004_ses-a1_task-rest_run-1_echo-1_bold
+sub-PNA004/ses-a1	func/sub-PNA004_ses-a1_task-rest_run-3_echo-1_part-phase_bold	func/sub-PNA004_ses-a1_task-rest_run-2_echo-1_part-phase_bold
+sub-PNA004/ses-a1	func/sub-PNA004_ses-a1_task-rest_echo-2_bold	func/sub-PNA004_ses-a1_task-rest_run-1_echo-2_bold
+sub-PNA004/ses-a1	func/sub-PNA004_ses-a1_task-rest_run-3_echo-2_part-phase_bold	func/sub-PNA004_ses-a1_task-rest_run-2_echo-2_part-phase_bold
+sub-PNA004/ses-a1	func/sub-PNA004_ses-a1_task-rest_echo-3_bold	func/sub-PNA004_ses-a1_task-rest_run-1_echo-3_bold
+sub-PNA004/ses-a1	func/sub-PNA004_ses-a1_task-rest_run-3_echo-3_part-phase_bold	func/sub-PNA004_ses-a1_task-rest_run-2_echo-3_part-phase_bold
+sub-PNA004/ses-a1	fmap/sub-PNA004_ses-a1_acq-fmri_dir-AP_epi	fmap/sub-PNA004_ses-a1_acq-fmri_dir-AP_run-1_epi
+sub-PNA004/ses-a1	fmap/sub-PNA004_ses-a1_acq-fmri_dir-PA_epi	fmap/sub-PNA004_ses-a1_acq-fmri_dir-PA_run-1_epi
+# PNC027: rest series 11/12 (10:10) -> run-1, series 31/32 (11:27) stays run-2; fmap series 13/14 -> run-1
+sub-PNC027/ses-a1	func/sub-PNC027_ses-a1_task-rest_echo-1_bold	func/sub-PNC027_ses-a1_task-rest_run-1_echo-1_bold
+sub-PNC027/ses-a1	func/sub-PNC027_ses-a1_task-rest_echo-1_part-phase_bold	func/sub-PNC027_ses-a1_task-rest_run-1_echo-1_part-phase_bold
+sub-PNC027/ses-a1	func/sub-PNC027_ses-a1_task-rest_echo-2_bold	func/sub-PNC027_ses-a1_task-rest_run-1_echo-2_bold
+sub-PNC027/ses-a1	func/sub-PNC027_ses-a1_task-rest_echo-2_part-phase_bold	func/sub-PNC027_ses-a1_task-rest_run-1_echo-2_part-phase_bold
+sub-PNC027/ses-a1	func/sub-PNC027_ses-a1_task-rest_echo-3_bold	func/sub-PNC027_ses-a1_task-rest_run-1_echo-3_bold
+sub-PNC027/ses-a1	func/sub-PNC027_ses-a1_task-rest_echo-3_part-phase_bold	func/sub-PNC027_ses-a1_task-rest_run-1_echo-3_part-phase_bold
+sub-PNC027/ses-a1	fmap/sub-PNC027_ses-a1_acq-fmri_dir-AP_epi	fmap/sub-PNC027_ses-a1_acq-fmri_dir-AP_run-1_epi
+sub-PNC027/ses-a1	fmap/sub-PNC027_ses-a1_acq-fmri_dir-PA_epi	fmap/sub-PNC027_ses-a1_acq-fmri_dir-PA_run-1_epi
+# PNE010: rest series 11/12 (12:45) stays run-1; series 29/30 (14:01) -> run-2
+sub-PNE010/ses-a1	func/sub-PNE010_ses-a1_task-rest_echo-1_bold	func/sub-PNE010_ses-a1_task-rest_run-2_echo-1_bold
+sub-PNE010/ses-a1	func/sub-PNE010_ses-a1_task-rest_echo-1_part-phase_bold	func/sub-PNE010_ses-a1_task-rest_run-2_echo-1_part-phase_bold
+sub-PNE010/ses-a1	func/sub-PNE010_ses-a1_task-rest_echo-2_bold	func/sub-PNE010_ses-a1_task-rest_run-2_echo-2_bold
+sub-PNE010/ses-a1	func/sub-PNE010_ses-a1_task-rest_echo-2_part-phase_bold	func/sub-PNE010_ses-a1_task-rest_run-2_echo-2_part-phase_bold
+sub-PNE010/ses-a1	func/sub-PNE010_ses-a1_task-rest_echo-3_bold	func/sub-PNE010_ses-a1_task-rest_run-2_echo-3_bold
+sub-PNE010/ses-a1	func/sub-PNE010_ses-a1_task-rest_echo-3_part-phase_bold	func/sub-PNE010_ses-a1_task-rest_run-2_echo-3_part-phase_bold
+# PNE016: MP2RAGE 0.5mm series 7-10 (13:57) -> run-1; series 29-32 (15:33) stays run-2
+sub-PNE016/ses-a1	anat/sub-PNE016_ses-a1_acq-05mm_inv-1_MP2RAGE	anat/sub-PNE016_ses-a1_acq-05mm_run-1_inv-1_MP2RAGE
+sub-PNE016/ses-a1	anat/sub-PNE016_ses-a1_acq-05mm_inv-2_MP2RAGE	anat/sub-PNE016_ses-a1_acq-05mm_run-1_inv-2_MP2RAGE
+sub-PNE016/ses-a1	anat/sub-PNE016_ses-a1_acq-05mm_T1map	anat/sub-PNE016_ses-a1_acq-05mm_run-1_T1map
+sub-PNE016/ses-a1	anat/sub-PNE016_ses-a1_acq-05mm_UNIT1	anat/sub-PNE016_ses-a1_acq-05mm_run-1_UNIT1

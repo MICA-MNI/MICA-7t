@@ -20,11 +20,14 @@ It also renames phase files left with dcm2niix's "_ph" suffix
 
 Every file of a renamed stem moves with it (.nii.gz, .json, .bval, .bvec), and
 the session's scans.tsv follows. Nothing is overwritten or deleted. A family
-that fits none of these shapes is reported and left alone. Without --apply it
-only prints what it would do.
+that fits none of these shapes, such as one mixing files with and without a
+run, is reported and left alone; --renames takes a reviewed list of stems to
+rename in those (session, old stem, new stem, tab-separated). Without --apply
+it only prints what it would do.
 
     patch_pni_runs.py /data_/mica3/BIDS_PNI/rawdata            # dry run
     patch_pni_runs.py /data_/mica3/BIDS_PNI/rawdata --apply
+    patch_pni_runs.py /data_/mica3/BIDS_PNI/rawdata --renames runs_by_time.tsv
 
 JSON is edited with jq, the tool 7t2bids writes it with, so formatting and
 numbers are kept exactly as they are.
@@ -156,6 +159,30 @@ def session_renames(session: Path) -> tuple[list[tuple[Path, Path, str]], list[s
     return renames, skipped
 
 
+def listed_renames(
+    rawdata: Path, table: Path
+) -> dict[Path, list[tuple[Path, Path, str]]]:
+    """Renames read from a reviewed table: session, old stem, new stem."""
+    by_session: dict[Path, list[tuple[Path, Path, str]]] = defaultdict(list)
+    for number, line in enumerate(table.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip() or line.startswith("#"):
+            continue
+        session_name, old_stem, new_stem = line.split("\t")
+        session = rawdata / session_name
+        datatype = old_stem.split("/")[0]
+        old_base, new_base = old_stem.split("/")[1], new_stem.split("/")[1]
+        moved = [
+            (session / datatype / (old_base + extension),
+             session / datatype / (new_base + extension), "LISTED")
+            for extension in EXTENSIONS
+            if (session / datatype / (old_base + extension)).exists()
+        ]
+        if not moved:
+            raise SystemExit(f"{table}:{number}: no file {session_name}/{old_stem}.*")
+        by_session[session].extend(moved)
+    return by_session
+
+
 def update_scans(session: Path, renames: list[tuple[Path, Path, str]], apply: bool) -> int:
     scans = next(iter(session.glob("*_scans.tsv")), None)
     if scans is None:
@@ -188,14 +215,19 @@ def main(arguments: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("rawdata", type=Path)
     parser.add_argument("--apply", action="store_true")
+    parser.add_argument("--renames", type=Path, help="reviewed renames, instead of the rules")
     args = parser.parse_args(arguments)
 
+    listed = listed_renames(args.rawdata, args.renames) if args.renames else None
     total = 0
     sessions = 0
-    for session in sorted(args.rawdata.glob("sub-*/ses-*")):
+    for session in sorted(listed if listed is not None else args.rawdata.glob("sub-*/ses-*")):
         if not session.is_dir():
             continue
-        renames, skipped = session_renames(session)
+        if listed is not None:
+            renames, skipped = listed[session], []
+        else:
+            renames, skipped = session_renames(session)
         for reason in skipped:
             print(f"LEAVE {session.relative_to(args.rawdata)} {reason}", file=sys.stderr)
         if not renames:
