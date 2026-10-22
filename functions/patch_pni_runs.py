@@ -124,13 +124,22 @@ def session_renames(session: Path) -> tuple[list[tuple[Path, Path, str]], list[s
                 files[new_stem] = []
 
         families: dict[str, set[str]] = defaultdict(set)
+        without_run: set[str] = set()
         for stem in files:
+            family = family_of(stem)
+            if not family:
+                continue
             if "_run-" in stem:
-                family = family_of(stem)
-                if family:
-                    families[family].add(stem)
+                families[family].add(stem)
+            else:
+                without_run.add(family)
         planned = {old.name for old, _, _ in renames}
         for family, stems in sorted(families.items()):
+            if family in without_run:
+                # Some acquisitions of this family carry a run and some do not;
+                # which run each should have depends on when it was acquired.
+                skipped.append(f"{datatype}/{family}: files with and without run")
+                continue
             mapping, rule = new_runs(stems)
             if mapping is None:
                 skipped.append(f"{datatype}/{family}: run is not a number")
