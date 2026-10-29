@@ -454,6 +454,7 @@ micapipe_cleanup -sub "${sub}" \
 |----------|--------------------------------------------|----------|------------------------|
 | ?        | "*func-rsfmri_acq-singleE_1*"              | func     | acq-singleE_task-rest_bold |
 | 01/02/03 | "*func-rsfmri_acq-mbep2d_ME_19mm"          | func     | task-rest_bold         |
+| a1       | "*func-rsfmri_acq-mbep2d_ME_19mm_Pha"      | func     | task-rest_part-phase_bold |
 | 01       | "*func-epiencode_acq-mbep2d_ME_19mm"       | func     | task-epiencode_bold    |
 | 01       | "*func-epiretrieve_acq-mbep2d_ME_19mm"     | func     | task-epiretrieve_bold  |
 | 01       | "*func-pattersep1_acq-mbep2d_ME_19mm"      | func     | task-patternsep1_bold  |
@@ -476,6 +477,8 @@ micapipe_cleanup -sub "${sub}" \
 
 > Each functional MRI acquisition includes three echoes and a phase. The final string will contain the identifier `echo-` followed by the echo number (e.g., `task-rest_echo-1_bold`). Additionally, the string `part-phase` will be included to identify the phase (e.g., `task-rest_echo-1_part-phase_bold`).
 
+> Since September 2025 the scanner exports the phase of the resting state, the DWI and their SBRefs as a separate series named like the magnitude plus `_Pha` (e.g. `func-rsfmri_acq-mbep2d_ME_19mm_Pha`). Each has its own row, whose BIDS name carries `part-phase`; `7t2bids` places `part-phase` after `run-` and `echo-` (e.g. `task-rest_echo-1_part-phase_bold`). A new `_Pha` series name needs its own row like any other.
+
 ## Diffusion weighted Imaging
 | Session  | Acquisition                              | BIDS dir | BIDS name                  |
 |----------|------------------------------------------|----------|----------------------------|
@@ -483,6 +486,8 @@ micapipe_cleanup -sub "${sub}" \
 | 01/02/a1 | "*dwi_acq_b0-dir_PA"                     | dwi      | acq-b0_dir-PA_dwi          |
 | 01/02/a1 | "*dwi_acq_b0_PA_SBRef"                   | dwi      | acq-b0_dir-PA_sbref        |
 | 01/02/a1 | "*dwi_acq_b0_PA"                         | dwi      | acq-b0_dir-PA_dwi          |
+| a1       | "*dwi_acq_b0*_PA_SBRef_Pha"              | dwi      | acq-b0_dir-PA_part-phase_sbref |
+| a1       | "*dwi_acq_b0*_PA_Pha"                    | dwi      | acq-b0_dir-PA_part-phase_dwi |
 | ?        | "*dwi_acq_b0_PA_1p5iso_SBRef"            | dwi      | acq-b0_dir-PA_sbref        |
 | ?        | "*dwi_acq_b0_PA_1p5iso"                  | dwi      | acq-b0_dir-PA_dwi          |
 | 01/02    | "*dwi_acq_b2000_90d-dir_AP_SBRef"        | dwi      | acq-b2000_dir-AP_sbref     |
@@ -493,12 +498,16 @@ micapipe_cleanup -sub "${sub}" \
 | 01/02    | "*dwi_acq_b300_10d-dir_AP"               | dwi      | acq-b300_dir-AP_dwi        |
 | a1       | "*dwi_acq_multib_38dir_AP_acc9_SBRef"    | dwi      | acq-multib38_dir-AP_sbref  |
 | a1       | "*dwi_acq_multib_38dir_AP_acc9"          | dwi      | acq-multib38_dir-AP_dwi    |
+| a1       | "*dwi_acq_multib_38dir_AP_acc9_SBRef_Pha" | dwi     | acq-multib38_dir-AP_part-phase_sbref |
+| a1       | "*dwi_acq_multib_38dir_AP_acc9_Pha"      | dwi      | acq-multib38_dir-AP_part-phase_dwi |
 | a1       | "*dwi_acq_multib_38dir_AP_acc9_1p5iso_SBRef" | dwi   | acq-multib38_dir-AP_sbref |
 | a1       | "*dwi_acq_multib_38dir_AP_acc9_1p5iso"   | dwi      | acq-multib38_dir-AP_dwi    |
 | a1       | "*dwi_acq_multib_38dir_AP_acc9_test_SBRef" | dwi    | acq-multib38_dir-AP_sbref  |
 | a1       | "*dwi_acq_multib_38dir_AP_acc9_test"     | dwi      | acq-multib38_dir-AP_dwi    |
 | a1       | "*dwi_acq_multib_70dir_AP_acc9_SBRef"    | dwi      | acq-multib70_dir-AP_sbref  |
 | a1       | "*dwi_acq_multib_70dir_AP_acc9"          | dwi      | acq-multib70_dir-AP_dwi    |
+| a1       | "*dwi_acq_multib_70dir_AP_acc9_SBRef_Pha" | dwi     | acq-multib70_dir-AP_part-phase_sbref |
+| a1       | "*dwi_acq_multib_70dir_AP_acc9_Pha"      | dwi      | acq-multib70_dir-AP_part-phase_dwi |
 | a1       | "*dwi_acq_multib_70dir_AP_acc9_1p5iso_SBRef" | dwi   | acq-multib70_dir-AP_sbref |
 | a1       | "*dwi_acq_multib_70dir_AP_acc9_1p5iso"   | dwi      | acq-multib70_dir-AP_dwi    |
 

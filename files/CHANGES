@@ -2,6 +2,16 @@
 
 ---
 
+## Unreleased
+
+1. Convert the phase series the scanner has exported on their own since September 2025 (`*_Pha`: resting state, DWI and their SBRefs). They had no row in `sequences*.tsv` and were never converted; each now has one, with a `part-phase` BIDS name.
+
+2. Keep repeated runs apart when the phase came as its own `_Pha` series, instead of renaming run-2 as the phase.
+
+3. Merge `acq-me` T2starw magnitude (run-1) and phase (run-2) of one acquisition into one run.
+
+> PATCH database: `functions/patch_pni_runs.py` renames the run entities that `2026_bids-eval_runs.py` reports as errors in sessions already converted (magnitude/phase split into runs, a single run with a run entity, non-contiguous runs), and the `rec-unwrapped_run-?_T2starw_ph` files of sub-PNE098 ses-a1. Four sessions mixed files with and without run in one acquisition (sub-PNA004, sub-PNC027, sub-PNE010, sub-PNE016 ses-a1); `patches/2026-10_runs_by_time.tsv` numbers their runs by acquisition order and is applied with `--renames`. Sessions acquired since 2025-09-11 need to be converted again to gain their phase.
+
 ## 2026-07-09 (v.3.3)
 
 1. Fixed permissions issue on `participants_7t2bids.tsv`

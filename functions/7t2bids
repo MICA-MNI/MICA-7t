@@ -152,6 +152,51 @@ load_tsv "${gitrepo}/files/sequences.tsv" orig bids
 load_tsv "${gitrepo}/files/sequences_dwi.tsv" origDWI bidsDWI
 
 # -----------------------------------------------------------------------------------------------
+# Phase exported as its own series
+# Since September 2025 the Terra exports the phase of the resting state, the DWI
+# and their SBRefs as a series of its own, named like the magnitude plus "_Pha"
+# (before, both shared one name). Those series have their own rows in
+# sequences*.tsv, whose BIDS name carries "part-phase" (e.g. task-rest_part-phase_bold).
+# Such a row is converted under its magnitude's name with "_ph" appended, which
+# the renames below turn into part-phase in its BIDS position (after run- and
+# echo-). dcm2niix appends "_ph" itself when the ImageType says P (resting
+# state, SBRef) but not for DWI phase, so it is added where it is missing.
+separate_phase=()
+convert_phase() {
+  local pattern=$1 bids_name=${2/part-phase_/}
+  shift 2
+  local mri="${bids_name##*_}" acq="${bids_name%_*}"
+  if [[ ${acq} == ${mri} ]]; then acq=""; else acq="${acq}_"; fi
+  local Phases=($(ls -d ${pattern} 2>/dev/null))
+  if [[ ${#Phases[@]} -eq 0 ]]; then return 0; fi
+  if [[ -n ${acq} ]]; then separate_phase+=("${acq%_}"); fi
+  local i out_name tmp f base ext
+  for i in "${!Phases[@]}"; do
+    if [[ ${#Phases[@]} -gt 1 ]]; then out_name="${id}${acq}run-$((i+1))_${mri}"; else out_name="${id}${bids_name}"; fi
+    Info "Phase series ${Phases[i]} -> ${out_name} (phase)"
+    tmp=$(mktemp -d "${BIDS}/.phase.XXXXXX")
+    dcm2niix -z y -b y "$@" -o "$tmp" -f "$out_name" "${Phases[i]}"
+    for f in "$tmp"/*; do
+      [[ -e "$f" ]] || continue
+      base=$(basename "$f"); ext="${base#*.}"; base="${base%%.*}"
+      if [[ ${base} != *_ph ]]; then base="${base}_ph"; fi
+      mv "$f" "${BIDS}/${base}.${ext}"
+    done
+    rmdir "$tmp"
+  done
+}
+
+# Whether an acquisition's phase came as its own "_Pha" series. Its runs are then
+# real repeats, not a magnitude/phase pair to be merged into one name.
+phase_is_separate() {
+  local acq=$1 entry
+  for entry in "${separate_phase[@]}"; do
+    if [[ ${entry} == "${acq}" || ${entry} == *"-${acq}" ]]; then return 0; fi
+  done
+  return 1
+}
+
+# -----------------------------------------------------------------------------------------------
 # time stamp
 start_time=$(date +%s)
 
@@ -170,6 +215,8 @@ for k in "${!orig[@]}"; do
   acq="${bids_name%_*}"
   # Check if acq_string is not empty
   if [[ ${acq} == ${mri} ]]; then acq=""; else acq="${acq}_"; fi
+  # A phase series exported on its own (see convert_phase)
+  if [[ ${bids_name} == *part-phase_* ]]; then convert_phase "${orig[k]}" "${bids_name}" -ba n; continue; fi
   # Find the number of dicoms_sorted with the sequence name (quiet)
   N=$(ls -d ${orig[k]} 2>/dev/null | wc -l)
   if [ "$N" -gt 1 ]; then
@@ -243,6 +290,8 @@ replace_suffix "T2starw_ph" "part-phase_T2starw" "$BIDS/anat"
 # This only affects the acquisitions that contain the phase encoded inside the same acquisition: e.g rest and rest_Q1k
 func_rename() {
   func_acq=$1
+  # A phase with its own "_Pha" series means run-1/run-2 are two real runs, not magnitude and phase
+  if phase_is_separate "${func_acq}"; then return 0; fi
   # remove run-? from echo-?_bold if there are 6 files (ONLY 1 run)"
   # Extract unique run numbers from the filenames
   unique_runs=($(ls "$BIDS"/func/*${func_acq}_run* 2>/dev/null | grep -oP 'run-\d+' | sort -u))
@@ -295,6 +344,30 @@ if ls "$BIDS"/anat/*"_run-"*MTR* 1> /dev/null 2>&1; then
     mv "$mtr" "${mtr/_run-?/}"
   done
 fi
+
+# A magnitude and its phase exported under one series name (acq-me T2starw and
+# acq-MTR T1w, until 2025) come out as run-1 and run-2 (part-phase) of one acquisition.
+# Merge each such pair into one run; leave anything else (real repeats) alone.
+mag_phase_pairs() {
+  local dir=$1 acq=$2 suffix=$3
+  local runs=($(ls "$dir"/*"_${acq}_run-"*"_${suffix}.nii.gz" 2>/dev/null | grep -oP 'run-\d+' | sort -u -V))
+  if [[ ${#runs[@]} -eq 0 || $(( ${#runs[@]} % 2 )) -ne 0 ]]; then return 0; fi
+  local i
+  for ((i=0; i<${#runs[@]}; i+=2)); do
+    # The first run of a pair holds no phase, the second nothing but phase
+    if ls "$dir"/*"_${acq}_${runs[i]}_"*part-phase*"_${suffix}.nii.gz" 1> /dev/null 2>&1; then return 0; fi
+    if ls "$dir"/*"_${acq}_${runs[i+1]}_"*"_${suffix}.nii.gz" 2>/dev/null | grep -qv "part-phase"; then return 0; fi
+  done
+  Info "${acq} ${suffix}: run pairs are magnitude and phase of one acquisition"
+  local run_num
+  for ((i=0; i<${#runs[@]}; i+=2)); do
+    if [[ ${#runs[@]} -eq 2 ]]; then run_num=""; else run_num="run-$((i / 2 + 1))_"; fi
+    replace_suffix "_${acq}_${runs[i]}_" "_${acq}_${run_num}" "$dir"
+    replace_suffix "_${acq}_${runs[i+1]}_" "_${acq}_${run_num}" "$dir"
+  done
+}
+mag_phase_pairs "$BIDS/anat" "acq-me" "T2starw"
+mag_phase_pairs "$BIDS/anat" "acq-MTR" "T1w"
 
 # Remove bvals and bvecs from MP2RAGE
 if ls "$BIDS"/anat/*MP2RAGE.bv* 1> /dev/null 2>&1; then
@@ -364,6 +437,8 @@ for k in "${!origDWI[@]}"; do
   acq="${bids_name%_*}"
   # Check if acq_string is not empty
   if [[ ${acq} == ${mri} ]]; then acq=""; else acq="${acq}_"; fi
+  # A phase series exported on its own (see convert_phase)
+  if [[ ${bids_name} == *part-phase_* ]]; then convert_phase "${origDWI[k]}" "${bids_name}"; continue; fi
   # Find the number of dicoms_sorted with the sequence name (quiet)
   N=$(ls -d ${origDWI[k]} 2>/dev/null | wc -l)
   if [ "$N" -gt 1 ]; then
@@ -384,11 +459,14 @@ Info "Moving files to their correct directory location"
 if ls "$BIDS"/*b0* 1> /dev/null 2>&1; then mv "$BIDS"/*b0* "$BIDS"/dwi; fi
 if ls "$BIDS"/*sbref* 1> /dev/null 2>&1; then mv "$BIDS"/*sbref* "$BIDS"/dwi; fi
 if ls "$BIDS"/*dwi.* 1> /dev/null 2>&1; then mv "$BIDS"/*dwi.* "$BIDS"/dwi; fi
+if ls "$BIDS"/*dwi_ph.* 1> /dev/null 2>&1; then mv "$BIDS"/*dwi_ph.* "$BIDS"/dwi; fi
 if ls "$BIDS"/*epi* 1> /dev/null 2>&1; then mv "$BIDS"/*epi* "$BIDS"/fmap; fi
 if ls "$BIDS"/anat/*ROI* 1> /dev/null 2>&1; then rm "$BIDS"/anat/*ROI*; fi
 
 dwi_rename() {
     local dwi_acq=$1
+    # A phase with its own "_Pha" series means run-1/run-2 are two real runs, not magnitude and phase
+    if phase_is_separate "${dwi_acq}"; then return 0; fi
     # If there is two files, remove the run-? and and the second file will be the phase
     dwis=($(ls ${BIDS}/dwi/*${dwi_acq}*_dwi.nii.gz))
     Info "DWIS ${dwi_acq}: ${#dwis[@]}"
