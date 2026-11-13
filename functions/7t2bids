@@ -27,7 +27,7 @@ raul.rodriguezcruces@mcgill.ca
 "
 }
 
-version="v3.3"
+version="v3.4"
 
 # File permissions: Files will be created with rw-rw-r-- & Directories will be created with rwxrwxr-x 
 umask 002
