@@ -343,10 +343,12 @@ def process_cbig_xls(cbig_xls_path, out_dir, pni_dir=None, sessions=None):
 def create_sessions(out_dir):
     print(f"-------------------------------------------")
     print("Creating sessions files...")
-    for ses_dir in glob.glob(os.path.join(out_dir, "sub-*", "ses-*")):
-        sub, ses = ses_dir.split(os.sep)[-2:]
-        sessions_tsv = os.path.join(out_dir, sub, f"{sub}_sessions.tsv")
-        pd.DataFrame({"session_id": [ses]}).to_csv(sessions_tsv, sep="\t", index=False)
+    for sub_dir in glob.glob(os.path.join(out_dir, "sub-*")):
+        sub = os.path.basename(sub_dir)
+        sessions = glob.glob(os.path.join(sub_dir, "ses-*"))
+        sessions = [os.path.basename(s) for s in sessions]
+
+        pd.DataFrame({"session_id": sorted(sessions)}).to_csv(os.path.join(sub_dir, f"{sub}_sessions.tsv"), sep="\t", index=False)
 
 def create_scans(out_dir):
     print(f"-------------------------------------------")

@@ -557,12 +557,10 @@ echo -e "sub-${Subj}\tSiemmensTerra7T\t${group}" >> "$participants_tsv"
 # -----------------------------------------------------------------------------------------------
 # create a sessions tsv
 sessions_tsv="${BIDS_DIR}/sub-${Subj}/sub-${Subj}_sessions.tsv"
-if [ ! -f "$sessions_tsv" ]; then echo -e "session_id" > "$sessions_tsv"; fi
-# Remove existing entry if it exists
-grep -v -P "^${SES}" "$sessions_tsv" > "${sessions_tsv}.tmp" && mv "${sessions_tsv}.tmp" "$sessions_tsv"
-# Add information about subject
-echo -e "${SES}" >> "$sessions_tsv"
-
+echo -e "session_id" > "$sessions_tsv"
+echo "session_id" > "$sessions_tsv"
+find "${BIDS_DIR}/sub-${Subj}" -maxdepth 1 -type d -name "ses-*" -printf '%f\n' | sort >> "$sessions_tsv"
+  
 # -----------------------------------------------------------------------------------------------
 # Create a scans tsv
 tsv_scans="${BIDS}/${id}scans.tsv"
