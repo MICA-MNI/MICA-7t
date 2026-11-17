@@ -1,20 +1,28 @@
 {
     "participant_id": {
-      "LongName": "Participant identification label",
-      "Description": "Assigned identification number for a subject. With 'sub-' as prefix"
-    },
-    "site": {
-      "LongName": "Site and scanner information",
-      "Description": "Specify name of site and scanner, e.g. Montreal_SiemmensTerra7T"
-    },
+    "LongName": "Participant identification label",
+    "Description": "Unique identification number assigned to a participant within the repository. The identifier MUST begin with the 'sub-' prefix, per BIDS.",
+    "Format": "string",
+    "Nullable": false
+  },
+    "scanner": {
+    "LongName": "Scanner information",
+    "Description": "Name or identifier of the scanner used for data acquisition, e.g., 'SiemensTerra7T', 'SiemensPrisma3T'.",
+    "Format": "string",
+    "Nullable": true
+  },
     "group": {
-      "LongName": "Group",
-      "Levels": {
-        "Healthy": "PNC",
-        "Epilepsy": "PNE",
-        "Autism": "PNA",
-        "Family": "PNF",
-        "Pilot": "Pilot"
-      }
+    "LongName": "Participant group",
+    "Description": "Broad classification of the participant.",
+    "Format": "string",
+    "Nullable": true,
+    "Levels": {
+      "Healthy": "Healthy control, HC or PNC",
+      "Patient": "Patient",
+      "Epilepsy": "PNE",
+      "Autism": "PNA",
+      "Family": "PNF",
+      "Pilot": "Pilot"
     }
+  } 
 }
