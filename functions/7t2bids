@@ -27,7 +27,7 @@ raul.rodriguezcruces@mcgill.ca
 "
 }
 
-version="v3.3"
+version="v3.5"
 
 # File permissions: Files will be created with rw-rw-r-- & Directories will be created with rwxrwxr-x 
 umask 002
@@ -539,7 +539,7 @@ if [ ! -f "$tsv_file" ]; then echo -e "sub\tses\tdate\tN.anat\tN.dwi\tN.func\tN.
 participants_tsv="$BIDS_DIR"/participants.tsv
 
 # Check if file exist
-if [ ! -f "$participants_tsv" ]; then echo -e "participant_id\tsite\tgroup" > "$participants_tsv"; fi
+if [ ! -f "$participants_tsv" ]; then echo -e "participant_id\tscanner\tgroup" > "$participants_tsv"; fi
 
 # Remove existing entry if it exists
 grep -v -P "^sub-${Subj}" "$participants_tsv" > "${participants_tsv}.tmp" && mv "${participants_tsv}.tmp" "$participants_tsv"
@@ -552,7 +552,7 @@ case "$Subj" in
     *PNF*)   group="Family" ;;
     *Pilot*) group="Pilot" ;;
 esac
-echo -e "sub-${Subj}\tMontreal_SiemmensTerra7T\t${group}" >> "$participants_tsv"
+echo -e "sub-${Subj}\tSiemmensTerra7T\t${group}" >> "$participants_tsv"
 
 # -----------------------------------------------------------------------------------------------
 # create a sessions tsv
@@ -610,8 +610,8 @@ jq --arg deno "$deno_version" --arg bids "$bids_validator_version" --arg version
 '.denoVersion=$deno | .BIDSValidator=$bids | .GeneratedBy[0].Version=$version | .GeneratedBy[0].Container.Tag=("micalab/7t2bids:"+$version)' \
 "$dataset_description" > "${dataset_description}.tmp" && mv "${dataset_description}.tmp" "$dataset_description"
 
-# Create README
-echo -e "The Presicion NeuroImaging (PNI) dataset was provided by the Multimodal Imaging and Connectome Analysis Lab, Montreal Neurological Institute and Hospital, The Neuro.\n\nIf you reference this dataset in your publications, please acknowledge its authors." > "$BIDS_DIR"/README
+# Copy README
+if [ ! -f "$BIDS_DIR"/README ]; then cp -v "$gitrepo"/files/README.md "$BIDS_DIR"/README; fi
 
 # -----------------------------------------------------------------------------------------------
 # Anonimize json keys
