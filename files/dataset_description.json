@@ -29,10 +29,10 @@
     "GeneratedBy": [
   {
     "Name": "7t2bids",
-    "Version": "v3.3",
+    "Version": "v3.5",
     "Container": {
       "Type": "Docker",
-      "Tag": "micalab/7t2bids:v3.3"
+      "Tag": "micalab/7t2bids:v3.5"
     },
     "Description": "Defacing applied to structural images for data sharing"
   }
